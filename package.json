@@ -1,0 +1,26 @@
+{
+  "name": "hammer-cli",
+  "version": "0.0.0",
+  "description": "A command line interface for hammer-io.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackcmeyer/hammer-cli.git"
+  },
+  "authors": [
+    "Jack Meyer <jackcmeyer@gmail.com> (www.jackcmeyer.com)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jackcmeyer/hammer-cli/issues"
+  },
+
+  "bin": {
+    "hammer-cli": "src/index.js"
+  },
+  "homepage": "https://github.com/jackcmeyer/hammer-cli#readme"
+}
