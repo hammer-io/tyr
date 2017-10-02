@@ -18,9 +18,13 @@
   "bugs": {
     "url": "https://github.com/jackcmeyer/hammer-cli/issues"
   },
-
   "bin": {
     "hammer-cli": "src/index.js"
   },
-  "homepage": "https://github.com/jackcmeyer/hammer-cli#readme"
+  "homepage": "https://github.com/jackcmeyer/hammer-cli#readme",
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb-base": "^12.0.1",
+    "eslint-plugin-import": "^2.7.0"
+  }
 }

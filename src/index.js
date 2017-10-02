@@ -1,2 +1,2 @@
 #! /usr/bin/env node
-console.log("Hello, Hammer!");
+console.log("Hello, Hammer!")
