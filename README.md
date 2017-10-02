@@ -1,4 +1,5 @@
 # hammer-cli
+[![Build Status](https://travis-ci.org/hammer-io/hammer-cli.svg?branch=master)](https://travis-ci.org/hammer-io/hammer-cli)
 
 # Installation
 Coming soon.
