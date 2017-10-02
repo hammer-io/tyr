@@ -38,3 +38,6 @@ jspm_packages
 
 # JetBrains dependencies
 .idea
+
+# Transpiled files
+dist
