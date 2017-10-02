@@ -1,4 +1,10 @@
 #! /usr/bin/env node
-console.log('Hello, Hammer!')
 
-// main logic of cli should go here
+import { Cli } from "./cli";
+
+function main() {
+    const cli = new Cli();
+    cli.run();
+}
+
+main();

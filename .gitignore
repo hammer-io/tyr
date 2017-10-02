@@ -38,6 +38,7 @@ jspm_packages
 
 # JetBrains dependencies
 .idea
-
+*.iml*.iml*.iml*.iml*.iml*.iml*.iml*.iml
+*.iml
 # Transpiled files
 dist
