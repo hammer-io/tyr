@@ -9,22 +9,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jackcmeyer/hammer-cli.git"
+    "url": "https://github.com/hammer-io/hammer-cli.git"
   },
   "authors": [
-    "Jack Meyer <jackcmeyer@gmail.com> (www.jackcmeyer.com)"
+    "Jack Meyer <jackcmeyer@gmail.com> (www.jackcmeyer.com)",
+    "Nischay Venkatram <nischay.v@gmail.com> (www.nischayv.com)"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jackcmeyer/hammer-cli/issues"
+    "url": "https://github.com/hammer-io/hammer-cli/issues"
   },
   "bin": {
     "hammer-cli": "src/index.js"
   },
-  "homepage": "https://github.com/jackcmeyer/hammer-cli#readme",
+  "homepage": "https://github.com/hammer-io/hammer-cli#readme",
   "devDependencies": {
-    "eslint": "^4.8.0",
-    "eslint-config-airbnb-base": "^12.0.1",
-    "eslint-plugin-import": "^2.7.0"
+    "eslint": "4.8.0",
+    "eslint-config-airbnb-base": "12.0.1",
+    "eslint-plugin-import": "2.7.0"
   }
 }
