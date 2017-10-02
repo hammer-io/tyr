@@ -6,9 +6,16 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
+import fs from 'fs';
 
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
+
+function writeFiles(config) {
+  if (!fs.existsSync(config.projectName)) {
+    fs.mkdirSync(config.projectName);
+  }
+}
 
 export default function run() {
   console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
@@ -26,6 +33,10 @@ export default function run() {
 
       if (!isItValid) {
         return 'Invalid Project Name';
+      }
+
+      if (fs.existsSync(value)) {
+        return 'Project with this name already exists in this directory';
       }
 
       return true;
@@ -68,6 +79,6 @@ export default function run() {
   ];
 
   inquirer.prompt(questions).then((answers) => {
-    console.log(answers);
+    writeFiles(answers);
   });
 }
