@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src/*.js"
+    "lint": "eslint src/*.js",
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -25,6 +27,8 @@
   },
   "homepage": "https://github.com/hammer-io/hammer-cli#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
     "eslint": "4.8.0",
     "eslint-config-airbnb-base": "12.0.1",
     "eslint-plugin-import": "2.7.0"
