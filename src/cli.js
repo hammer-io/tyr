@@ -2,48 +2,72 @@
  * The Cli class.
  */
 
-var chalk = require('chalk');
-var figlet = require('figlet');
-var inquirer = require('inquirer');
+import chalk from 'chalk';
+import figlet from 'figlet';
+import inquirer from 'inquirer';
+import isValid from 'is-valid-path';
 
-export class Cli {
+import ciChoices from '../ci-choices.json';
+import containerizationChoices from '../containerization-choices.json';
 
-    constructor() {
+export default function run() {
+  console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
 
+  const questions = [{
+    name: 'projectName',
+    type: 'input',
+    message: 'Project Name:',
+    validate: (value) => {
+      const isItValid = isValid(value);
+
+      if (typeof value === 'undefined' || value === '') {
+        return 'Invalid Project Name';
+      }
+
+      if (!isItValid) {
+        return 'Invalid Project Name';
+      }
+
+      return true;
     }
+  }, {
+    name: 'description',
+    type: 'input',
+    message: 'Description:',
+  }, {
+    name: 'version',
+    type: 'input',
+    message: 'Version:',
+    default: '0.0.0',
+    validate: (value) => {
+      if (/^(\d+\.)?(\d+\.)?(\*|\d+)/.test(value)) {
+        return true;
+      }
 
-    run() {
-        console.log(chalk.yellow(figlet.textSync("hammer-io", {horizontalLayout: 'full'})));
-
-
-        var questions = [{
-                name: 'projectName',
-                type: 'input',
-                message: 'Project Name:',
-                validate: function(value) {
-                    return true;
-                }
-            }, {
-                name: 'description',
-                type: 'input',
-                message: 'Description:',
-                validate: function(value) {
-                    return true;
-                }
-            }, {
-                name: 'version',
-                type: 'input',
-                message: 'Version:',
-                validate: function(value) {
-                    return true;
-                }
-            }
-        ];
-
-        inquirer.prompt(questions).then(function(answers) {
-           console.log(answers);
-        });
-
-
+      return 'Invalid Version Number';
     }
+  }, {
+    name: 'author',
+    type: 'input',
+    message: 'Author:'
+  }, {
+    name: 'license',
+    type: 'input',
+    message: 'License:'
+  }, {
+    name: 'ci',
+    type: 'list',
+    message: 'Choose your CI tool:',
+    choices: ciChoices.choices
+  }, {
+    name: 'container',
+    type: 'list',
+    message: 'Choose your Containerization Tool:',
+    choices: containerizationChoices.choices
+  }
+  ];
+
+  inquirer.prompt(questions).then((answers) => {
+    console.log(answers);
+  });
 }

@@ -1,10 +1,9 @@
 #! /usr/bin/env node
 
-import { Cli } from "./cli";
+import run from './cli';
 
 function main() {
-    const cli = new Cli();
-    cli.run();
+  run();
 }
 
 main();
