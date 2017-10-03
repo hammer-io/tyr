@@ -13,7 +13,9 @@ Coming soon.
 
 ## Usage
 `npm start`: starts the main command line interface.
+
 `npm test`: runs the test suite
+
 `npm run lint`: runs the linter
 
 ## Contributing
