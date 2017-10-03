@@ -9,9 +9,9 @@ import isValid from 'is-valid-path';
 import fs from 'fs';
 import createPackageJson from './create-package-json';
 import createIndexFile from './create-index-file';
-
-
+import initTravisCI from './travis-ci/travis-ci-create';
 import initDocker from './docker/docker-create';
+
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
 
@@ -19,12 +19,22 @@ import containerizationChoices from '../containerization-choices.json';
 function writeFiles(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
+<<<<<<< HEAD
     fs.mkdirSync(`${config.projectName}/src`);
     createPackageJson(config);
     createIndexFile(config.projectName);
   }
   if (config.container === 'Docker') {
     initDocker(config);
+=======
+    createPackageJson(config);
+  }
+  if (config.container === 'Docker') {
+    initDocker(config);
+  }
+  if (config.ci === 'TravisCI') {
+    initTravisCI(config);
+>>>>>>> master
   }
 }
 
