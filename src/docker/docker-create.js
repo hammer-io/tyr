@@ -1,36 +1,40 @@
 import fs from 'fs';
 
-function copyFile(source, target, cb) {
-  let cbCalled = false;
+const dockerFileContents = `# Use the official Node runtime as a parent image
+# More info at https://hub.docker.com/_/node/
+FROM node:alpine
+    
+# Set the working directory
+WORKDIR /usr/src/app
 
-  function done(err) {
-    if (!cbCalled) {
-      cb(err);
-      cbCalled = true;
-    }
-  }
+# Install app dependencies
+COPY package.json package-lock.json ./
+RUN npm install
 
-  const rd = fs.createReadStream(source);
-  rd.on('error', (err) => {
-    done(err);
-  });
-  const wr = fs.createWriteStream(target);
-  wr.on('error', (err) => {
-    done(err);
-  });
-  wr.on('close', () => {
-    done();
-  });
-  rd.pipe(wr);
-}
+# Bundle app source
+COPY . .
+
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
+
+# Run "npm start" when the container launches
+CMD ["npm", "start"]
+`;
 
 export default function initDocker(config) {
   console.log('Creating Dockerfile and .dockerignore...');
 
-  copyFile('./assets/docker/Dockerfile', `${config.projectName}/Dockerfile`, (err) => {
-    console.log(`ERROR: Failed to create Dockerfile\n    ${err}`);
+  fs.writeFile(`${config.projectName}/Dockerfile`, dockerFileContents, (err) => {
+    if (err) {
+      console.log(`ERROR: Failed to write Dockerfile\n${err.toString()}`);
+    }
   });
-  copyFile('./assets/docker/.dockerignore', `${config.projectName}/.dockerignore`, (err) => {
-    console.log(`ERROR: Failed to create .dockerignore\n    ${err}`);
+
+  const dockerIgnoreContents = 'node_modules\nnpm-debug.log\n';
+
+  fs.writeFile(`${config.projectName}/.dockerignore`, dockerIgnoreContents, (err) => {
+    if (err) {
+      console.log(`ERROR: Failed to write .dockerignore\n${err.toString()}`);
+    }
   });
 }
