@@ -15,6 +15,7 @@
     "url": "https://github.com/hammer-io/hammer-cli.git"
   },
   "authors": [
+    "Erica Clark <clarkerican@gmail.com",
     "Jack Meyer <jackcmeyer@gmail.com> (www.jackcmeyer.com)",
     "Nischay Venkatram <nischay.v@gmail.com> (www.nischayv.com)"
   ],
@@ -30,7 +31,8 @@
     "chalk": "^1.1.3",
     "figlet": "^1.2.0",
     "inquirer": "^1.2.3",
-    "is-valid-path": "^0.1.1"
+    "is-valid-path": "^0.1.1",
+    "package-writer": "^0.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -7,13 +7,16 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
+import createPackageJson from './createPackageJson';
 
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
 
+
 function writeFiles(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
+    createPackageJson(config);
   }
 }
 
