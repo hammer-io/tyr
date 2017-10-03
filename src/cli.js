@@ -8,7 +8,7 @@ import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
 import createPackageJson from './create-package-json';
-
+import initTravisCI from './travis-ci/travis-ci-create';
 import initDocker from './docker/docker-create';
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
@@ -21,6 +21,9 @@ function writeFiles(config) {
   }
   if (config.container === 'Docker') {
     initDocker(config);
+  }
+  if (config.ci === 'TravisCI') {
+    initTravisCI(config);
   }
 }
 
