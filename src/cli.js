@@ -19,22 +19,15 @@ import containerizationChoices from '../containerization-choices.json';
 function writeFiles(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
-<<<<<<< HEAD
     fs.mkdirSync(`${config.projectName}/src`);
     createPackageJson(config);
     createIndexFile(config.projectName);
   }
   if (config.container === 'Docker') {
     initDocker(config);
-=======
-    createPackageJson(config);
-  }
-  if (config.container === 'Docker') {
-    initDocker(config);
   }
   if (config.ci === 'TravisCI') {
     initTravisCI(config);
->>>>>>> master
   }
 }
 
