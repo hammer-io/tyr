@@ -15,12 +15,11 @@ export default function createPackageJson(config) {
   packageJson.license = config.license;
 
   const json = JSON.stringify(packageJson, null, '\t');
-  console.log(json);
+
   fs.writeFile(`${config.projectName}/package.json`, json, 'utf8', (err) => {
     if (err) {
       console.log(`An error occurred while writing to ${config.projectName}/package.json`);
     }
-    console.log('package.json created!');
   });
 }
 
