@@ -7,7 +7,7 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import createPackageJson from './createPackageJson';
+import createPackageJson from './create-package-json';
 
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
