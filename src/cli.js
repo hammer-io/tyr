@@ -51,6 +51,9 @@ export default function run() {
     message: 'Version:',
     default: '0.0.0',
     validate: (value) => {
+
+      // tests for valid version number.
+      // any combination of (number) (.number)* will work
       if (/^(\d+\.)?(\d+\.)?(\*|\d+)/.test(value)) {
         return true;
       }
