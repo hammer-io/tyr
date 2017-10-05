@@ -1,4 +1,5 @@
 import fs from 'fs';
+import constants from '../constants/constants';
 
 const travisCIFileContents = '' +
     'language: node_js\n' +
@@ -12,9 +13,9 @@ const travisCIFileContents = '' +
 export default function initTravisCI(config) {
   console.log('Creating .travis.yml...');
 
-  fs.writeFile(`${config.projectName}/.travis.yml`, travisCIFileContents, (err) => {
+  fs.writeFile(`${config.projectName}/${constants.travisCI.fileName}`, travisCIFileContents, (err) => {
     if (err) {
-      console.log(`ERROR: Failed to write .travis.yml file\n${err.toString()}`);
+      console.log(`${constants.travisCI.error.fileWrite}\n${err.toString()}`);
     }
   });
 }

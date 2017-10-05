@@ -7,13 +7,14 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import createPackageJson from './create-package-json';
-import createIndexFile from './create-index-file';
+import createPackageJson from './package-json/create-package-json';
+import createIndexFile from './index-js/create-index-file';
 import initTravisCI from './travis-ci/travis-ci-create';
 import initDocker from './docker/docker-create';
 
-import ciChoices from '../ci-choices.json';
-import containerizationChoices from '../containerization-choices.json';
+import ciChoices from './constants/ci-choices';
+import containerizationChoices from './constants/containerization-choices';
+import constants from './constants/constants';
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -27,10 +28,10 @@ function initProject(config) {
     createPackageJson(config);
     createIndexFile(config.projectName);
 
-    if (config.container === 'Docker') {
+    if (config.container === constants.docker.name) {
       initDocker(config);
     }
-    if (config.ci === 'TravisCI') {
+    if (config.ci === constants.travisCI.name) {
       initTravisCI(config);
     }
   }
@@ -41,34 +42,34 @@ function initProject(config) {
  */
 function getConfigs() {
   const questions = [{
-    name: 'projectName',
+    name: constants.config.projectName.name,
     type: 'input',
-    message: 'Project Name:',
+    message: constants.config.projectName.message,
     validate: (value) => {
       const isItValid = isValid(value);
 
       if (typeof value === 'undefined' || value === '') {
-        return 'Invalid Project Name';
+        return constants.config.projectName.error.invalidMessage;
       }
 
       if (!isItValid) {
-        return 'Invalid Project Name';
+        return constants.config.projectName.error.invalidMessage;
       }
 
       if (fs.existsSync(value)) {
-        return 'Project with this name already exists in this directory';
+        return constants.config.projectName.error.duplicateMessage;
       }
 
       return true;
     }
   }, {
-    name: 'description',
+    name: constants.config.description.name,
     type: 'input',
-    message: 'Description:',
+    message: constants.config.description.message,
   }, {
-    name: 'version',
+    name: constants.config.version.name,
     type: 'input',
-    message: 'Version:',
+    message: constants.config.version.message,
     default: '0.0.0',
     validate: (value) => {
       // tests for valid version number.
@@ -77,25 +78,25 @@ function getConfigs() {
         return true;
       }
 
-      return 'Invalid Version Number';
+      return constants.config.version.error.invalidMessage;
     }
   }, {
-    name: 'author',
+    name: constants.config.author.name,
     type: 'input',
-    message: 'Author:'
+    message: constants.config.author.message
   }, {
-    name: 'license',
+    name: constants.config.license.name,
     type: 'input',
-    message: 'License:'
+    message: constants.config.license.message
   }, {
-    name: 'ci',
+    name: constants.config.ci.name,
     type: 'list',
-    message: 'Choose your CI tool:',
+    message: constants.config.ci.message,
     choices: ciChoices.choices
   }, {
-    name: 'container',
+    name: constants.config.container.name,
     type: 'list',
-    message: 'Choose your Containerization Tool:',
+    message: constants.config.container.message,
     choices: containerizationChoices.choices
   }];
 
@@ -107,13 +108,13 @@ function getConfigs() {
  */
 function getGithubCredentials() {
   const questions = [{
-    name: 'githubUsername',
+    name: constants.github.username.name,
     type: 'input',
-    message: 'GitHub Username:',
+    message: constants.github.username.message,
   }, {
-    name: 'githubPassword',
+    name: constants.github.password.name,
     type: 'password',
-    message: 'GitHub Password'
+    message: constants.github.password.message
   }];
 
   inquirer.prompt(questions).then((answers) => {
@@ -127,7 +128,7 @@ function getGithubCredentials() {
  * The main execution function for hammer-cli.
  */
 export default function run() {
-  console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
+  console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
 
 
   getConfigs()

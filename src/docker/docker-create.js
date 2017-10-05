@@ -1,5 +1,7 @@
 import fs from 'fs';
 
+import constants from '../constants/constants'
+
 const dockerFileContents = `# Use the official Node runtime as a parent image
 # More info at https://hub.docker.com/_/node/
 FROM node:alpine
@@ -24,17 +26,17 @@ CMD ["npm", "start"]
 export default function initDocker(config) {
   console.log('Creating Dockerfile and .dockerignore...');
 
-  fs.writeFile(`${config.projectName}/Dockerfile`, dockerFileContents, (err) => {
+  fs.writeFile(`${config.projectName}/${constants.docker.dockerFile.fileName}`, dockerFileContents, (err) => {
     if (err) {
-      console.log(`ERROR: Failed to write Dockerfile\n${err.toString()}`);
+      console.log(`${constants.docker.dockerFile.error.fileWrite}\n${err.toString()}`);
     }
   });
 
   const dockerIgnoreContents = 'node_modules\nnpm-debug.log\n';
 
-  fs.writeFile(`${config.projectName}/.dockerignore`, dockerIgnoreContents, (err) => {
+  fs.writeFile(`${config.projectName}/${constants.docker.dockerIgnore.fileName}`, dockerIgnoreContents, (err) => {
     if (err) {
-      console.log(`ERROR: Failed to write .dockerignore\n${err.toString()}`);
+      console.log(`${constants.docker.dockerIgnore.error.fileWrite}\n${err.toString()}`);
     }
   });
 }

@@ -1,6 +1,6 @@
 
 import fs from 'fs';
-import packageTemplate from '../templates/template-package.json';
+import packageTemplate from '../../templates/template-package.json';
 
 
 export default function createPackageJson(config) {
