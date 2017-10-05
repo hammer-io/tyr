@@ -12,7 +12,7 @@ export default {
     dockerIgnore: {
       fileName: '.dockerignore',
       error:{
-        fileWrite: 'Failed to write .dockerignore'
+        fileWrite: 'Failed to write .dockerignore!'
       }
     }
   },
@@ -21,7 +21,7 @@ export default {
     name: 'TravisCI',
     fileName: '.travis.yml',
     error: {
-      fileWrite: 'Failed to write .travis.yml'
+      fileWrite: 'Failed to write .travis.yml!'
     }
   },
 
