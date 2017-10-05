@@ -15,25 +15,31 @@ import initDocker from './docker/docker-create';
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
 
-
-function writeFiles(config) {
+/**
+ * Initializes the files and accounts needed to use or application
+ * @param config the config object form the main inquirer prompt
+ */
+function initProject(config) {
+  // if the project doesn't already exist, intialize the files and accounts
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
     fs.mkdirSync(`${config.projectName}/src`);
     createPackageJson(config);
     createIndexFile(config.projectName);
-  }
-  if (config.container === 'Docker') {
-    initDocker(config);
-  }
-  if (config.ci === 'TravisCI') {
-    initTravisCI(config);
+
+    if (config.container === 'Docker') {
+      initDocker(config);
+    }
+    if (config.ci === 'TravisCI') {
+      initTravisCI(config);
+    }
   }
 }
 
-export default function run() {
-  console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
-
+/**
+ * Gets the basic configuration settings for the user
+ */
+function getConfigs() {
   const questions = [{
     name: 'projectName',
     type: 'input',
@@ -91,10 +97,44 @@ export default function run() {
     type: 'list',
     message: 'Choose your Containerization Tool:',
     choices: containerizationChoices.choices
-  }
-  ];
+  }];
+
+  return inquirer.prompt(questions);
+}
+
+/**
+ * Gets the user's github credentials, logs them in, then safely stores their credentials somewhere.
+ */
+function getGithubCredentials() {
+  const questions = [{
+    name: 'githubUsername',
+    type: 'input',
+    message: 'GitHub Username:',
+  }, {
+    name: 'githubPassword',
+    type: 'password',
+    message: 'GitHub Password'
+  }];
 
   inquirer.prompt(questions).then((answers) => {
-    writeFiles(answers);
+    // TODO log the user into github and safely store their credentials/tokens somewhere
+    console.log(answers);
   });
+}
+
+
+/**
+ * The main execution function for hammer-cli.
+ */
+export default function run() {
+  console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
+
+
+  getConfigs()
+    .then((answers) => {
+      initProject(answers)
+    })
+    .then(() => {
+      getGithubCredentials();
+    });
 }
