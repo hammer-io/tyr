@@ -40,7 +40,7 @@ function initProject(config) {
 /**
  * Gets the basic configuration settings for the user
  */
-function getConfigs() {
+function promptConfigs() {
   const questions = [{
     name: constants.config.projectName.name,
     type: 'input',
@@ -106,7 +106,7 @@ function getConfigs() {
 /**
  * Gets the user's github credentials, logs them in, then safely stores their credentials somewhere.
  */
-function getGithubCredentials() {
+function promptGithubCredentials() {
   const questions = [{
     name: constants.github.username.name,
     type: 'input',
@@ -117,25 +117,20 @@ function getGithubCredentials() {
     message: constants.github.password.message
   }];
 
-  inquirer.prompt(questions).then((answers) => {
-    // TODO log the user into github and safely store their credentials/tokens somewhere
-    console.log(answers);
-  });
+  return inquirer.prompt(questions);
 }
 
 
 /**
  * The main execution function for hammer-cli.
  */
-export default function run() {
+export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
 
+  const configs = await promptConfigs();
+  initProject(configs);
 
-  getConfigs()
-    .then((answers) => {
-      initProject(answers)
-    })
-    .then(() => {
-      getGithubCredentials();
-    });
+  const githubCredentials = await promptGithubCredentials();
+  console.log(githubCredentials);
+
 }
