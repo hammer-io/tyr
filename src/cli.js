@@ -132,5 +132,4 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
   console.log(githubCredentials);
-
 }
