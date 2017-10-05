@@ -1,4 +1,4 @@
-{
-  "none": "<None>",
-  "choices": ["<None>", "Docker"]
+export default {
+  none: "<None>",
+  choices: ["<None>", "Docker"]
 }
