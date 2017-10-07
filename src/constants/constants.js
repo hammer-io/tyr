@@ -11,7 +11,7 @@ export default {
 
     dockerIgnore: {
       fileName: '.dockerignore',
-      error:{
+      error: {
         fileWrite: 'Failed to write .dockerignore!'
       }
     }
@@ -20,6 +20,14 @@ export default {
   travisCI: {
     name: 'TravisCI',
     fileName: '.travis.yml',
+    fileConents: '' +
+    'language: node_js\n' +
+    'node_js:\n' +
+    '  - \'5\'\n' +
+    '\n' +
+    'notifications:\n' +
+    '  email:\n' +
+    '    on_success: never',
     error: {
       fileWrite: 'Failed to write .travis.yml!'
     }
