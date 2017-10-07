@@ -34,9 +34,7 @@ export function initProject(config) {
     if (config.ci === constants.travisCI.name) {
       initTravisCI(config);
     }
-  }
-
-  else {
+  } else {
     return constants.config.projectName.error.duplicateMessage;
   }
 }
