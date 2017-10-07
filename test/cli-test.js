@@ -34,8 +34,6 @@ describe('Init Project', () => {
 describe('Init Project', () => {
   describe('#initProject()', () => {
     it('should create a src directory underneath the project directory', () => {
-
-
       cli.initProject(configs);
       assert.equal(true, fs.existsSync(configs.projectName + '/src'));
 
@@ -58,3 +56,33 @@ describe('Init Project', () => {
     });
   });
 });
+
+describe('Init Project', () => {
+  describe('#initTravisCI()', () => {
+    it('should create a .travis.yml file', () => {
+
+      cli.initProject(configs);
+      assert.equal(true, fs.existsSync(`${configs.projectName}/.travis.yml`));
+
+      // clean up directory that was created
+      fsExtra.removeSync(configs.projectName);
+    });
+  });
+});
+
+describe('Init Project', () => {
+  describe('#initTravisCI()', () => {
+    it('should create a Dockerfile and .dockerignore', () => {
+
+      cli.initProject(configs);
+      assert.equal(true, fs.existsSync(`${configs.projectName}/Dockerfile`));
+      assert.equal(true, fs.existsSync(`${configs.projectName}/.dockerignore`));
+
+
+      // clean up directory that was created
+      fsExtra.removeSync(configs.projectName);
+    });
+  });
+});
+
+
