@@ -48,7 +48,7 @@ function promptConfigs() {
     validate: (value) => {
       const isItValid = isValid(value);
 
-      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') != -1) {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
         return constants.config.projectName.error.invalidMessage;
       }
 
@@ -89,7 +89,7 @@ function promptConfigs() {
     type: 'input',
     message: constants.config.license.message,
     validate: (value) => {
-      if (typeof value === 'undefined' || value === '' ) {
+      if (typeof value === 'undefined' || value === '') {
         return constants.config.license.error.invalidMessage;
       }
 
