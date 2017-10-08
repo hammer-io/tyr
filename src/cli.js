@@ -48,7 +48,7 @@ function promptConfigs() {
     validate: (value) => {
       const isItValid = isValid(value);
 
-      if (typeof value === 'undefined' || value === '') {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') != -1) {
         return constants.config.projectName.error.invalidMessage;
       }
 
