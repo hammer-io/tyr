@@ -7,7 +7,7 @@ export default function createIndexFile(folderName) {
     if (err) {
       console.log(`${constants.indexJS.error.fileRead}\n${err.toString()}`);
     } else {
-      fs.writeFile(`${folderName}/src/index.js`, contents, (err) => {
+      fs.writeFileSync(`${folderName}/src/index.js`, contents, (err) => {
         if (err) {
           console.log(`${constants.indexJS.error.fileWrite}\n${err.toString()}`);
         }

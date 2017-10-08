@@ -26,7 +26,7 @@ CMD ["npm", "start"]
 export default function initDocker(config) {
   console.log('Creating Dockerfile and .dockerignore...');
 
-  fs.writeFile(`${config.projectName}/${constants.docker.dockerFile.fileName}`, dockerFileContents, (err) => {
+  fs.writeFileSync(`${config.projectName}/${constants.docker.dockerFile.fileName}`, dockerFileContents, (err) => {
     if (err) {
       console.log(`${constants.docker.dockerFile.error.fileWrite}\n${err.toString()}`);
     }
@@ -34,7 +34,7 @@ export default function initDocker(config) {
 
   const dockerIgnoreContents = 'node_modules\nnpm-debug.log\n';
 
-  fs.writeFile(`${config.projectName}/${constants.docker.dockerIgnore.fileName}`, dockerIgnoreContents, (err) => {
+  fs.writeFileSync(`${config.projectName}/${constants.docker.dockerIgnore.fileName}`, dockerIgnoreContents, (err) => {
     if (err) {
       console.log(`${constants.docker.dockerIgnore.error.fileWrite}\n${err.toString()}`);
     }
