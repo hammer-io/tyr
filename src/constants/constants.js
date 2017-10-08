@@ -85,7 +85,7 @@ export default {
       message: 'License:',
 
       error: {
-        invalidMessage: 'Invalid Lincense!'
+        invalidMessage: 'Invalid License!'
       }
     },
 
