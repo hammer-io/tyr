@@ -82,7 +82,11 @@ export default {
 
     license: {
       name: 'license',
-      message: 'License:'
+      message: 'License:',
+
+      error: {
+        invalidMessage: 'Invalid Lincense!'
+      }
     },
 
     ci: {

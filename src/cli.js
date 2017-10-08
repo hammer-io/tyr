@@ -87,7 +87,14 @@ function promptConfigs() {
   }, {
     name: constants.config.license.name,
     type: 'input',
-    message: constants.config.license.message
+    message: constants.config.license.message,
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' ) {
+        return constants.config.license.error.invalidMessage;
+      }
+
+      return true;
+    }
   }, {
     name: constants.config.ci.name,
     type: 'list',
