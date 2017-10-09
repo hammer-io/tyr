@@ -1,5 +1,7 @@
 import inquirer from 'inquirer';
 
+import constants from '../constants/constants';
+
 const superagent = require('superagent');
 const winston = require('winston');
 
@@ -162,6 +164,6 @@ export default async function enableTravisOnProject(username, projectName) {
 
     winston.log('info', `TravisCI successfully enabled on ${config.username}/${config.projectName}`);
   } catch (err) {
-    winston.log('error', 'enableTravisOnProject failed.', err);
+    winston.log('error', constants.travisCI.error.enableTravisOnProject, err);
   }
 }
