@@ -6,9 +6,7 @@ const winston = require('winston');
 const hammerAgent = 'Travis/1.0';
 
 function activateTravisHook(repositoryId, travisAccessToken) {
-  winston.log('info', 'activateTravisHook', {
-    repositoryId
-  });
+  winston.log('verbose', 'activateTravisHook', { repositoryId });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -36,7 +34,7 @@ function activateTravisHook(repositoryId, travisAccessToken) {
 }
 
 function getRepositoryId(travisAccessToken, config) {
-  winston.log('info', 'getRepositoryId', {
+  winston.log('verbose', 'getRepositoryId', {
     username: config.username,
     projectName: config.projectName
   });
@@ -60,10 +58,7 @@ function getRepositoryId(travisAccessToken, config) {
 }
 
 function deleteGitHubToken(githubUrl, config) {
-  winston.log('info', 'deleteGitHubToken', {
-    username: config.username,
-    projectName: config.projectName
-  });
+  winston.log('verbose', 'deleteGitHubToken', { username: config.username });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -81,7 +76,7 @@ function deleteGitHubToken(githubUrl, config) {
 }
 
 function requestTravisToken(githubToken) {
-  winston.log('info', 'requestTravisToken');
+  winston.log('verbose', 'requestTravisToken');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -103,10 +98,7 @@ function requestTravisToken(githubToken) {
 }
 
 function requestGitHubToken(config) {
-  winston.log('info', 'requestGitHubToken', {
-    username: config.username,
-    projectName: config.projectName
-  });
+  winston.log('verbose', 'requestGitHubToken', { username: config.username });
 
   return new Promise((resolve, reject) => {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
@@ -132,10 +124,6 @@ function requestGitHubToken(config) {
         }
       });
   });
-}
-
-function handleError(err) {
-  winston.log('error', 'enableTravisOnProject failed.', err);
 }
 
 function promptPassword() {
@@ -172,8 +160,8 @@ export default async function enableTravisOnProject(username, projectName) {
     const repoId = await getRepositoryId(travisAccessToken, config);
     await activateTravisHook(repoId, travisAccessToken);
 
-    winston.log('info', 'activateTravisHook', 'SUCCESS!');
+    winston.log('info', `TravisCI successfully enabled on ${config.username}/${config.projectName}`);
   } catch (err) {
-    handleError(err);
+    winston.log('error', 'enableTravisOnProject failed.', err);
   }
 }
