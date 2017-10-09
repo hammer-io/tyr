@@ -50,7 +50,8 @@ export default {
     '  email:\n' +
     '    on_success: never',
     error: {
-      fileWrite: 'Failed to write .travis.yml!'
+      fileWrite: 'Failed to write .travis.yml!',
+      enableTravisOnProject: 'Failed to enable TravisCI for the project!'
     }
   },
 
