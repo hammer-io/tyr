@@ -16,10 +16,6 @@ export default function createPackageJson(config) {
 
   const json = JSON.stringify(packageJson, null, '\t');
 
-  fs.writeFileSync(`${config.projectName}/package.json`, json, 'utf8', (err) => {
-    if (err) {
-      console.log(`An error occurred while writing to ${config.projectName}/package.json`);
-    }
-  });
+  fs.writeFileSync(`${config.projectName}/package.json`, json);
 }
 
