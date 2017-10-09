@@ -4,87 +4,102 @@ const superagent = require('superagent');
 const winston = require('winston');
 
 const hammerAgent = 'Travis/1.0';
-let travisAccessToken = '';
 
-function activateTravisHook(repositoryId) {
+function activateTravisHook(repositoryId, travisAccessToken) {
   winston.log('info', 'activateTravisHook', {
     repositoryId
   });
-  superagent
-    .put('https://api.travis-ci.org/hooks')
-    .send({
-      hook: {
-        id: repositoryId,
-        active: true
-      }
-    })
-    .set({
-      'Content-Type': 'application/json',
-      'User-Agent': hammerAgent,
-      Accept: 'application/vnd.travis-ci.2+json',
-      Authorization: `token ${travisAccessToken}`
-    })
-    .end((err) => {
-      if (err) { return console.log(err); }
-      winston.log('info', 'activateTravisHook', 'SUCCESS!');
-    });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .put('https://api.travis-ci.org/hooks')
+      .send({
+        hook: {
+          id: repositoryId,
+          active: true
+        }
+      })
+      .set({
+        'Content-Type': 'application/json',
+        'User-Agent': hammerAgent,
+        Accept: 'application/vnd.travis-ci.2+json',
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+  });
 }
 
-function getRepositoryId(config) {
+function getRepositoryId(travisAccessToken, config) {
   winston.log('info', 'getRepositoryId', {
     username: config.username,
     projectName: config.projectName
   });
-  superagent
-    .get(`https://api.travis-ci.org/repos/${config.username}/${config.projectName}`)
-    .set({
-      'User-Agent': hammerAgent,
-      Accept: 'application/vnd.travis-ci.2+json',
-      Authorization: `token ${travisAccessToken}`
-    })
-    .end((err, res) => {
-      if (err) { return console.log(err); }
-      activateTravisHook(res.body.repo.id);
-    });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`https://api.travis-ci.org/repos/${config.username}/${config.projectName}`)
+      .set({
+        'User-Agent': hammerAgent,
+        Accept: 'application/vnd.travis-ci.2+json',
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body.repo.id);
+        }
+      });
+  });
 }
 
-function deleteGitHubToken(githubToken, url, config) {
+function deleteGitHubToken(githubUrl, config) {
   winston.log('info', 'deleteGitHubToken', {
     username: config.username,
     projectName: config.projectName
   });
-  superagent
-    .delete(url)
-    .send({ githubToken })
-    .set({ Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}` })
-    .end((err) => {
-      if (err) { return console.log(err); }
-      getRepositoryId(config);
-    });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .delete(githubUrl)
+      // .send({ config.githubToken })
+      .set({ Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}` })
+      .end((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+  });
 }
 
-function requestTravisToken(githubToken, url, config) {
-  winston.log('info', 'requestTravisToken', {
-    username: config.username,
-    projectName: config.projectName
+function requestTravisToken(githubToken) {
+  winston.log('info', 'requestTravisToken');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .post('https://api.travis-ci.org/auth/github')
+      .send({ github_token: githubToken })
+      .set({
+        'Content-Type': 'application/json',
+        'User-Agent': hammerAgent,
+        Accept: 'application/vnd.travis-ci.2+json'
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body.access_token);
+        }
+      });
   });
-  superagent
-    .post('https://api.travis-ci.org/auth/github')
-    .send({ github_token: githubToken })
-    .set({
-      'Content-Type': 'application/json',
-      'User-Agent': hammerAgent,
-      Accept: 'application/vnd.travis-ci.2+json'
-    })
-    .end((err, res) => {
-      if (err) { return console.log(err); }
-
-      // Store the TravisCI access token
-      travisAccessToken = res.body.access_token;
-
-      // Delete the GitHub token via the GitHub API.
-      deleteGitHubToken(githubToken, url, config)
-    });
 }
 
 function requestGitHubToken(config) {
@@ -92,42 +107,73 @@ function requestGitHubToken(config) {
     username: config.username,
     projectName: config.projectName
   });
-  // Create a GitHub token via the GitHub API, store GitHub token and URL.
-  superagent
-    .post('https://api.github.com/authorizations')
-    .send({
-      scopes: [
-        'read:org', 'user:email', 'repo_deployment',
-        'repo:status',
-        'public_repo', 'write:repo_hook'
-      ],
-      note: 'temporary token to auth against travis'
-    })
-    .set({
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}`
-    })
-    .end((err, res) => {
-      if (err) { return console.log(err); }
 
-      // Use the /auth/github endpoint to exchange it for an access token. Store the access token.
-      requestTravisToken(res.body.token, res.body.url, config);
-    });
+  return new Promise((resolve, reject) => {
+    // Create a GitHub token via the GitHub API, store GitHub token and URL.
+    superagent
+      .post('https://api.github.com/authorizations')
+      .send({
+        scopes: [
+          'read:org', 'user:email', 'repo_deployment',
+          'repo:status',
+          'public_repo', 'write:repo_hook'
+        ],
+        note: 'temporary token to auth against travis'
+      })
+      .set({
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ token: res.body.token, url: res.body.url });
+        }
+      });
+  });
 }
 
-export default function enableTravisOnProject(username, projectName) {
+function handleError(err) {
+  winston.log('error', 'enableTravisOnProject failed.', err);
+}
+
+function promptPassword() {
   const questions = [{
     name: 'passw',
     type: 'password',
     message: 'GitHub Password:'
   }];
 
-  inquirer.prompt(questions).then((answers) => {
-    const config = {
-      username,
-      projectName,
-      passw: answers.passw
-    };
-    requestGitHubToken(config);
-  });
+  return inquirer.prompt(questions);
+}
+
+export default async function enableTravisOnProject(username, projectName) {
+  const answers = await promptPassword();
+  const config = {
+    username,
+    projectName,
+    passw: answers.passw
+  };
+
+  try {
+    // Create a temporary GitHub oauth token
+    const githubResponse = await requestGitHubToken(config);
+    const githubToken = githubResponse.token;
+    const githubUrl = githubResponse.url;
+
+    // Use the GitHub token to get a Travis token
+    const travisAccessToken = await requestTravisToken(githubToken);
+
+    // Delete the temporary GitHub token
+    await deleteGitHubToken(githubUrl, config);
+
+    // Get the prjoect repository ID, and then use that ID to activate Travis for the project
+    const repoId = await getRepositoryId(travisAccessToken, config);
+    await activateTravisHook(repoId, travisAccessToken);
+
+    winston.log('info', 'activateTravisHook', 'SUCCESS!');
+  } catch (err) {
+    handleError(err);
+  }
 }
