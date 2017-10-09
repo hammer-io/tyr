@@ -4,6 +4,25 @@ export default {
     name: 'Docker',
     dockerFile: {
       fileName: 'Dockerfile',
+      fileContents: '# Use the official Node runtime as a parent image\n' +
+      '# More info at https://hub.docker.com/_/node/\n' +
+      'FROM node:alpine\n' +
+      '    \n' +
+      '# Set the working directory\n' +
+      'WORKDIR /usr/src/app\n' +
+      '\n' +
+      '# Install app dependencies\n' +
+      'COPY package.json package-lock.json ./\n' +
+      'RUN npm install\n' +
+      '\n' +
+      '# Bundle app source\n' +
+      'COPY . .\n' +
+      '\n' +
+      '# Make port 8080 available to the world outside this container\n' +
+      'EXPOSE 8080\n' +
+      '\n' +
+      '# Run "npm start" when the container launches\n' +
+      'CMD ["npm", "start"]\n',
       error: {
         fileWrite: 'Failed to write Dockerfile!'
       }
@@ -11,6 +30,8 @@ export default {
 
     dockerIgnore: {
       fileName: '.dockerignore',
+      fileContents: 'node_modules\n' +
+      'npm-debug.log',
       error: {
         fileWrite: 'Failed to write .dockerignore!'
       }
@@ -20,7 +41,7 @@ export default {
   travisCI: {
     name: 'TravisCI',
     fileName: '.travis.yml',
-    fileConents: '' +
+    fileContents: '' +
     'language: node_js\n' +
     'node_js:\n' +
     '  - \'5\'\n' +
@@ -52,6 +73,12 @@ export default {
 
   indexJS: {
     fileName: 'index.js',
+    fileContents: '\n' +
+    'function main() {\n' +
+    '  console.log(\'Hello World\');\n' +
+    '}\n' +
+    '\n' +
+    'main();\n',
     error: {
       fileWrite: 'Failed to write index.js!',
       fileRead: 'Failed to read template-index.js!'
