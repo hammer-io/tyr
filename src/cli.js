@@ -20,7 +20,7 @@ import constants from './constants/constants';
  * Initializes the files and accounts needed to use or application
  * @param config the config object form the main inquirer prompt
  */
-function initProject(config) {
+export function initProject(config) {
   // if the project doesn't already exist, intialize the files and accounts
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
@@ -34,6 +34,8 @@ function initProject(config) {
     if (config.ci === constants.travisCI.name) {
       initTravisCI(config);
     }
+  } else {
+    return constants.config.projectName.error.duplicateMessage;
   }
 }
 
@@ -135,6 +137,7 @@ export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
 
   const configs = await promptConfigs();
+  console.log(configs);
   initProject(configs);
 
   const githubCredentials = await promptGithubCredentials();
