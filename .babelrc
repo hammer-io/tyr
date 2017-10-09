@@ -1,4 +1,5 @@
 {
+  "plugins": ["transform-async-to-generator"],
   "presets": [
     ["env", {
       "targets": {

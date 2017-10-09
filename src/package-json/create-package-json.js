@@ -1,6 +1,6 @@
 
 import fs from 'fs';
-import packageTemplate from '../templates/template-package.json';
+import packageTemplate from '../templates/template-package';
 
 
 export default function createPackageJson(config) {
@@ -16,10 +16,6 @@ export default function createPackageJson(config) {
 
   const json = JSON.stringify(packageJson, null, '\t');
 
-  fs.writeFile(`${config.projectName}/package.json`, json, 'utf8', (err) => {
-    if (err) {
-      console.log(`An error occurred while writing to ${config.projectName}/package.json`);
-    }
-  });
+  fs.writeFileSync(`${config.projectName}/package.json`, json);
 }
 
