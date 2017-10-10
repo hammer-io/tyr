@@ -211,6 +211,8 @@ export default async function run() {
         console.log(err);
       }
       console.log(res);
+      console.log(res.data.ssh_url);
+      console.log(res.ssh_url);
       git
         .init()
         .add('.gitignore')
