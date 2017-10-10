@@ -67,6 +67,18 @@ export default {
     }
   },
 
+  dockerHub: {
+    username: {
+      name: 'dockerHubUsername',
+      message: 'Docker Hub Username:'
+    },
+
+    password: {
+      name: 'dockerHubPassword',
+      message: 'Docker Hub Password:'
+    }
+  },
+
   hammer: {
     name: 'hammer-io',
     cliName: 'hammer-cli'

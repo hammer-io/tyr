@@ -1,7 +1,6 @@
 /**
  * The Cli class.
  */
-
 import chalk from 'chalk';
 import figlet from 'figlet';
 import inquirer from 'inquirer';
@@ -126,6 +125,23 @@ function promptGithubCredentials() {
   return inquirer.prompt(questions);
 }
 
+/**
+ * Gets the user's github credentials, logs them in, then safely stores their credentials somewhere.
+ */
+function promptDockerHubCredentials() {
+  const questions = [{
+    name: constants.dockerHub.username.name,
+    type: 'input',
+    message: constants.dockerHub.username.message,
+  }, {
+    name: constants.dockerHub.password.name,
+    type: 'password',
+    message: constants.dockerHub.password.message
+  }];
+
+  return inquirer.prompt(questions);
+}
+
 
 /**
  * The main execution function for hammer-cli.
@@ -139,4 +155,7 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
   console.log(githubCredentials);
+
+  const dockerHubCredentials = await promptDockerHubCredentials();
+  console.log(dockerHubCredentials);
 }
