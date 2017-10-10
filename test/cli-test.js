@@ -1,10 +1,9 @@
-//Sample test
 import assert from 'assert';
 import fs from 'fs';
 import fsExtra from 'fs-extra';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
-var cli = require('../dist/cli');
+import cli from '../dist/cli'
 import constants from '../dist/constants/constants';
 
 const configs = {
@@ -32,7 +31,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should return an error if a directory with the project name already exists', () => {
-      var result = cli.initProject(configs); // run initProject again to see if it fails
+      const result = cli.initProject(configs); // run initProject again to see if it fails
       assert.equal(constants.config.projectName.error.duplicateMessage, result);
     });
   });
@@ -43,7 +42,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
-      var contents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
+      const contents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
       assert.equal(constants.travisCI.fileContents, contents);
     });
   });
@@ -55,8 +54,8 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
-      var dockerContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
-      var dockerignoreContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
+      const dockerContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
+      const dockerignoreContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
 
       assert.equal(constants.docker.dockerFile.fileContents, dockerContents);
       assert.equal(constants.docker.dockerIgnore.fileContents, dockerignoreContents);
@@ -87,7 +86,7 @@ describe('Initialize Project Files', () => {
         '}';
 
 
-      var packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`);
+      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`);
       assert.equal(packageJsonExpectedContents, packageJsonActualContents);
     });
   });
@@ -98,7 +97,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create an index.js file with the proper contents', () => {
-      var indexJsContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      const indexJsContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
       assert.equal(constants.indexJS.fileContents, indexJsContents);
     });
   });
