@@ -1,0 +1,16 @@
+{
+	"name": "asdf4",
+	"version": "0.0.0",
+	"description": "asdf",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "node src/index.js"
+	},
+	"repository": {},
+	"authors": [
+		"asdf"
+	],
+	"license": "MIT",
+	"bin": {},
+	"dependencies": {}
+}

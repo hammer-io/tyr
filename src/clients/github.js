@@ -21,7 +21,7 @@ export function requestGitHubToken(config) {
       })
       .set({
         'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}`
+        Authorization: `Basic ${Buffer.from(`${config.username}:${config.password}`).toString('base64')}`
       })
       .end((err, res) => {
         if (err) {

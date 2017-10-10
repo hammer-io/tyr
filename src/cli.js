@@ -8,11 +8,22 @@ import isValid from 'is-valid-path';
 import fs from 'fs';
 import initGit from './git/git-init';
 import utils from './utils';
+import * as githubClient from './clients/github';
 
 
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
+
+const git = require('simple-git')();
+const Preferences = require('preferences');
+const GitHubApi = require('github');
+
+
+const github = new GitHubApi({
+  version: '3.0.0'
+});
+
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -34,9 +45,6 @@ export function initProject(config) {
     }
   } else {
     return constants.config.projectName.error.duplicateMessage;
-  }
-  if (config.githubUsername && config.githubPassword) {
-    initGit(config);
   }
 }
 
@@ -160,7 +168,62 @@ export default async function run() {
   initProject(configs);
 
   const githubCredentials = await promptGithubCredentials();
-  console.log(githubCredentials);
+
+  const prefs = new Preferences('hammer-cli');
+  let githubToken;
+  if (prefs.github && prefs.github.token) {
+    githubToken = prefs.github.token;
+  } else {
+    console.log('authenticate github');
+    console.log(githubCredentials.githubUsername);
+    // Create a temporary GitHub oauth token
+    const githubResponse = await
+      githubClient.requestGitHubToken({
+        username: githubCredentials.githubUsername,
+        password: githubCredentials.githubPassword
+      });
+    githubToken = githubResponse.token;
+
+    prefs.github = {
+      token: githubToken
+    }
+  }
+
+  console.log(githubToken);
+
+
+  const data = {
+    name: configs.projectName,
+    description: configs.description,
+    private: false
+  };
+
+  github.authenticate({
+    type: 'oauth',
+    token: githubToken
+  });
+
+  github.repos.create(
+    data,
+    (err, res) => {
+      if (err) {
+        console.log('An error occurred ');
+        console.log(err);
+      }
+      console.log(res.ssh_url);
+      git
+        .init()
+        .add('.gitignore')
+        .add('./*')
+        .commit('Initial commit')
+        .addRemote('origin', res.ssh_url)
+        .push('origin', 'master')
+        .then(() => {
+          console.log('finshed');
+        });
+    }
+  );
+
 
   const dockerHubCredentials = await promptDockerHubCredentials();
   console.log(dockerHubCredentials);
