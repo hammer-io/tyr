@@ -1,16 +1,12 @@
 /**
  * The Cli class.
  */
-
 import chalk from 'chalk';
 import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import createPackageJson from './package-json/create-package-json';
-import createIndexFile from './index-js/create-index-file';
-import initTravisCI from './travis-ci/travis-ci-create';
-import initDocker from './docker/docker-create';
+import utils from './utils';
 
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
@@ -25,14 +21,14 @@ export function initProject(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
     fs.mkdirSync(`${config.projectName}/src`);
-    createPackageJson(config);
-    createIndexFile(config.projectName);
+    utils.file.createPackageJson(config);
+    utils.file.createIndexFile(config.projectName);
 
     if (config.container === constants.docker.name) {
-      initDocker(config);
+      utils.docker.initDocker(config);
     }
     if (config.ci === constants.travisCI.name) {
-      initTravisCI(config);
+      utils.travis.initTravisCI(config);
     }
   } else {
     return constants.config.projectName.error.duplicateMessage;
@@ -129,6 +125,24 @@ function promptGithubCredentials() {
   return inquirer.prompt(questions);
 }
 
+/**
+ * Gets the user's docker hub credentials, logs them in,
+ * then safely stores their credentials somewhere.
+ */
+function promptDockerHubCredentials() {
+  const questions = [{
+    name: constants.dockerHub.username.name,
+    type: 'input',
+    message: constants.dockerHub.username.message,
+  }, {
+    name: constants.dockerHub.password.name,
+    type: 'password',
+    message: constants.dockerHub.password.message
+  }];
+
+  return inquirer.prompt(questions);
+}
+
 
 /**
  * The main execution function for hammer-cli.
@@ -142,4 +156,7 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
   console.log(githubCredentials);
+
+  const dockerHubCredentials = await promptDockerHubCredentials();
+  console.log(dockerHubCredentials);
 }
