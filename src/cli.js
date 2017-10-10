@@ -1,72 +1,78 @@
 /**
  * The Cli class.
  */
-
 import chalk from 'chalk';
 import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import createPackageJson from './create-package-json';
-import createIndexFile from './create-index-file';
-import initTravisCI from './travis-ci/travis-ci-create';
-import initDocker from './docker/docker-create';
 import initGit from './git/git-init';
-
-import ciChoices from '../ci-choices.json';
-import containerizationChoices from '../containerization-choices.json';
+import utils from './utils';
 
 
-function writeFiles(config) {
+import ciChoices from './constants/ci-choices';
+import containerizationChoices from './constants/containerization-choices';
+import constants from './constants/constants';
+
+/**
+ * Initializes the files and accounts needed to use or application
+ * @param config the config object form the main inquirer prompt
+ */
+export function initProject(config) {
+  // if the project doesn't already exist, intialize the files and accounts
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
     fs.mkdirSync(`${config.projectName}/src`);
-    createPackageJson(config);
-    createIndexFile(config.projectName);
-  }
-  if (config.container === 'Docker') {
-    initDocker(config);
-  }
-  if (config.ci === 'TravisCI') {
-    initTravisCI(config);
+    utils.file.createPackageJson(config);
+    utils.file.createIndexFile(config.projectName);
+
+    if (config.container === constants.docker.name) {
+      utils.docker.initDocker(config);
+    }
+    if (config.ci === constants.travisCI.name) {
+      utils.travis.initTravisCI(config);
+    }
+  } else {
+    return constants.config.projectName.error.duplicateMessage;
   }
   if (config.githubUsername && config.githubPassword) {
     initGit(config);
   }
 }
 
-export default function run() {
-  console.log(chalk.yellow(figlet.textSync('hammer-io', { horizontalLayout: 'full' })));
-
+/**
+ * Gets the basic configuration settings for the user
+ */
+function promptConfigs() {
   const questions = [{
-    name: 'projectName',
+    name: constants.config.projectName.name,
     type: 'input',
-    message: 'Project Name:',
+    message: constants.config.projectName.message,
     validate: (value) => {
       const isItValid = isValid(value);
 
-      if (typeof value === 'undefined' || value === '') {
-        return 'Invalid Project Name';
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return constants.config.projectName.error.invalidMessage;
       }
 
       if (!isItValid) {
-        return 'Invalid Project Name';
+        return constants.config.projectName.error.invalidMessage;
       }
 
       if (fs.existsSync(value)) {
-        return 'Project with this name already exists in this directory';
+        return constants.config.projectName.error.duplicateMessage;
       }
 
       return true;
     }
   }, {
-    name: 'description',
+    name: constants.config.description.name,
     type: 'input',
-    message: 'Description:',
+    message: constants.config.description.message,
   }, {
-    name: 'version',
+    name: constants.config.version.name,
     type: 'input',
-    message: 'Version:',
+    message: constants.config.version.message,
     default: '0.0.0',
     validate: (value) => {
       // tests for valid version number.
@@ -75,47 +81,87 @@ export default function run() {
         return true;
       }
 
-      return 'Invalid Version Number';
+      return constants.config.version.error.invalidMessage;
     }
   }, {
-    name: 'author',
+    name: constants.config.author.name,
     type: 'input',
-    message: 'Author:'
+    message: constants.config.author.message
   }, {
-    name: 'license',
+    name: constants.config.license.name,
     type: 'input',
-    message: 'License:'
+    message: constants.config.license.message,
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '') {
+        return constants.config.license.error.invalidMessage;
+      }
+
+      return true;
+    }
   }, {
-    name: 'ci',
+    name: constants.config.ci.name,
     type: 'list',
-    message: 'Choose your CI tool:',
+    message: constants.config.ci.message,
     choices: ciChoices.choices
   }, {
-    name: 'container',
+    name: constants.config.container.name,
     type: 'list',
-    message: 'Choose your Containerization Tool:',
+    message: constants.config.container.message,
     choices: containerizationChoices.choices
-  },
-  {
-    name: 'githubUsername',
-    type: 'input',
-    message: 'Github Username:',
-    validate: (value) => {
-      // tests for the github username according to the username rules
-      if ((/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i).test(value)) {
-        return true;
-      }
-      return 'Invalid Github Username'
-    }
-  },
-  {
-    name: 'githubPassword',
-    type: 'password',
-    message: 'Github Password: '
-  }
-  ];
+  }];
 
-  inquirer.prompt(questions).then((answers) => {
-    writeFiles(answers);
-  });
+  return inquirer.prompt(questions);
+}
+
+/**
+ * Gets the user's github credentials, logs them in, then safely stores their credentials somewhere.
+ */
+function promptGithubCredentials() {
+  const questions = [{
+    name: constants.github.username.name,
+    type: 'input',
+    message: constants.github.username.message,
+  }, {
+    name: constants.github.password.name,
+    type: 'password',
+    message: constants.github.password.message
+  }];
+
+  return inquirer.prompt(questions);
+}
+
+/**
+ * Gets the user's docker hub credentials, logs them in,
+ * then safely stores their credentials somewhere.
+ */
+function promptDockerHubCredentials() {
+  const questions = [{
+    name: constants.dockerHub.username.name,
+    type: 'input',
+    message: constants.dockerHub.username.message,
+  }, {
+    name: constants.dockerHub.password.name,
+    type: 'password',
+    message: constants.dockerHub.password.message
+  }];
+
+  return inquirer.prompt(questions);
+}
+
+
+/**
+ * The main execution function for hammer-cli.
+ */
+export default async function run() {
+  console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
+
+  const configs = await promptConfigs();
+  console.log(configs);
+  initProject(configs);
+
+  const githubCredentials = await promptGithubCredentials();
+  console.log(githubCredentials);
+
+  const dockerHubCredentials = await promptDockerHubCredentials();
+  console.log(dockerHubCredentials);
 }
