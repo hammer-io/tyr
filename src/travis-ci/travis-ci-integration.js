@@ -1,25 +1,12 @@
-import inquirer from 'inquirer';
-
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github'
 import * as travisClient from '../clients/travis-ci'
 
-function promptPassword() {
-  const questions = [{
-    name: 'passw',
-    type: 'password',
-    message: 'GitHub Password:'
-  }];
-
-  return inquirer.prompt(questions);
-}
-
-export default async function enableTravisOnProject(username, projectName) {
-  const answers = await promptPassword();
+export default async function enableTravisOnProject(username, password, projectName, environmentVariables) {
   const config = {
     username,
     projectName,
-    passw: answers.passw
+    password
   };
 
   try {
@@ -37,6 +24,9 @@ export default async function enableTravisOnProject(username, projectName) {
     // Get the project repository ID, and then use that ID to activate Travis for the project
     const repoId = await travisClient.getRepositoryId(travisAccessToken, config);
     await travisClient.activateTravisHook(repoId, travisAccessToken);
+
+    // Add environment variables
+    await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
 
     winston.log('info', `TravisCI successfully enabled on ${config.username}/${config.projectName}`);
   } catch (err) {

@@ -40,7 +40,6 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
         }
       })
       .set({
-        'Content-Type': 'application/json',
         'User-Agent': hammerAgent,
         Accept: 'application/vnd.travis-ci.2+json',
         Authorization: `token ${travisAccessToken}`
@@ -63,7 +62,6 @@ export function requestTravisToken(githubToken) {
       .post('https://api.travis-ci.org/auth/github')
       .send({ github_token: githubToken })
       .set({
-        'Content-Type': 'application/json',
         'User-Agent': hammerAgent,
         Accept: 'application/vnd.travis-ci.2+json'
       })
@@ -72,6 +70,29 @@ export function requestTravisToken(githubToken) {
           reject(err);
         } else {
           resolve(res.body.access_token);
+        }
+      });
+  });
+}
+
+export function setEnvironmentVariables(travisAccessToken, repoId, environmentVariables) {
+  winston.log('verbose', 'setEnvironmentVariables');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .post('https://api.travis-ci.org/settings/env_vars')
+      .query({repository_id: repoId})
+      .send({ env_vars: environmentVariables })
+      .set({
+        'User-Agent': hammerAgent,
+        Accept: 'application/vnd.travis-ci.2+json',
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body.env_vars);
         }
       });
   });
