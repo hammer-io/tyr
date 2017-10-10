@@ -1,6 +1,5 @@
 import assert from 'assert';
-import fs from 'fs';
-import fsExtra from 'fs-extra';
+import fs from 'fs-extra';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
 import { initProject } from '../dist/cli'
@@ -103,7 +102,7 @@ describe('Initialize Project Files', () => {
   });
 
   after(() => {
-    fsExtra.removeSync(configs.projectName);
+    fs.removeSync(configs.projectName);
   });
 });
 
