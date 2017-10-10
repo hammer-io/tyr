@@ -126,7 +126,8 @@ function promptGithubCredentials() {
 }
 
 /**
- * Gets the user's docker hub credentials, logs them in, then safely stores their credentials somewhere.
+ * Gets the user's docker hub credentials, logs them in,
+ * then safely stores their credentials somewhere.
  */
 function promptDockerHubCredentials() {
   const questions = [{
