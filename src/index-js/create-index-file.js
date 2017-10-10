@@ -1,4 +1,3 @@
-
 import fs from 'fs';
 import constants from '../constants/constants';
 

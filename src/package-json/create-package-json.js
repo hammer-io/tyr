@@ -1,4 +1,3 @@
-
 import fs from 'fs';
 import packageTemplate from '../templates/template-package';
 

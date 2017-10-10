@@ -8,7 +8,7 @@
     "test": "npm run build && mocha --compilers js:babel-register --require babel-polyfill",
     "lint": "eslint src/*.js",
     "build": "babel src --out-dir dist",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
