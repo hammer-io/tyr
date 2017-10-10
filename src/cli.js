@@ -163,11 +163,11 @@ function promptDockerHubCredentials() {
 export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
 
-  const configs = await promptConfigs();
-  console.log(configs);
-  initProject(configs);
+  // const configs = await promptConfigs();
+  // console.log(configs);
+  // initProject(configs);
 
-  const githubCredentials = await promptGithubCredentials();
+  //const githubCredentials = await promptGithubCredentials();
 
   const prefs = new Preferences('hammer-cli');
   let githubToken;
@@ -193,8 +193,8 @@ export default async function run() {
 
 
   const data = {
-    name: configs.projectName,
-    description: configs.description,
+    name: "myRepo", //configs.projectName,
+    description: "my desc",//configs.description,
     private: false
   };
 
@@ -210,7 +210,7 @@ export default async function run() {
         console.log('An error occurred ');
         console.log(err);
       }
-      console.log(res.ssh_url);
+      console.log(res);
       git
         .init()
         .add('.gitignore')
@@ -225,6 +225,6 @@ export default async function run() {
   );
 
 
-  const dockerHubCredentials = await promptDockerHubCredentials();
-  console.log(dockerHubCredentials);
+  // const dockerHubCredentials = await promptDockerHubCredentials();
+  // console.log(dockerHubCredentials);
 }
