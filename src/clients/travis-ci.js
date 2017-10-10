@@ -3,6 +3,9 @@ const winston = require('winston');
 
 const hammerAgent = 'Travis/1.0';
 
+/**
+ * Get github repo id from Travis-CI
+ */
 export function getRepositoryId(travisAccessToken, config) {
   winston.log('verbose', 'getRepositoryId', {
     username: config.username,
@@ -27,6 +30,9 @@ export function getRepositoryId(travisAccessToken, config) {
   });
 }
 
+/**
+ * Activate Travis hook on a Github repository
+ */
 export function activateTravisHook(repositoryId, travisAccessToken) {
   winston.log('verbose', 'activateTravisHook', { repositoryId });
 
@@ -54,6 +60,9 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
   });
 }
 
+/**
+ * Request Travis-CI auth token
+ */
 export function requestTravisToken(githubToken) {
   winston.log('verbose', 'requestTravisToken');
 
@@ -75,6 +84,9 @@ export function requestTravisToken(githubToken) {
   });
 }
 
+/**
+ * Set environment variables on a Travis-CI project
+ */
 export function setEnvironmentVariables(travisAccessToken, repoId, environmentVariables) {
   winston.log('verbose', 'setEnvironmentVariables');
 

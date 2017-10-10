@@ -1,6 +1,9 @@
 const superagent = require('superagent');
 const winston = require('winston');
 
+/**
+ * Request github oauth token
+ */
 export function requestGitHubToken(config) {
   winston.log('verbose', 'requestGitHubToken', { username: config.username });
 
@@ -30,6 +33,9 @@ export function requestGitHubToken(config) {
   });
 }
 
+/**
+ * Delete github oauth token
+ */
 export function deleteGitHubToken(githubUrl, config) {
   winston.log('verbose', 'deleteGitHubToken', { username: config.username });
 

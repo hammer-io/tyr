@@ -8,6 +8,9 @@ export function initTravisCI(config) {
   fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, constants.travisCI.fileContents);
 }
 
+/**
+ * Initialize Travis-CI on the created project
+ */
 export async function enableTravisOnProject(username, password, projectName, environmentVariables) {
   const config = {
     username,
