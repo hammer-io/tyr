@@ -1,8 +1,14 @@
-import constants from '../constants/constants';
-import * as githubClient from '../clients/github'
-import * as travisClient from '../clients/travis-ci'
+import fs from 'fs';
 
-export default async function enableTravisOnProject(username, password, projectName, environmentVariables) {
+import constants from '../constants/constants';
+import * as githubClient from '../clients/github';
+import * as travisClient from '../clients/travis-ci';
+
+export function initTravisCI(config) {
+  fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, constants.travisCI.fileContents);
+}
+
+export async function enableTravisOnProject(username, password, projectName, environmentVariables) {
   const config = {
     username,
     projectName,

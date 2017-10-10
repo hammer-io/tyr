@@ -1,8 +1,9 @@
 import fs from 'fs';
+
 import packageTemplate from '../templates/template-package';
+import constants from '../constants/constants'
 
-
-export default function createPackageJson(config) {
+export function createPackageJson(config) {
   const author = config.author.split(',');
 
   const packageJson = packageTemplate;
@@ -18,3 +19,6 @@ export default function createPackageJson(config) {
   fs.writeFileSync(`${config.projectName}/package.json`, json);
 }
 
+export function createIndexFile(folderName) {
+  fs.writeFileSync(`${folderName}/src/index.js`, constants.indexJS.fileContents);
+}
