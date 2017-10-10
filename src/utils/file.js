@@ -3,6 +3,9 @@ import fs from 'fs';
 import packageTemplate from '../templates/template-package';
 import constants from '../constants/constants'
 
+/**
+ * Generate a package.json file based on the user options selected
+ */
 export function createPackageJson(config) {
   const author = config.author.split(',');
 
@@ -19,6 +22,9 @@ export function createPackageJson(config) {
   fs.writeFileSync(`${config.projectName}/package.json`, json);
 }
 
+/**
+ * Generate a simple index.js file
+ */
 export function createIndexFile(folderName) {
   fs.writeFileSync(`${folderName}/src/index.js`, constants.indexJS.fileContents);
 }
