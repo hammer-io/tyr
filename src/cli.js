@@ -11,6 +11,7 @@ import createPackageJson from './create-package-json';
 import createIndexFile from './create-index-file';
 import initTravisCI from './travis-ci/travis-ci-create';
 import initDocker from './docker/docker-create';
+import initGit from './git/git-init';
 
 import ciChoices from '../ci-choices.json';
 import containerizationChoices from '../containerization-choices.json';
@@ -28,6 +29,9 @@ function writeFiles(config) {
   }
   if (config.ci === 'TravisCI') {
     initTravisCI(config);
+  }
+  if (config.githubUsername && config.githubPassword) {
+    initGit(config);
   }
 }
 
@@ -91,6 +95,23 @@ export default function run() {
     type: 'list',
     message: 'Choose your Containerization Tool:',
     choices: containerizationChoices.choices
+  },
+  {
+    name: 'githubUsername',
+    type: 'input',
+    message: 'Github Username:',
+    validate: (value) => {
+      // tests for the github username according to the username rules
+      if ((/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i).test(value)) {
+        return true;
+      }
+      return 'Invalid Github Username'
+    }
+  },
+  {
+    name: 'githubPassword',
+    type: 'password',
+    message: 'Github Password: '
   }
   ];
 

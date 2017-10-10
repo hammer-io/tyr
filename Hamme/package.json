@@ -1,0 +1,16 @@
+{
+	"name": "Hamme",
+	"version": "0.0.0",
+	"description": "Hi",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "node src/index.js"
+	},
+	"repository": {},
+	"authors": [
+		"Erica"
+	],
+	"license": "MIT",
+	"bin": {},
+	"dependencies": {}
+}
