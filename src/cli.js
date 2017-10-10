@@ -7,9 +7,7 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-// import createPackageJson from './package-json/create-package-json';
-// import createIndexFile from './index-js/create-index-file';
-import { docker, file, travis } from './utils';
+import utils from './utils';
 
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
@@ -24,14 +22,14 @@ export function initProject(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
     fs.mkdirSync(`${config.projectName}/src`);
-    file.createPackageJson(config);
-    file.createIndexFile(config.projectName);
+    utils.file.createPackageJson(config);
+    utils.file.createIndexFile(config.projectName);
 
     if (config.container === constants.docker.name) {
-      docker.initDocker(config);
+      utils.docker.initDocker(config);
     }
     if (config.ci === constants.travisCI.name) {
-      travis.initTravisCI(config);
+      utils.travis.initTravisCI(config);
     }
   } else {
     return constants.config.projectName.error.duplicateMessage;

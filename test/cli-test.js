@@ -3,7 +3,7 @@ import fs from 'fs';
 import fsExtra from 'fs-extra';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
-import cli from '../dist/cli'
+import { initProject } from '../dist/cli'
 import constants from '../dist/constants/constants';
 
 const configs = {
@@ -18,7 +18,7 @@ const configs = {
 
 describe('Initialize Project Files', () => {
   before(() => {
-    cli.initProject(configs);
+    initProject(configs);
   });
 
   describe('Initialize Project Directories', () => {
@@ -31,7 +31,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should return an error if a directory with the project name already exists', () => {
-      const result = cli.initProject(configs); // run initProject again to see if it fails
+      const result = initProject(configs); // run initProject again to see if it fails
       assert.equal(constants.config.projectName.error.duplicateMessage, result);
     });
   });
