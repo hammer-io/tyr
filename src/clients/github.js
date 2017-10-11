@@ -1,5 +1,6 @@
 import fs from 'fs';
 import constants from '../constants/constants';
+import gitignoreConstants from '../constants/gitignore-constants';
 
 const superagent = require('superagent');
 const winston = require('winston');
@@ -12,6 +13,15 @@ const github = new GitHubApi({
   version: '3.0.0'
 });
 
+const githubApiUrl = 'https://api.github.com';
+
+/**
+ * Returns the string used for the basic authorization header in a POST request.
+ */
+function basicAuthorization(username, password) {
+  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+}
+
 /**
  * Request github oauth token
  */
@@ -21,7 +31,7 @@ export function requestGitHubToken(config) {
   return new Promise((resolve, reject) => {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     superagent
-      .post('https://api.github.com/authorizations')
+      .post(`${githubApiUrl}/authorizations`)
       .send({
         scopes: [
           'read:org', 'user:email', 'repo_deployment',
@@ -32,7 +42,7 @@ export function requestGitHubToken(config) {
       })
       .set({
         'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${config.username}:${config.password}`).toString('base64')}`
+        Authorization: basicAuthorization(config.username, config.password)
       })
       .end((err, res) => {
         if (err) {
@@ -53,8 +63,7 @@ export function deleteGitHubToken(githubUrl, config) {
   return new Promise((resolve, reject) => {
     superagent
       .delete(githubUrl)
-      // .send({ config.githubToken })
-      .set({ Authorization: `Basic ${Buffer.from(`${config.username}:${config.password}`).toString('base64')}` })
+      .set({ Authorization: basicAuthorization(config.username, config.password) })
       .end((err) => {
         if (err) {
           reject(err);
@@ -78,7 +87,6 @@ export function getGitHubToken(githubCredentials) {
   const prefs = new Preferences('hammer-cli');
 
   let githubToken;
-  let githubResponse;
   if (prefs.github && prefs.github.token) {
     githubToken = prefs.github.token;
   } else {
@@ -105,7 +113,7 @@ export function createGitIgnore(projectName) {
   winston.log('verbose', 'createGitIgnore', { projectName });
 
   try {
-    fs.writeFileSync(`${projectName}/${constants.git.gitIgnore.fileName}`, constants.git.gitIgnore.fileContents);
+    fs.writeFileSync(`${projectName}/${constants.git.gitIgnore.fileName}`, gitignoreConstants.gitignore.fileContents);
   } catch (err) {
     winston.log('error', constants.git.gitIgnore.error.fileWrite, err);
   }
@@ -164,3 +172,4 @@ export function setupGitHub(configs, githubCredentials) {
   createGitIgnore(configs.projectName);
   createGitHubRepository(configs, githubToken, githubCredentials);
 }
+

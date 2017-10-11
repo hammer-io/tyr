@@ -102,21 +102,6 @@ describe('Initialize Project Files', () => {
     });
   });
 
-  describe('Initialize local git repo', () => {
-    it('should create a .git file', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/.git`));
-    });
-
-    it('should create a .gitignore file', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/.gitignore`));
-    });
-
-    it('should create an .gitignore with proper contents', () => {
-      const gitIgnoreContents = fs.readFileSync(`${configs.projectName}/.gitignore`);
-      assert.equal(constants.git.gitignore.fileContents, gitIgnoreContents);
-    });
-  });
-
   after(() => {
     fs.removeSync(configs.projectName);
   });
