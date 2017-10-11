@@ -35,8 +35,8 @@
     "fs-extra": "4.0.2",
     "inquirer": "1.2.3",
     "is-valid-path": "0.1.1",
-    "superagent": "^3.6.2",
-    "winston": "^2.4.0"
+    "superagent": "3.6.2",
+    "winston": "2.4.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
