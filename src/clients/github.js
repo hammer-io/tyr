@@ -78,6 +78,7 @@ export function getGitHubToken(githubCredentials) {
   const prefs = new Preferences('hammer-cli');
 
   let githubToken;
+  let githubResponse;
   if (prefs.github && prefs.github.token) {
     githubToken = prefs.github.token;
   } else {
@@ -145,14 +146,17 @@ export function createGitHubRepository(configs, githubToken, githubCredentials) 
         .add('./*')
         .commit('Initial commit')
         .addRemote('origin', `https://github.com/${githubCredentials.githubUsername}/${configs.projectName}.git`)
-        .push('origin', 'master')
-        .then(() => {
-          console.log('finshed');
-        });
+        .push('origin', 'master');
     }
   );
 }
 
+/**
+ * Setups up a github repo, by requesting a github token, creating a .gitignore,
+ * and initializing the local and remote repository
+ * @param configs
+ * @param githubCredentials
+ */
 export function setupGitHub(configs, githubCredentials) {
   winston.log('verbose', 'setupGitHub', { githubUsername: githubCredentials.githubUsername });
 
