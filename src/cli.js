@@ -147,6 +147,16 @@ function promptDockerHubCredentials() {
   return inquirer.prompt(questions);
 }
 
+/**
+ * When the user first uses the application, the user preferences file
+ * has not been created or initialized. Any initialization code that needs
+ * to happen should be placed here.
+ */
+function initPreferencesIfUninitialized() {
+  if (!preferences.prereqs) {
+    preferences.prereqs = {};
+  }
+}
 
 /**
  * Make sure the user has all requirements satisfied before allowing
@@ -155,10 +165,7 @@ function promptDockerHubCredentials() {
 function promptGlobalPrerequisites() {
   const questions = [];
 
-  // If this is the first time settings prereqs in the preferences, create the object
-  if (!preferences.prereqs) {
-    preferences.prereqs = {};
-  }
+  initPreferencesIfUninitialized();
 
   constants.tyr.globalPrereqs.forEach((prereq) => {
     // Only ask them if they haven't said YES in the past (i.e. if it's not complete)
@@ -175,8 +182,14 @@ function promptGlobalPrerequisites() {
   return inquirer.prompt(questions);
 }
 
+/**
+ * Returns true if all answers are 'true' (i.e. if the user said YES to
+ * having completed all prerequisites).
+ */
 export function isUserFinishedWithPrereqs(answers) {
   let finishedPrereqs = true;
+
+  initPreferencesIfUninitialized();
 
   constants.tyr.globalPrereqs.forEach((prereq) => {
     // If they answered 'No' for something, display the appropriate response
