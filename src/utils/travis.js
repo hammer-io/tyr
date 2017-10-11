@@ -1,4 +1,5 @@
 import fs from 'fs';
+import winston from 'winston';
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
@@ -35,7 +36,9 @@ export async function enableTravisOnProject(username, password, projectName, env
     await travisClient.activateTravisHook(repoId, travisAccessToken);
 
     // Add environment variables
-    await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
+    if (environmentVariables) {
+      await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
+    }
 
     winston.log('info', `TravisCI successfully enabled on ${config.username}/${config.projectName}`);
   } catch (err) {
