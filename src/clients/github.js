@@ -19,26 +19,26 @@ export function requestGitHubToken(config) {
   return new Promise((resolve, reject) => {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     superagent
-      .post(`${githubApiUrl}/authorizations`)
-      .send({
-        scopes: [
-          'read:org', 'user:email', 'repo_deployment',
-          'repo:status',
-          'public_repo', 'write:repo_hook'
-        ],
-        note: 'temporary token to auth against travis'
-      })
-      .set({
-        'Content-Type': 'application/json',
-        Authorization: basicAuthorization(config.username, config.password)
-      })
-      .end((err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ token: res.body.token, url: res.body.url });
-        }
-      });
+    .post(`${githubApiUrl}/authorizations`)
+    .send({
+      scopes: [
+        'read:org', 'user:email', 'repo_deployment',
+        'repo:status',
+        'public_repo', 'write:repo_hook'
+      ],
+      note: 'temporary token to auth against travis'
+    })
+    .set({
+      'Content-Type': 'application/json',
+      Authorization: basicAuthorization(config.username, config.password)
+    })
+    .end((err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ token: res.body.token, url: res.body.url });
+      }
+    });
   });
 }
 
@@ -50,14 +50,14 @@ export function deleteGitHubToken(githubUrl, config) {
 
   return new Promise((resolve, reject) => {
     superagent
-      .delete(githubUrl)
-      .set({ Authorization: basicAuthorization(config.username, config.password) })
-      .end((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+    .delete(githubUrl)
+    .set({ Authorization: basicAuthorization(config.username, config.password) })
+    .end((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
 }
