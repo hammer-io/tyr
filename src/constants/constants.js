@@ -64,6 +64,13 @@ export default {
     password: {
       name: 'githubPassword',
       message: 'GitHub Password:'
+    },
+
+    gitIgnore: {
+      fileName: '.gitignore',
+      error: {
+        fileWrite: 'Failed to write .gitignore!'
+      }
     }
   },
 
