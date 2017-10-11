@@ -6,25 +6,13 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import initGit from './git/git-init';
 import utils from './utils';
-import * as githubClient from './clients/github';
 
 
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
-import {setupGitHub} from './clients/github';
-
-const git = require('simple-git');
-const Preferences = require('preferences');
-const GitHubApi = require('github');
-
-
-
-const github = new GitHubApi({
-  version: '3.0.0'
-});
+import { setupGitHub } from './clients/github';
 
 
 /**
