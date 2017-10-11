@@ -2,6 +2,8 @@ const superagent = require('superagent');
 const winston = require('winston');
 
 const tyrAgent = 'Travis/1.0';
+const travisApiUrl = 'https://api.travis-ci.org';
+const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
 /**
  * Get github repo id from Travis-CI
@@ -14,10 +16,10 @@ export function getRepositoryId(travisAccessToken, config) {
 
   return new Promise((resolve, reject) => {
     superagent
-      .get(`https://api.travis-ci.org/repos/${config.username}/${config.projectName}`)
+      .get(`${travisApiUrl}/repos/${config.username}/${config.projectName}`)
       .set({
         'User-Agent': tyrAgent,
-        Accept: 'application/vnd.travis-ci.2+json',
+        Accept: travisApiAccept,
         Authorization: `token ${travisAccessToken}`
       })
       .end((err, res) => {
@@ -38,7 +40,7 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
 
   return new Promise((resolve, reject) => {
     superagent
-      .put('https://api.travis-ci.org/hooks')
+      .put(`${travisApiUrl}/hooks`)
       .send({
         hook: {
           id: repositoryId,
@@ -47,7 +49,7 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
       })
       .set({
         'User-Agent': tyrAgent,
-        Accept: 'application/vnd.travis-ci.2+json',
+        Accept: travisApiAccept,
         Authorization: `token ${travisAccessToken}`
       })
       .end((err) => {
@@ -68,11 +70,11 @@ export function requestTravisToken(githubToken) {
 
   return new Promise((resolve, reject) => {
     superagent
-      .post('https://api.travis-ci.org/auth/github')
+      .post(`${travisApiUrl}/auth/github`)
       .send({ github_token: githubToken })
       .set({
         'User-Agent': tyrAgent,
-        Accept: 'application/vnd.travis-ci.2+json'
+        Accept: travisApiAccept
       })
       .end((err, res) => {
         if (err) {
@@ -88,16 +90,16 @@ export function requestTravisToken(githubToken) {
  * Set environment variables on a Travis-CI project
  */
 export function setEnvironmentVariables(travisAccessToken, repoId, environmentVariables) {
-  winston.log('verbose', 'setEnvironmentVariables');
+  winston.log('verbose', 'setEnvironmentVariables', { repoId });
 
   return new Promise((resolve, reject) => {
     superagent
-      .post('https://api.travis-ci.org/settings/env_vars')
-      .query({repository_id: repoId})
+      .post(`${travisApiUrl}/settings/env_vars`)
+      .query({ repository_id: repoId })
       .send({ env_vars: environmentVariables })
       .set({
         'User-Agent': tyrAgent,
-        Accept: 'application/vnd.travis-ci.2+json',
+        Accept: travisApiAccept,
         Authorization: `token ${travisAccessToken}`
       })
       .end((err, res) => {
