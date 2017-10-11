@@ -13,6 +13,7 @@ import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
+import { setupGitHub } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
@@ -225,5 +226,9 @@ export default async function run() {
   // eslint-disable-next-line
   const githubCredentials = await promptGithubCredentials();
   // eslint-disable-next-line
-  const dockerHubCredentials = await promptDockerHubCredentials();
+  if (configs.docker) {
+    const dockerHubCredentials = await promptDockerHubCredentials();
+    console.log(dockerHubCredentials);
+  }
+  setupGitHub(configs, githubCredentials);
 }
