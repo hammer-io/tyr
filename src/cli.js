@@ -6,8 +6,9 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import utils from './utils';
+import Preferences from 'preferences';
 
+import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
@@ -145,18 +146,57 @@ function promptDockerHubCredentials() {
 
 
 /**
+ * Make sure the user has all requirements satisfied before allowing
+ * them to continue creating a project.
+ */
+function promptGlobalPrerequisites() {
+  const questions = [];
+
+  constants.hammer.globalPrereqs.forEach((prereq) => {
+    questions.push({
+      name: prereq.name,
+      type: 'confirm',
+      message: prereq.message,
+      default: false
+    });
+  });
+
+  return inquirer.prompt(questions);
+}
+
+function userIsFinishedWithPrereqs(answers) {
+  let finishedPrereqs = true;
+
+  constants.hammer.globalPrereqs.forEach((prereq) => {
+    // If they answered 'No' for something, display the appropriate response
+    if (!answers[prereq.name]) {
+      console.log(chalk.red(prereq.responseIfNo));
+      finishedPrereqs = false;
+    }
+  });
+
+  return finishedPrereqs;
+}
+
+
+/**
  * The main execution function for hammer-cli.
  */
 export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
 
+  const prereqAnswers = await promptGlobalPrerequisites();
+  const canContinue = await userIsFinishedWithPrereqs(prereqAnswers);
+  if (!canContinue) {
+    return;
+  }
+  if (!userIsFinishedWithPrereqs) {
+    return;
+  }
+
   const configs = await promptConfigs();
-  console.log(configs);
   initProject(configs);
 
   const githubCredentials = await promptGithubCredentials();
-  console.log(githubCredentials);
-
   const dockerHubCredentials = await promptDockerHubCredentials();
-  console.log(dockerHubCredentials);
 }
