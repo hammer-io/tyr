@@ -1,6 +1,15 @@
 const superagent = require('superagent');
 const winston = require('winston');
 
+const githubApiUrl = 'https://api.github.com';
+
+/**
+ * Returns the string used for the basic authorization header in a POST request.
+ */
+function basicAuthorization(username, password) {
+  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+}
+
 /**
  * Request github oauth token
  */
@@ -10,26 +19,26 @@ export function requestGitHubToken(config) {
   return new Promise((resolve, reject) => {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     superagent
-      .post('https://api.github.com/authorizations')
-      .send({
-        scopes: [
-          'read:org', 'user:email', 'repo_deployment',
-          'repo:status',
-          'public_repo', 'write:repo_hook'
-        ],
-        note: 'temporary token to auth against travis'
-      })
-      .set({
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}`
-      })
-      .end((err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ token: res.body.token, url: res.body.url });
-        }
-      });
+    .post(`${githubApiUrl}/authorizations`)
+    .send({
+      scopes: [
+        'read:org', 'user:email', 'repo_deployment',
+        'repo:status',
+        'public_repo', 'write:repo_hook'
+      ],
+      note: 'temporary token to auth against travis'
+    })
+    .set({
+      'Content-Type': 'application/json',
+      Authorization: basicAuthorization(config.username, config.password)
+    })
+    .end((err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ token: res.body.token, url: res.body.url });
+      }
+    });
   });
 }
 
@@ -41,15 +50,14 @@ export function deleteGitHubToken(githubUrl, config) {
 
   return new Promise((resolve, reject) => {
     superagent
-      .delete(githubUrl)
-      // .send({ config.githubToken })
-      .set({ Authorization: `Basic ${Buffer.from(`${config.username}:${config.passw}`).toString('base64')}` })
-      .end((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+    .delete(githubUrl)
+    .set({ Authorization: basicAuthorization(config.username, config.password) })
+    .end((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
 }
