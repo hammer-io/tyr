@@ -1,7 +1,7 @@
 const superagent = require('superagent');
 const winston = require('winston');
 
-const hammerAgent = 'Travis/1.0';
+const tyrAgent = 'Travis/1.0';
 
 /**
  * Get github repo id from Travis-CI
@@ -16,7 +16,7 @@ export function getRepositoryId(travisAccessToken, config) {
     superagent
       .get(`https://api.travis-ci.org/repos/${config.username}/${config.projectName}`)
       .set({
-        'User-Agent': hammerAgent,
+        'User-Agent': tyrAgent,
         Accept: 'application/vnd.travis-ci.2+json',
         Authorization: `token ${travisAccessToken}`
       })
@@ -46,7 +46,7 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
         }
       })
       .set({
-        'User-Agent': hammerAgent,
+        'User-Agent': tyrAgent,
         Accept: 'application/vnd.travis-ci.2+json',
         Authorization: `token ${travisAccessToken}`
       })
@@ -71,7 +71,7 @@ export function requestTravisToken(githubToken) {
       .post('https://api.travis-ci.org/auth/github')
       .send({ github_token: githubToken })
       .set({
-        'User-Agent': hammerAgent,
+        'User-Agent': tyrAgent,
         Accept: 'application/vnd.travis-ci.2+json'
       })
       .end((err, res) => {
@@ -96,7 +96,7 @@ export function setEnvironmentVariables(travisAccessToken, repoId, environmentVa
       .query({repository_id: repoId})
       .send({ env_vars: environmentVariables })
       .set({
-        'User-Agent': hammerAgent,
+        'User-Agent': tyrAgent,
         Accept: 'application/vnd.travis-ci.2+json',
         Authorization: `token ${travisAccessToken}`
       })
