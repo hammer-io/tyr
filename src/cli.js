@@ -7,11 +7,14 @@ import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
 import Preferences from 'preferences';
+import winston from 'winston';
 
 import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
+
+const preferences = new Preferences(constants.hammer.name);
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -152,13 +155,21 @@ function promptDockerHubCredentials() {
 function promptGlobalPrerequisites() {
   const questions = [];
 
+  // If this is the first time settings prereqs in the preferences, create the object
+  if (!preferences.prereqs) {
+    preferences.prereqs = {};
+  }
+
   constants.hammer.globalPrereqs.forEach((prereq) => {
-    questions.push({
-      name: prereq.name,
-      type: 'confirm',
-      message: prereq.message,
-      default: false
-    });
+    // Only ask them if they haven't said YES in the past (i.e. if it's not complete)
+    if (!preferences.prereqs[prereq.name]) {
+      questions.push({
+        name: prereq.name,
+        type: 'confirm',
+        message: prereq.message,
+        default: false
+      });
+    }
   });
 
   return inquirer.prompt(questions);
@@ -169,9 +180,12 @@ function userIsFinishedWithPrereqs(answers) {
 
   constants.hammer.globalPrereqs.forEach((prereq) => {
     // If they answered 'No' for something, display the appropriate response
-    if (!answers[prereq.name]) {
+    if (answers[prereq.name] === false) {
       console.log(chalk.red(prereq.responseIfNo));
       finishedPrereqs = false;
+      preferences.prereqs[prereq.name] = false;
+    } else if (answers[prereq.name] === true) {
+      preferences.prereqs[prereq.name] = true;
     }
   });
 
@@ -184,19 +198,19 @@ function userIsFinishedWithPrereqs(answers) {
  */
 export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
+  winston.log('debug', preferences);
 
   const prereqAnswers = await promptGlobalPrerequisites();
   const canContinue = await userIsFinishedWithPrereqs(prereqAnswers);
   if (!canContinue) {
     return;
   }
-  if (!userIsFinishedWithPrereqs) {
-    return;
-  }
 
   const configs = await promptConfigs();
   initProject(configs);
 
+  // eslint-disable-next-line
   const githubCredentials = await promptGithubCredentials();
+  // eslint-disable-next-line
   const dockerHubCredentials = await promptDockerHubCredentials();
 }
