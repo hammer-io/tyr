@@ -1,8 +1,9 @@
 import assert from 'assert';
+import chalk from 'chalk';
 import fs from 'fs-extra';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
-import { initProject } from '../dist/cli'
+import { initProject, userIsFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
 
 const configs = {
@@ -14,6 +15,83 @@ const configs = {
   ci: 'TravisCI',
   container: 'Docker'
 };
+
+// Test strategy for capturing console output found here:
+// https://stackoverflow.com/questions/18543047/mocha-monitor-application-output
+function captureStream(stream){
+  const oldWrite = stream.write;
+  let buf = '';
+  stream.write = function(chunk, encoding, callback){
+    buf += chunk.toString(); // chunk is a String or Buffer
+    oldWrite.apply(stream, arguments);
+  };
+
+  return {
+    unhook: function unhook(){
+      stream.write = oldWrite;
+    },
+    captured: function(){
+      return buf;
+    },
+    clear: function(){
+      buf = '';
+    }
+  };
+}
+
+describe('User Preferences:', () => {
+  describe('When the user is asked about completing the prerequisites:', () => {
+    let hook;
+
+    beforeEach(() => {
+      hook = captureStream(process.stdout);
+    });
+
+    afterEach(() => {
+      hook.unhook();
+    });
+
+    it('should output prereq-specific error if user answers NO for a single prereq', () => {
+      constants.hammer.globalPrereqs.forEach((prereq) => {
+        const promptAnswers = {};
+        promptAnswers[prereq.name] = false;
+        userIsFinishedWithPrereqs(promptAnswers);
+        assert.equal(hook.captured(), chalk.red(prereq.responseIfNo) + '\n');
+        hook.clear();
+      });
+    });
+
+    it('should output all the prereq-specific errors if user answers NO for all the prereqs', () => {
+      const promptAnswers = {};
+      let expected = '';
+      constants.hammer.globalPrereqs.forEach((prereq) => {
+        promptAnswers[prereq.name] = false;
+        expected += chalk.red(prereq.responseIfNo) + '\n';
+      });
+      userIsFinishedWithPrereqs(promptAnswers);
+      assert.equal(hook.captured(), expected);
+    });
+
+    it('should return \'false\' if any of the prereq questions are NO', () => {
+      // Check for single NO's
+      constants.hammer.globalPrereqs.forEach((prereq) => {
+        const promptAnswers = {};
+        promptAnswers[prereq.name] = false;
+        const actual = userIsFinishedWithPrereqs(promptAnswers);
+        assert.equal(actual, false);
+      });
+    });
+
+    it('should return \'true\' if all of the prereq questions are YES', () => {
+      const promptAnswers = {};
+      constants.hammer.globalPrereqs.forEach((prereq) => {
+        promptAnswers[prereq.name] = true;
+      });
+      const actual = userIsFinishedWithPrereqs(promptAnswers);
+      assert.equal(actual, true);
+    });
+  });
+});
 
 describe('Initialize Project Files', () => {
   before(() => {

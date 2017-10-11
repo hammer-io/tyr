@@ -175,7 +175,7 @@ function promptGlobalPrerequisites() {
   return inquirer.prompt(questions);
 }
 
-function userIsFinishedWithPrereqs(answers) {
+export function userIsFinishedWithPrereqs(answers) {
   let finishedPrereqs = true;
 
   constants.hammer.globalPrereqs.forEach((prereq) => {
