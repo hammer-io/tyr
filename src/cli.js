@@ -145,10 +145,10 @@ function promptDockerHubCredentials() {
 
 
 /**
- * The main execution function for hammer-cli.
+ * The main execution function for tyr.
  */
 export default async function run() {
-  console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
+  console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
 
   const configs = await promptConfigs();
   console.log(configs);

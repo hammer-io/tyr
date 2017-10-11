@@ -1,5 +1,5 @@
 {
-  "name": "hammer-cli",
+  "name": "tyr",
   "version": "0.0.0",
   "description": "A command line interface for hammer-io.",
   "main": "src/index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hammer-io/hammer-cli.git"
+    "url": "https://github.com/hammer-io/tyr.git"
   },
   "authors": [
     "Erica Clark <clarkerican@gmail.com",
@@ -22,12 +22,12 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hammer-io/hammer-cli/issues"
+    "url": "https://github.com/hammer-io/tyr/issues"
   },
   "bin": {
-    "hammer-cli": "src/index.js"
+    "tyr": "src/index.js"
   },
-  "homepage": "https://github.com/hammer-io/hammer-cli#readme",
+  "homepage": "https://github.com/hammer-io/tyr#readme",
   "dependencies": {
     "babel-polyfill": "6.26.0",
     "chalk": "1.1.3",
