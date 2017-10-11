@@ -14,7 +14,7 @@ import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
 
-const preferences = new Preferences(constants.hammer.name);
+const preferences = new Preferences(constants.tyr.name);
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -160,7 +160,7 @@ function promptGlobalPrerequisites() {
     preferences.prereqs = {};
   }
 
-  constants.hammer.globalPrereqs.forEach((prereq) => {
+  constants.tyr.globalPrereqs.forEach((prereq) => {
     // Only ask them if they haven't said YES in the past (i.e. if it's not complete)
     if (!preferences.prereqs[prereq.name]) {
       questions.push({
@@ -175,10 +175,10 @@ function promptGlobalPrerequisites() {
   return inquirer.prompt(questions);
 }
 
-export function userIsFinishedWithPrereqs(answers) {
+export function isUserFinishedWithPrereqs(answers) {
   let finishedPrereqs = true;
 
-  constants.hammer.globalPrereqs.forEach((prereq) => {
+  constants.tyr.globalPrereqs.forEach((prereq) => {
     // If they answered 'No' for something, display the appropriate response
     if (answers[prereq.name] === false) {
       console.log(chalk.red(prereq.responseIfNo));
@@ -194,14 +194,14 @@ export function userIsFinishedWithPrereqs(answers) {
 
 
 /**
- * The main execution function for hammer-cli.
+ * The main execution function for tyr.
  */
 export default async function run() {
-  console.log(chalk.yellow(figlet.textSync(constants.hammer.name, { horizontalLayout: 'full' })));
+  console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
   winston.log('debug', preferences);
 
   const prereqAnswers = await promptGlobalPrerequisites();
-  const canContinue = await userIsFinishedWithPrereqs(prereqAnswers);
+  const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
   if (!canContinue) {
     return;
   }

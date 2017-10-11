@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
-import { initProject, userIsFinishedWithPrereqs } from '../dist/cli'
+import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
 
 const configs = {
@@ -52,10 +52,10 @@ describe('User Preferences:', () => {
     });
 
     it('should output prereq-specific error if user answers NO for a single prereq', () => {
-      constants.hammer.globalPrereqs.forEach((prereq) => {
+      constants.tyr.globalPrereqs.forEach((prereq) => {
         const promptAnswers = {};
         promptAnswers[prereq.name] = false;
-        userIsFinishedWithPrereqs(promptAnswers);
+        isUserFinishedWithPrereqs(promptAnswers);
         assert.equal(hook.captured(), chalk.red(prereq.responseIfNo) + '\n');
         hook.clear();
       });
@@ -64,30 +64,30 @@ describe('User Preferences:', () => {
     it('should output all the prereq-specific errors if user answers NO for all the prereqs', () => {
       const promptAnswers = {};
       let expected = '';
-      constants.hammer.globalPrereqs.forEach((prereq) => {
+      constants.tyr.globalPrereqs.forEach((prereq) => {
         promptAnswers[prereq.name] = false;
         expected += chalk.red(prereq.responseIfNo) + '\n';
       });
-      userIsFinishedWithPrereqs(promptAnswers);
+      isUserFinishedWithPrereqs(promptAnswers);
       assert.equal(hook.captured(), expected);
     });
 
     it('should return \'false\' if any of the prereq questions are NO', () => {
       // Check for single NO's
-      constants.hammer.globalPrereqs.forEach((prereq) => {
+      constants.tyr.globalPrereqs.forEach((prereq) => {
         const promptAnswers = {};
         promptAnswers[prereq.name] = false;
-        const actual = userIsFinishedWithPrereqs(promptAnswers);
+        const actual = isUserFinishedWithPrereqs(promptAnswers);
         assert.equal(actual, false);
       });
     });
 
     it('should return \'true\' if all of the prereq questions are YES', () => {
       const promptAnswers = {};
-      constants.hammer.globalPrereqs.forEach((prereq) => {
+      constants.tyr.globalPrereqs.forEach((prereq) => {
         promptAnswers[prereq.name] = true;
       });
-      const actual = userIsFinishedWithPrereqs(promptAnswers);
+      const actual = isUserFinishedWithPrereqs(promptAnswers);
       assert.equal(actual, true);
     });
   });

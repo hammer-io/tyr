@@ -1,5 +1,5 @@
-# hammer-cli
-[![Build Status](https://travis-ci.org/hammer-io/hammer-cli.svg?branch=master)](https://travis-ci.org/hammer-io/hammer-cli)
+# tyr
+[![Build Status](https://travis-ci.org/hammer-io/tyr.svg?branch=master)](https://travis-ci.org/hammer-io/tyr)
 
 ## Installation
 Coming soon.
@@ -7,8 +7,8 @@ Coming soon.
 ## Installation for Development
 1. Fork this repository.
 2. Open your favorite terminal and go to the directory you want to install.
-3. `git clone https://github.com/username/hammer-cli`,
-4. `cd hammer-cli`
+3. `git clone https://github.com/username/tyr`,
+4. `cd tyr`
 5. You're all set!
 
 ## Usage
@@ -19,4 +19,4 @@ Coming soon.
 `npm run lint`: runs the linter
 
 ## Contributing
-Please see our [Contributing Guide](https://github.com/hammer-io/hammer-cli/blob/master/CONTRIBUTING.md) for contribution guidelines.
+Please see our [Contributing Guide](https://github.com/hammer-io/tyr/blob/master/CONTRIBUTING.md) for contribution guidelines.

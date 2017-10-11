@@ -79,9 +79,9 @@ export default {
     }
   },
 
-  hammer: {
-    name: 'hammer-io',
-    cliName: 'hammer-cli',
+  tyr: {
+    name: 'tyr',
+    cliName: 'tyr',
     globalPrereqs: [
       {
         name: 'hasGithubAccount',
