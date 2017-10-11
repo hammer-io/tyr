@@ -6,11 +6,15 @@ import figlet from 'figlet';
 import inquirer from 'inquirer';
 import isValid from 'is-valid-path';
 import fs from 'fs';
-import utils from './utils';
+import Preferences from 'preferences';
+import winston from 'winston';
 
+import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import constants from './constants/constants';
+
+const preferences = new Preferences(constants.tyr.name);
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -143,20 +147,83 @@ function promptDockerHubCredentials() {
   return inquirer.prompt(questions);
 }
 
+/**
+ * When the user first uses the application, the user preferences file
+ * has not been created or initialized. Any initialization code that needs
+ * to happen should be placed here.
+ */
+function initPreferencesIfUninitialized() {
+  if (!preferences.prereqs) {
+    preferences.prereqs = {};
+  }
+}
+
+/**
+ * Make sure the user has all requirements satisfied before allowing
+ * them to continue creating a project.
+ */
+function promptGlobalPrerequisites() {
+  const questions = [];
+
+  initPreferencesIfUninitialized();
+
+  constants.tyr.globalPrereqs.forEach((prereq) => {
+    // Only ask them if they haven't said YES in the past (i.e. if it's not complete)
+    if (!preferences.prereqs[prereq.name]) {
+      questions.push({
+        name: prereq.name,
+        type: 'confirm',
+        message: prereq.message,
+        default: false
+      });
+    }
+  });
+
+  return inquirer.prompt(questions);
+}
+
+/**
+ * Returns true if all answers are 'true' (i.e. if the user said YES to
+ * having completed all prerequisites).
+ */
+export function isUserFinishedWithPrereqs(answers) {
+  let finishedPrereqs = true;
+
+  initPreferencesIfUninitialized();
+
+  constants.tyr.globalPrereqs.forEach((prereq) => {
+    // If they answered 'No' for something, display the appropriate response
+    if (answers[prereq.name] === false) {
+      console.log(chalk.red(prereq.responseIfNo));
+      finishedPrereqs = false;
+      preferences.prereqs[prereq.name] = false;
+    } else if (answers[prereq.name] === true) {
+      preferences.prereqs[prereq.name] = true;
+    }
+  });
+
+  return finishedPrereqs;
+}
+
 
 /**
  * The main execution function for tyr.
  */
 export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
+  winston.log('debug', preferences);
+
+  const prereqAnswers = await promptGlobalPrerequisites();
+  const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
+  if (!canContinue) {
+    return;
+  }
 
   const configs = await promptConfigs();
-  console.log(configs);
   initProject(configs);
 
+  // eslint-disable-next-line
   const githubCredentials = await promptGithubCredentials();
-  console.log(githubCredentials);
-
+  // eslint-disable-next-line
   const dockerHubCredentials = await promptDockerHubCredentials();
-  console.log(dockerHubCredentials);
 }
