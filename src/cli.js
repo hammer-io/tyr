@@ -17,6 +17,8 @@ import { setupGitHub } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
+winston.level = 'debug';
+
 /**
  * Initializes the files and accounts needed to use or application
  * @param config the config object form the main inquirer prompt
@@ -223,12 +225,22 @@ export default async function run() {
   const configs = await promptConfigs();
   initProject(configs);
 
-  // eslint-disable-next-line
   const githubCredentials = await promptGithubCredentials();
 
   if (configs.docker) {
     // eslint-disable-next-line
     const dockerHubCredentials = await promptDockerHubCredentials();
   }
-  setupGitHub(configs, githubCredentials);
+
+  await setupGitHub(
+    configs.projectName, configs.projectDescription,
+    githubCredentials.githubUsername, githubCredentials.githubPassword
+  );
+
+  if (configs.travis) {
+    utils.enableTravisOnProject(
+      githubCredentials.githubUsername, githubCredentials.githubPassword,
+      configs.projectName, null
+    );
+  }
 }

@@ -63,6 +63,31 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
 }
 
 /**
+ * Triggers a new sync with GitHub. Needed to see the newly-created repository
+ */
+export function syncTravisWithGithub(travisAccessToken) {
+  winston.log('verbose', 'syncTravisWithGithub');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .post(`${travisApiUrl}/users/sync`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err) => {
+        if (err) {
+          // TODO: Might return status 409 if the user is currently syncing.
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+  });
+}
+
+/**
  * Request Travis-CI auth token
  */
 export function requestTravisToken(githubToken) {
