@@ -100,48 +100,48 @@ describe('Initialize Project Files', () => {
 
   describe('Initialize Project Directories', () => {
     it('should create a new directory with the project name', () => {
-      assert.equal(true, fs.existsSync(configs.projectName));
+      assert.equal(fs.existsSync(configs.projectName), true);
     });
 
     it('should create a src directory underneath the project directory', () => {
-      assert.equal(true, fs.existsSync(configs.projectName + '/src'));
+      assert.equal(fs.existsSync(configs.projectName + '/src'), true);
     });
 
     it('should return an error if a directory with the project name already exists', () => {
-      const result = initProject(configs); // run initProject again to see if it fails
-      assert.equal(constants.config.projectName.error.duplicateMessage, result);
+      const actualResult = initProject(configs); // run initProject again to see if it fails
+      assert.equal(actualResult, constants.config.projectName.error.duplicateMessage);
     });
   });
 
   describe('Initialize Travis CI', () => {
     it('should create a .travis.yml file', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/.travis.yml`));
+      assert.equal(fs.existsSync(`${configs.projectName}/.travis.yml`), true);
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
-      const contents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
-      assert.equal(constants.travisCI.fileContents, contents);
+      const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
+      assert.equal(actualContents, constants.travisCI.fileContents);
     });
   });
 
   describe('Initialize Docker', () => {
     it('should create a Dockerfile and .dockerignore', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/Dockerfile`));
-      assert.equal(true, fs.existsSync(`${configs.projectName}/.dockerignore`));
+      assert.equal(fs.existsSync(`${configs.projectName}/Dockerfile`), true);
+      assert.equal(fs.existsSync(`${configs.projectName}/.dockerignore`), true);
     });
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
-      const dockerContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
-      const dockerignoreContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
+      const dockerActualContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
+      const dockerignoreActualContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
 
-      assert.equal(constants.docker.dockerFile.fileContents, dockerContents);
-      assert.equal(constants.docker.dockerIgnore.fileContents, dockerignoreContents);
+      assert.equal(dockerActualContents, constants.docker.dockerFile.fileContents);
+      assert.equal(dockerignoreActualContents, constants.docker.dockerIgnore.fileContents);
     });
   });
 
   describe('Initialize package.json', () => {
     it('should create a package.json file', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/package.json`));
+      assert.equal(fs.existsSync(`${configs.projectName}/package.json`), true);
     });
 
     it('should create a package.json file with the proper contents', () => {
@@ -164,18 +164,18 @@ describe('Initialize Project Files', () => {
 
 
       const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`);
-      assert.equal(packageJsonExpectedContents, packageJsonActualContents);
+      assert.equal(packageJsonActualContents, packageJsonExpectedContents);
     });
   });
 
   describe('Initialize index.js', () => {
     it('should create an index.js file', () => {
-      assert.equal(true, fs.existsSync(`${configs.projectName}/src/index.js`));
+      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const indexJsContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
-      assert.equal(constants.indexJS.fileContents, indexJsContents);
+      assert.equal(indexJsContents,constants.indexJS.fileContents);
     });
   });
 
