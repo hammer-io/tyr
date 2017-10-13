@@ -31,10 +31,10 @@ Please ensure that commits are descriptive and are free of any obvious grammatic
 
 ## Logging
 
-We use the [winston](https://github.com/winstonjs/winston){:target="_blank"} module for
+We use the [winston](https://github.com/winstonjs/winston) module for
 logging. There are several different log levels that we use:
 
-```json
+```javascript
 { 
   error: 0, 
   warn: 1, 
@@ -45,8 +45,8 @@ logging. There are several different log levels that we use:
 }
 ```
 
-The `info` level is used by default. To increase the level (say, for debugging or if we
-add a `--verbose` flag to the CLI), you can set the level by adding the following line.
+The `info` level is used by default. To increase the level for debugging, you can
+set the level by adding the following line.
 
 ```javascript
 winston.level = 'debug';
