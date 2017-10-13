@@ -1,4 +1,4 @@
 export default {
-  none: "<None>",
-  choices: ["<None>", "TravisCI"]
+  none: '<None>',
+  choices: ['<None>', 'TravisCI']
 }
