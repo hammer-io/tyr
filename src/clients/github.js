@@ -142,13 +142,24 @@ export function createGitHubRepository(projectName, projectDescription, username
  * @param projectName
  */
 export function initAddCommitAndPush(username, projectName) {
-  git(`${process.cwd()}/${projectName}`)
-    .init()
-    .add('.gitignore')
-    .add('./*')
-    .commit('Initial commit')
-    .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
-    .push('origin', 'master');
+  winston.log('verbose', 'initAddCommitAndPush', { username, projectName });
+  winston.log('info', 'Pushing all files to the new git repository...');
+
+  return new Promise((resolve) => {
+    git(`${process.cwd()}/${projectName}`)
+      .init()
+      .add('.gitignore')
+      .add('./*')
+      .commit('Initial commit')
+      .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
+      .push('origin', 'master')
+      .exec(() => {
+        console.log('Please wait while the files are uploaded...');
+        setTimeout(() => {
+          resolve();
+        }, 10000); // TODO: Find a better way to do this than a timeout
+      });
+  });
 }
 
 
@@ -164,9 +175,13 @@ export function initAddCommitAndPush(username, projectName) {
 export async function setupGitHub(projectName, projectDescription, username, password) {
   winston.log('verbose', 'setupGitHub', { username });
 
-  const githubResponse = await requestGitHubToken(username, password);
-  await createGitIgnore(projectName);
-  await createGitHubRepository(projectName, projectDescription, username, password);
-  await initAddCommitAndPush(username, projectName);
-  await deleteGitHubToken(githubResponse.url, username, password);
+  try {
+    const githubResponse = await requestGitHubToken(username, password);
+    await createGitIgnore(projectName);
+    await createGitHubRepository(projectName, projectDescription, username, password);
+    await initAddCommitAndPush(username, projectName);
+    await deleteGitHubToken(githubResponse.url, username, password);
+  } catch (err) {
+    winston.log('error', 'setupGitHub failed for some reason', err);
+  }
 }

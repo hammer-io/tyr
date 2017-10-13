@@ -8,15 +8,12 @@ const travisApiAccept = 'application/vnd.travis-ci.2+json';
 /**
  * Get github repo id from Travis-CI
  */
-export function getRepositoryId(travisAccessToken, config) {
-  winston.log('verbose', 'getRepositoryId', {
-    username: config.username,
-    projectName: config.projectName
-  });
+export function getRepositoryId(travisAccessToken, username, projectName) {
+  winston.log('verbose', 'getRepositoryId', { username, projectName });
 
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/repos/${config.username}/${config.projectName}`)
+      .get(`${travisApiUrl}/repos/${username}/${projectName}`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -78,10 +75,13 @@ export function syncTravisWithGithub(travisAccessToken) {
       })
       .end((err) => {
         if (err) {
-          // TODO: Might return status 409 if the user is currently syncing.
           reject(err);
         } else {
-          resolve();
+          // TODO: Might return status 409 if the user is currently syncing.
+          console.log('Please wait while we sync TravisCI with GitHub...');
+          setTimeout(() => {
+            resolve();
+          }, 10000); // TODO: Find a better way to do this than a timeout.
         }
       });
   });

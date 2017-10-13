@@ -17,7 +17,6 @@ import { setupGitHub } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
-winston.level = 'debug';
 
 /**
  * Initializes the files and accounts needed to use or application
@@ -237,8 +236,8 @@ export default async function run() {
     githubCredentials.githubUsername, githubCredentials.githubPassword
   );
 
-  if (configs.travis) {
-    utils.enableTravisOnProject(
+  if (configs.ci === constants.travisCI.name) {
+    await utils.travis.enableTravisOnProject(
       githubCredentials.githubUsername, githubCredentials.githubPassword,
       configs.projectName, null
     );
