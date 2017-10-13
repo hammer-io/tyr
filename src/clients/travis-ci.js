@@ -8,15 +8,12 @@ const travisApiAccept = 'application/vnd.travis-ci.2+json';
 /**
  * Get github repo id from Travis-CI
  */
-export function getRepositoryId(travisAccessToken, config) {
-  winston.log('verbose', 'getRepositoryId', {
-    username: config.username,
-    projectName: config.projectName
-  });
+export function getRepositoryId(travisAccessToken, username, projectName) {
+  winston.log('verbose', 'getRepositoryId', { username, projectName });
 
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/repos/${config.username}/${config.projectName}`)
+      .get(`${travisApiUrl}/repos/${username}/${projectName}`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -57,6 +54,34 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
           reject(err);
         } else {
           resolve();
+        }
+      });
+  });
+}
+
+/**
+ * Triggers a new sync with GitHub. Needed to see the newly-created repository
+ */
+export function syncTravisWithGithub(travisAccessToken) {
+  winston.log('verbose', 'syncTravisWithGithub');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .post(`${travisApiUrl}/users/sync`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          // TODO: Might return status 409 if the user is currently syncing.
+          console.log('Please wait while we sync TravisCI with GitHub...');
+          setTimeout(() => {
+            resolve();
+          }, 10000); // TODO: Find a better way to do this than a timeout.
         }
       });
   });

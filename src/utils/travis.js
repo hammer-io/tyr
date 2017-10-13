@@ -13,15 +13,9 @@ export function initTravisCI(config) {
  * Initialize Travis-CI on the created project
  */
 export async function enableTravisOnProject(username, password, projectName, environmentVariables) {
-  const config = {
-    username,
-    projectName,
-    password
-  };
-
   try {
     // Create a temporary GitHub oauth token
-    const githubResponse = await githubClient.requestGitHubToken(config);
+    const githubResponse = await githubClient.requestGitHubToken(username, password);
     const githubToken = githubResponse.token;
     const githubUrl = githubResponse.url;
 
@@ -29,10 +23,13 @@ export async function enableTravisOnProject(username, password, projectName, env
     const travisAccessToken = await travisClient.requestTravisToken(githubToken);
 
     // Delete the temporary GitHub token
-    await githubClient.deleteGitHubToken(githubUrl, config);
+    await githubClient.deleteGitHubToken(githubUrl, username, password);
+
+    // Sync Travis with GitHub, which must be done before activating the repository
+    await travisClient.syncTravisWithGithub(travisAccessToken);
 
     // Get the project repository ID, and then use that ID to activate Travis for the project
-    const repoId = await travisClient.getRepositoryId(travisAccessToken, config);
+    const repoId = await travisClient.getRepositoryId(travisAccessToken, username, projectName);
     await travisClient.activateTravisHook(repoId, travisAccessToken);
 
     // Add environment variables
@@ -40,7 +37,7 @@ export async function enableTravisOnProject(username, password, projectName, env
       await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
     }
 
-    winston.log('info', `TravisCI successfully enabled on ${config.username}/${config.projectName}`);
+    winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);
   } catch (err) {
     winston.log('error', constants.travisCI.error.enableTravisOnProject, err);
   }
