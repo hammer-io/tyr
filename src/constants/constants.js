@@ -112,16 +112,6 @@ export default {
         name: 'hasGithubAccount',
         message: 'Do you have a GitHub account?',
         responseIfNo: 'GitHub is currently the source control tool of choice. Please visit https://github.com/ to create a new account before proceeding.'
-      },
-      {
-        name: 'hasDockerhubAccount',
-        message: 'Do you have a Dockerhub account?',
-        responseIfNo: 'Docker and Docker Hub are used by default for creating your project\'s application container. Please visit https://hub.docker.com/ to create a new account before proceeding.'
-      },
-      {
-        name: 'hasHerokuAccount',
-        message: 'Do you have a Heroku account?',
-        responseIfNo: 'Heroku is used to deploy the built application. Please visit https://www.heroku.com/ to create a new account'
       }
     ],
     optionalPrereqs: {
@@ -129,6 +119,16 @@ export default {
         name: 'hasTravisAccount',
         message: 'Do you have a Travis account?',
         responseIfNo: 'If you want to use TravisCI as your continuous integration choice, please visit https://travis-ci.org/ and create an account before proceeding.'
+      },
+      dockerHub: {
+        name: 'hasDockerhubAccount',
+        message: 'Do you have a Dockerhub account?',
+        responseIfNo: 'Docker and Docker Hub are used by default for creating your project\'s application container. Please visit https://hub.docker.com/ to create a new account before proceeding.'
+      },
+      heroku: {
+        name: 'hasHerokuAccount',
+        message: 'Do you have a Heroku account?',
+        responseIfNo: 'Heroku is used to deploy the built application. Please visit https://www.heroku.com/ to create a new account'
       }
     }
   },
