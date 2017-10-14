@@ -25,7 +25,7 @@
     "url": "https://github.com/hammer-io/tyr/issues"
   },
   "bin": {
-    "tyr": "src/index.js"
+    "tyr": "dist/index.js"
   },
   "homepage": "https://github.com/hammer-io/tyr#readme",
   "dependencies": {
