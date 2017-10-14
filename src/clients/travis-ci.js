@@ -114,14 +114,14 @@ export function requestTravisToken(githubToken) {
 /**
  * Set environment variables on a Travis-CI project
  */
-export function setEnvironmentVariables(travisAccessToken, repoId, environmentVariables) {
-  winston.log('verbose', 'setEnvironmentVariables', { repoId });
+export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
+  winston.log('verbose', 'setEnvironmentVariable', { repoId });
 
   return new Promise((resolve, reject) => {
     superagent
       .post(`${travisApiUrl}/settings/env_vars`)
       .query({ repository_id: repoId })
-      .send({ env_vars: environmentVariables })
+      .send({ env_var: environmentVariable })
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -131,7 +131,7 @@ export function setEnvironmentVariables(travisAccessToken, repoId, environmentVa
         if (err) {
           reject(err);
         } else {
-          resolve(res.body.env_vars);
+          resolve(res.body.env_var);
         }
       });
   });

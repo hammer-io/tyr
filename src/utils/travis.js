@@ -33,8 +33,14 @@ export async function enableTravisOnProject(username, password, projectName, env
     await travisClient.activateTravisHook(repoId, travisAccessToken);
 
     // Add environment variables
-    if (environmentVariables) {
-      await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
+    if (environmentVariables && environmentVariables.length !== 0) {
+      for (const env of environmentVariables) { // eslint-disable-line no-restricted-syntax
+        await travisClient.setEnvironmentVariable( // eslint-disable-line no-await-in-loop
+          travisAccessToken,
+          repoId,
+          env
+        );
+      }
     }
 
     winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);
