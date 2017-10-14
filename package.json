@@ -37,6 +37,7 @@
     "is-valid-path": "0.1.1",
     "lodash": "4.17.4",
     "preferences": "0.2.1",
+    "shelljs": "0.7.8",
     "simple-git": "1.79.0",
     "superagent": "3.6.2",
     "winston": "2.4.0"

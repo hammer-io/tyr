@@ -252,12 +252,14 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
-  await setupGitHub(
-    configs.projectName,
-    configs.projectDescription,
-    githubCredentials.githubUsername,
-    githubCredentials.githubPassword
-  );
+  if (githubCredentials.githubUsername && githubCredentials.githubPassword) {
+    await setupGitHub(
+      configs.projectName,
+      configs.projectDescription,
+      githubCredentials.githubUsername,
+      githubCredentials.githubPassword
+    );
+  }
 
   const environmentVariables = [];
   if (configs.docker) {
@@ -296,4 +298,6 @@ export default async function run() {
       environmentVariables
     );
   }
+
+  utils.npm.npmInstall(`${configs.projectName}`);
 }
