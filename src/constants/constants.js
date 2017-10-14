@@ -87,6 +87,7 @@ export default {
   },
 
   heroku: {
+    name: 'Heroku',
     email: {
       name: 'herokuEmail',
       message: 'Heroku Email:'
