@@ -199,6 +199,11 @@ export default {
     deployment: {
       name: 'deployment',
       message: 'Choose your hosting service:'
+    },
+
+    web: {
+      name: 'web',
+      message: 'Choose your web application framework:'
     }
   }
 }
