@@ -12,6 +12,7 @@ import winston from 'winston';
 import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
+import deploymentChoices from './constants/deployment-choices';
 import constants from './constants/constants';
 import { setupGitHub } from './clients/github';
 
@@ -109,13 +110,18 @@ function promptConfigs() {
     type: 'list',
     message: constants.config.container.message,
     choices: containerizationChoices.choices
+  }, {
+    name: constants.config.deployment.name,
+    type: 'list',
+    message: constants.config.deployment.message,
+    choices: deploymentChoices.choices
   }];
 
   return inquirer.prompt(questions);
 }
 
 /**
- * Gets the user's github credentials, logs them in, then safely stores their credentials somewhere.
+ * Gets the user's github credentials
  */
 function promptGithubCredentials() {
   const questions = [{
@@ -132,8 +138,7 @@ function promptGithubCredentials() {
 }
 
 /**
- * Gets the user's docker hub credentials, logs them in,
- * then safely stores their credentials somewhere.
+ * Gets the user's docker hub credentials
  */
 function promptDockerHubCredentials() {
   const questions = [{
@@ -144,6 +149,27 @@ function promptDockerHubCredentials() {
     name: constants.dockerHub.password.name,
     type: 'password',
     message: constants.dockerHub.password.message
+  }];
+
+  return inquirer.prompt(questions);
+}
+
+/**
+ * Gets the user's heroku credentials
+ */
+function promptHerokuCredentials() {
+  const questions = [{
+    name: constants.heroku.email.name,
+    type: 'input',
+    message: constants.heroku.username.message,
+  }, {
+    name: constants.heroku.username.name,
+    type: 'input',
+    message: constants.heroku.username.message,
+  }, {
+    name: constants.heroku.password.name,
+    type: 'password',
+    message: constants.heroku.password.message
   }];
 
   return inquirer.prompt(questions);
@@ -226,20 +252,48 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
+  await setupGitHub(
+    configs.projectName,
+    configs.projectDescription,
+    githubCredentials.githubUsername,
+    githubCredentials.githubPassword
+  );
+
+  const environmentVariables = [];
   if (configs.docker) {
-    // eslint-disable-next-line
     const dockerHubCredentials = await promptDockerHubCredentials();
+    environmentVariables.push({
+      name: 'DOCKER_USERNAME',
+      value: dockerHubCredentials.dockerHubUsername
+    });
+    environmentVariables.push({
+      name: 'DOCKER_PASSWORD',
+      value: dockerHubCredentials.dockerHubPassword
+    })
   }
 
-  await setupGitHub(
-    configs.projectName, configs.projectDescription,
-    githubCredentials.githubUsername, githubCredentials.githubPassword
-  );
+  if (configs.heroku) {
+    const herokuCredentials = await promptHerokuCredentials();
+    environmentVariables.push({
+      name: 'HEROKU_EMAIL',
+      value: herokuCredentials.herokuEmail
+    });
+    environmentVariables.push({
+      name: 'HEROKU_USERNAME',
+      value: herokuCredentials.herokuUsername
+    });
+    environmentVariables.push({
+      name: 'HEROKU_PASSWORD',
+      value: herokuCredentials.herokuPassword
+    })
+  }
 
   if (configs.ci === constants.travisCI.name) {
     await utils.travis.enableTravisOnProject(
-      githubCredentials.githubUsername, githubCredentials.githubPassword,
-      configs.projectName, null
+      githubCredentials.githubUsername,
+      githubCredentials.githubPassword,
+      configs.projectName,
+      environmentVariables
     );
   }
 }

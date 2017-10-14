@@ -86,6 +86,23 @@ export default {
     }
   },
 
+  heroku: {
+    email: {
+      name: 'herokuEmail',
+      message: 'Heroku Email:'
+    },
+
+    username: {
+      name: 'herokuUsername',
+      message: 'Heroku Username:'
+    },
+
+    password: {
+      name: 'herokuPassword',
+      message: 'Heroku Password:'
+    }
+  },
+
   tyr: {
     name: 'tyr',
     cliName: 'tyr',
@@ -99,6 +116,11 @@ export default {
         name: 'hasDockerhubAccount',
         message: 'Do you have a Dockerhub account?',
         responseIfNo: 'Docker and Docker Hub are used by default for creating your project\'s application container. Please visit https://hub.docker.com/ to create a new account before proceeding.'
+      },
+      {
+        name: 'hasHerokuAccount',
+        message: 'Do you have a Heroku account?',
+        responseIfNo: 'Heroku is used to deploy the built application. Please visit https://www.heroku.com/ to create a new account'
       }
     ],
     optionalPrereqs: {
@@ -171,6 +193,11 @@ export default {
     container: {
       name: 'container',
       message: 'Choose your containerization tool:'
+    },
+
+    deployment: {
+      name: 'deployment',
+      message: 'Choose your hosting service:'
     }
   }
 }
