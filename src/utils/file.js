@@ -17,7 +17,6 @@ export function createPackageJson(config, dependencies) {
   const author = config.author.split(',');
 
   const packageJson = packageTemplate;
-  console.log(packageJson);
 
   packageJson.name = config.projectName;
   packageJson.version = config.version;
@@ -36,9 +35,16 @@ export function createPackageJson(config, dependencies) {
  */
 export function createIndexFile(folderName, usingExpress) {
   if (usingExpress) {
-    fs.writeFileSync(`${folderName}/src/index.js`, loadTemplate('./../../templates/js/express/index.js'));
-    fs.writeFileSync(`${folderName}/src/routes.js`, loadTemplate('./../../templates/js/express/routes.js'));
+    fs.writeFileSync(
+      `${folderName}/src/index.js`,
+      loadTemplate('./../../templates/js/express/index.js')
+    );
+    fs.writeFileSync(`${folderName}/src/routes.js`,
+      loadTemplate('./../../templates/js/express/routes.js')
+    );
   } else {
-    fs.writeFileSync(`${folderName}/src/index.js`, loadTemplate('./../../templates/js/index.js'));
+    fs.writeFileSync(`${folderName}/src/index.js`,
+      loadTemplate('./../../templates/js/index.js')
+    );
   }
 }

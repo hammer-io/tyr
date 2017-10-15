@@ -1,6 +1,14 @@
 import fs from 'fs';
+import path from 'path'
 
 import constants from '../constants/constants'
+
+/**
+ * Load template file
+ */
+function loadTemplate(filepath) {
+  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+}
 
 /**
  * Generate the required Docker files
@@ -9,11 +17,11 @@ import constants from '../constants/constants'
 export function initDocker(config) {
   fs.writeFileSync(
     `${config.projectName}/${constants.docker.dockerFile.fileName}`,
-    constants.docker.dockerFile.fileContents
+    loadTemplate('./../../templates/docker/Dockerfile')
   );
 
   fs.writeFileSync(
     `${config.projectName}/${constants.docker.dockerIgnore.fileName}`,
-    constants.docker.dockerIgnore.fileContents
+    loadTemplate('./../../templates/docker/.dockerignore')
   );
 }
