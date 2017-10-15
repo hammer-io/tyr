@@ -3,7 +3,7 @@ import winston from 'winston';
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
-import * as travisClient from '../clients/travis-ci';
+import * as travisClient from '../clients/travis';
 
 export function initTravisCI(config) {
   fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, constants.travisCI.fileContents);

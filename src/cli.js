@@ -113,8 +113,16 @@ export function initProject(config) {
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
     fs.mkdirSync(`${config.projectName}/src`);
-    utils.file.createPackageJson(config);
-    utils.file.createIndexFile(config.projectName);
+
+    const dependencies = {};
+    let usingExpress = false;
+    if (config.web === constants.express.name) {
+      dependencies.express = constants.express.version;
+      usingExpress = true;
+    }
+
+    utils.file.createPackageJson(config, dependencies);
+    utils.file.createIndexFile(config.projectName, usingExpress);
 
     if (config.container === constants.docker.name) {
       utils.docker.initDocker(config);
@@ -245,62 +253,62 @@ export function isUserFinishedWithPrereqs(answers) {
  * The main execution function for tyr.
  */
 export default async function run() {
-  console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
-  winston.log('debug', preferences);
-
-  const prereqAnswers = await promptGlobalPrerequisites();
-  const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
-  if (!canContinue) {
-    return;
-  }
+  // console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
+  // winston.log('debug', preferences);
+  //
+  // const prereqAnswers = await promptGlobalPrerequisites();
+  // const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
+  // if (!canContinue) {
+  //   return;
+  // }
 
   const configs = await promptConfigs();
   initProject(configs);
-
-  const githubCredentials = await promptGithubCredentials();
-
-  await setupGitHub(
-    configs.projectName,
-    configs.projectDescription,
-    githubCredentials.githubUsername,
-    githubCredentials.githubPassword
-  );
-
-  const environmentVariables = [];
-  if (configs.containerization === 'Docker') {
-    const dockerHubCredentials = await promptDockerHubCredentials();
-    environmentVariables.push({
-      name: 'DOCKER_USERNAME',
-      value: dockerHubCredentials.dockerHubUsername
-    });
-    environmentVariables.push({
-      name: 'DOCKER_PASSWORD',
-      value: dockerHubCredentials.dockerHubPassword
-    })
-  }
-
-  if (configs.deployment === constants.heroku.name) {
-    const herokuCredentials = await promptHerokuCredentials();
-    environmentVariables.push({
-      name: 'HEROKU_EMAIL',
-      value: herokuCredentials.herokuEmail
-    });
-    environmentVariables.push({
-      name: 'HEROKU_USERNAME',
-      value: herokuCredentials.herokuUsername
-    });
-    environmentVariables.push({
-      name: 'HEROKU_PASSWORD',
-      value: herokuCredentials.herokuPassword
-    })
-  }
-
-  if (configs.ci === constants.travisCI.name) {
-    await utils.travis.enableTravisOnProject(
-      githubCredentials.githubUsername,
-      githubCredentials.githubPassword,
-      configs.projectName,
-      environmentVariables
-    );
-  }
+  //
+  // const githubCredentials = await promptGithubCredentials();
+  //
+  // await setupGitHub(
+  //   configs.projectName,
+  //   configs.projectDescription,
+  //   githubCredentials.githubUsername,
+  //   githubCredentials.githubPassword
+  // );
+  //
+  // const environmentVariables = [];
+  // if (configs.containerization === 'Docker') {
+  //   const dockerHubCredentials = await promptDockerHubCredentials();
+  //   environmentVariables.push({
+  //     name: 'DOCKER_USERNAME',
+  //     value: dockerHubCredentials.dockerHubUsername
+  //   });
+  //   environmentVariables.push({
+  //     name: 'DOCKER_PASSWORD',
+  //     value: dockerHubCredentials.dockerHubPassword
+  //   })
+  // }
+  //
+  // if (configs.deployment === constants.heroku.name) {
+  //   const herokuCredentials = await promptHerokuCredentials();
+  //   environmentVariables.push({
+  //     name: 'HEROKU_EMAIL',
+  //     value: herokuCredentials.herokuEmail
+  //   });
+  //   environmentVariables.push({
+  //     name: 'HEROKU_USERNAME',
+  //     value: herokuCredentials.herokuUsername
+  //   });
+  //   environmentVariables.push({
+  //     name: 'HEROKU_PASSWORD',
+  //     value: herokuCredentials.herokuPassword
+  //   })
+  // }
+  //
+  // if (configs.ci === constants.travisCI.name) {
+  //   await utils.travis.enableTravisOnProject(
+  //     githubCredentials.githubUsername,
+  //     githubCredentials.githubPassword,
+  //     configs.projectName,
+  //     environmentVariables
+  //   );
+  // }
 }

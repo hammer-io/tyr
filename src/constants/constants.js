@@ -104,6 +104,11 @@ export default {
     }
   },
 
+  express: {
+    name: 'ExpressJS',
+    version: '4.16.0'
+  },
+
   tyr: {
     name: 'tyr',
     cliName: 'tyr',

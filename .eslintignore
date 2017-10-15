@@ -2,4 +2,4 @@
 
 test/*
 dist/*
-src/templates/*
+templates/*
