@@ -17,6 +17,24 @@ const configs = {
   container: 'Docker'
 };
 
+const configs2 = {
+  projectName: 'jack',
+  description: 'Jack\'s Test Project',
+  version: '0.0.1',
+  author: 'Jack Meyer',
+  license: 'MIT',
+  web: 'ExpressJS'
+};
+
+const configs3 = {
+  projectName: 'jack',
+  description: 'Jack\'s Test Project',
+  version: '0.0.1',
+  author: 'Jack Meyer',
+  license: 'MIT',
+  deployment: 'Heroku'
+};
+
 // Test strategy for capturing console output found here:
 // https://stackoverflow.com/questions/18543047/mocha-monitor-application-output
 function captureStream(stream){
@@ -185,6 +203,76 @@ describe('Initialize Project Files', () => {
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../templates/js/index.js');
       const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  after(() => {
+    fs.removeSync(configs.projectName);
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+describe('Initialize Project Files With ExpressJS', () => {
+  before(() => {
+    initProject(configs2);
+  });
+
+  describe('Initialize package.json', () => {
+    it('should create a package.json file with the proper contents', () => {
+      const packageJsonExpectedContents = '{\n' +
+        '  "name": "jack",\n' +
+        '  "version": "0.0.1",\n' +
+        '  "description": "Jack\'s Test Project",\n' +
+        '  "main": "src/index.js",\n' +
+        '  "scripts": {\n' +
+        '    "start": "node src/index.js"\n' +
+        '  },\n' +
+        '  "repository": {},\n' +
+        '  "authors": [\n' +
+        '    "Jack Meyer"\n' +
+        '  ],\n' +
+        '  "license": "MIT",\n' +
+        '  "bin": {},\n' +
+        '  "dependencies": {\n' +
+        '    "express": "4.16.0"\n' +
+        '  }\n' +
+        '}';
+      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
+      assert.equal(packageJsonActualContents, packageJsonExpectedContents);
+    });
+  });
+
+  describe('Initialize index.js', () => {
+    it('should create an index.js file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+    });
+
+    it('should create an index.js file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../templates/js/express/index.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  describe('Initialize routes.js', () => {
+    it('should create an routes.js file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+    });
+
+    it('should create an index.js file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../templates/js/express/routes.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/src/routes.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
