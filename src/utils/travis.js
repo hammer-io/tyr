@@ -1,6 +1,7 @@
 import fs from 'fs';
 import winston from 'winston';
 import path from 'path';
+import yaml from 'js-yaml'
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
@@ -14,10 +15,30 @@ function loadTemplate(filepath) {
 }
 
 export function initTravisCI(config) {
-  fs.writeFileSync(
-    `${config.projectName}/${constants.travisCI.fileName}`,
-    loadTemplate('./../../templates/travis/.travis.yml')
-  );
+  if (config.deployment === 'Heroku') {
+    try {
+      const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
+      const dockerBuild = `docker build -t ${config.projectName} .`;
+      const dockerPs = 'docker ps -a';
+      const afterSuccess =
+        'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
+        'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+        `docker tag ${config.projectName} registry.heroku.com/${config.projectName}/web;\n` +
+        `docker push registry.heroku.com/${config.projectName}/web;\n` +
+        'fi';
+
+      file.before_install = [dockerBuild, dockerPs];
+      file.after_success = [afterSuccess];
+      fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, yaml.safeDump(file, { lineWidth: 100 }));
+    } catch (e) {
+      winston.log('error', constants.travisCI.error.fileWrite, e);
+    }
+  } else {
+    fs.writeFileSync(
+      `${config.projectName}/${constants.travisCI.fileName}`,
+      loadTemplate('./../../templates/travis/.travis.yml')
+    );
+  }
 }
 
 /**

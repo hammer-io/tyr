@@ -32,6 +32,7 @@ const configs3 = {
   version: '0.0.1',
   author: 'Jack Meyer',
   license: 'MIT',
+  ci: 'TravisCI',
   deployment: 'Heroku'
 };
 
@@ -212,17 +213,6 @@ describe('Initialize Project Files', () => {
   });
 });
 
-
-
-
-
-
-
-
-
-
-
-
 describe('Initialize Project Files With ExpressJS', () => {
   before(() => {
     initProject(configs2);
@@ -282,5 +272,39 @@ describe('Initialize Project Files With ExpressJS', () => {
   });
 });
 
+describe('Initialize Project Files With Heroku', () => {
+  before(() => {
+    initProject(configs3);
+  });
 
+  describe('Initialize Travis CI', () => {
+    it('should create a .travis.yml file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/.travis.yml`), true);
+    });
 
+    it('should create a .travis.yml file with the proper contents', () => {
+      const expectedContents = 'language: node_js\n' +
+        'node_js:\n' +
+        '  - \'5\'\n' +
+        'notifications:\n' +
+        '  email:\n' +
+        '    on_success: never\n' +
+        'before_install:\n' +
+        '  - docker build -t jack .\n' +
+        '  - docker ps -a\n' +
+        'after_success:\n' +
+        '  - |-\n' +
+        '    if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
+        '    docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+        '    docker tag jack registry.heroku.com/jack/web;\n' +
+        '    docker push registry.heroku.com/jack/web;\n' +
+        '    fi\n'
+      const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`, 'utf-8');
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  after(() => {
+    fs.removeSync(configs.projectName);
+  });
+});
