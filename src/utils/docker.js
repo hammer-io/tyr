@@ -1,7 +1,7 @@
 import fs from 'fs';
-import path from 'path'
+import path from 'path';
 
-import constants from '../constants/constants'
+import constants from '../constants/constants';
 
 /**
  * Load template file

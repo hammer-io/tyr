@@ -15,7 +15,6 @@ import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
 import constants from './constants/constants';
-import { setupGitHub } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
@@ -253,62 +252,62 @@ export function isUserFinishedWithPrereqs(answers) {
  * The main execution function for tyr.
  */
 export default async function run() {
-  // console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
-  // winston.log('debug', preferences);
-  //
-  // const prereqAnswers = await promptGlobalPrerequisites();
-  // const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
-  // if (!canContinue) {
-  //   return;
-  // }
+  console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
+  winston.log('debug', preferences);
+
+  const prereqAnswers = await promptGlobalPrerequisites();
+  const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
+  if (!canContinue) {
+    return;
+  }
 
   const configs = await promptConfigs();
   initProject(configs);
-  //
-  // const githubCredentials = await promptGithubCredentials();
-  //
-  // await setupGitHub(
-  //   configs.projectName,
-  //   configs.projectDescription,
-  //   githubCredentials.githubUsername,
-  //   githubCredentials.githubPassword
-  // );
-  //
-  // const environmentVariables = [];
-  // if (configs.containerization === 'Docker') {
-  //   const dockerHubCredentials = await promptDockerHubCredentials();
-  //   environmentVariables.push({
-  //     name: 'DOCKER_USERNAME',
-  //     value: dockerHubCredentials.dockerHubUsername
-  //   });
-  //   environmentVariables.push({
-  //     name: 'DOCKER_PASSWORD',
-  //     value: dockerHubCredentials.dockerHubPassword
-  //   })
-  // }
-  //
-  // if (configs.deployment === constants.heroku.name) {
-  //   const herokuCredentials = await promptHerokuCredentials();
-  //   environmentVariables.push({
-  //     name: 'HEROKU_EMAIL',
-  //     value: herokuCredentials.herokuEmail
-  //   });
-  //   environmentVariables.push({
-  //     name: 'HEROKU_USERNAME',
-  //     value: herokuCredentials.herokuUsername
-  //   });
-  //   environmentVariables.push({
-  //     name: 'HEROKU_PASSWORD',
-  //     value: herokuCredentials.herokuPassword
-  //   })
-  // }
-  //
-  // if (configs.ci === constants.travisCI.name) {
-  //   await utils.travis.enableTravisOnProject(
-  //     githubCredentials.githubUsername,
-  //     githubCredentials.githubPassword,
-  //     configs.projectName,
-  //     environmentVariables
-  //   );
-  // }
+
+  const githubCredentials = await promptGithubCredentials();
+
+  await utils.setupGitHub(
+    configs.projectName,
+    configs.projectDescription,
+    githubCredentials.githubUsername,
+    githubCredentials.githubPassword
+  );
+
+  const environmentVariables = [];
+  if (configs.containerization === 'Docker') {
+    const dockerHubCredentials = await promptDockerHubCredentials();
+    environmentVariables.push({
+      name: 'DOCKER_USERNAME',
+      value: dockerHubCredentials.dockerHubUsername
+    });
+    environmentVariables.push({
+      name: 'DOCKER_PASSWORD',
+      value: dockerHubCredentials.dockerHubPassword
+    });
+  }
+
+  if (configs.deployment === constants.heroku.name) {
+    const herokuCredentials = await promptHerokuCredentials();
+    environmentVariables.push({
+      name: 'HEROKU_EMAIL',
+      value: herokuCredentials.herokuEmail
+    });
+    environmentVariables.push({
+      name: 'HEROKU_USERNAME',
+      value: herokuCredentials.herokuUsername
+    });
+    environmentVariables.push({
+      name: 'HEROKU_PASSWORD',
+      value: herokuCredentials.herokuPassword
+    });
+  }
+
+  if (configs.ci === constants.travisCI.name) {
+    await utils.travis.enableTravisOnProject(
+      githubCredentials.githubUsername,
+      githubCredentials.githubPassword,
+      configs.projectName,
+      environmentVariables
+    );
+  }
 }

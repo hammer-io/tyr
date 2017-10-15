@@ -211,4 +211,4 @@ export default {
       message: 'Choose your web application framework:'
     }
   }
-}
+};
