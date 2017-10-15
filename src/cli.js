@@ -273,7 +273,7 @@ export default async function run() {
   );
 
   const environmentVariables = [];
-  if (configs.containerization === 'Docker') {
+  if (configs.containerization === constants.docker.name) {
     const dockerHubCredentials = await promptDockerHubCredentials();
     environmentVariables.push({
       name: 'DOCKER_USERNAME',
