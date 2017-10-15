@@ -247,7 +247,6 @@ export function isUserFinishedWithPrereqs(answers) {
   return finishedPrereqs;
 }
 
-
 /**
  * The main execution function for tyr.
  */
