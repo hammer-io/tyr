@@ -1,12 +1,23 @@
 import fs from 'fs';
 import winston from 'winston';
+import path from 'path';
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
 import * as travisClient from '../clients/travis';
 
+/**
+ * Load template file
+ */
+function loadTemplate(filepath) {
+  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+}
+
 export function initTravisCI(config) {
-  fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, constants.travisCI.fileContents);
+  fs.writeFileSync(
+    `${config.projectName}/${constants.travisCI.fileName}`,
+    loadTemplate('./../../templates/travis/.travis.yml')
+  );
 }
 
 /**

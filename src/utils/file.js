@@ -39,11 +39,13 @@ export function createIndexFile(folderName, usingExpress) {
       `${folderName}/src/index.js`,
       loadTemplate('./../../templates/js/express/index.js')
     );
-    fs.writeFileSync(`${folderName}/src/routes.js`,
+    fs.writeFileSync(
+      `${folderName}/src/routes.js`,
       loadTemplate('./../../templates/js/express/routes.js')
     );
   } else {
-    fs.writeFileSync(`${folderName}/src/index.js`,
+    fs.writeFileSync(
+      `${folderName}/src/index.js`,
       loadTemplate('./../../templates/js/index.js')
     );
   }
