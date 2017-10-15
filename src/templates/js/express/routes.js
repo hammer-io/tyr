@@ -1,5 +1,4 @@
-/* eslint-disable */
-const express = require('express');
+const express = require('src/templates/js/index');
 const router = express.Router();
 
 // Routes go here
