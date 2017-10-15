@@ -13,6 +13,7 @@ import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
+import webChoices from './constants/web-choices';
 import constants from './constants/constants';
 import { setupGitHub } from './clients/github';
 
@@ -91,7 +92,14 @@ function promptConfigs() {
     type: 'list',
     message: constants.config.deployment.message,
     choices: deploymentChoices.choices
-  }];
+  }, {
+    name: constants.config.web.name,
+    type: 'list',
+    message: constants.config.web.message,
+    choices: webChoices.choices
+  }
+
+  ];
 
   return inquirer.prompt(questions);
 }
