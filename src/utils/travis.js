@@ -1,7 +1,7 @@
 import fs from 'fs';
 import winston from 'winston';
 import path from 'path';
-import yaml from 'js-yaml'
+import yaml from 'js-yaml';
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
