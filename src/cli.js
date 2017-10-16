@@ -265,7 +265,7 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
-  await utils.setupGitHub(
+  await utils.git.setupGitHub(
     configs.projectName,
     configs.projectDescription,
     githubCredentials.githubUsername,
