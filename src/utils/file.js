@@ -33,20 +33,9 @@ export function createPackageJson(config, dependencies) {
 /**
  * Generate a simple index.js file
  */
-export function createIndexFile(folderName, usingExpress) {
-  if (usingExpress) {
-    fs.writeFileSync(
-      `${folderName}/src/index.js`,
-      loadTemplate('./../../templates/js/express/index.js')
-    );
-    fs.writeFileSync(
-      `${folderName}/src/routes.js`,
-      loadTemplate('./../../templates/js/express/routes.js')
-    );
-  } else {
-    fs.writeFileSync(
-      `${folderName}/src/index.js`,
-      loadTemplate('./../../templates/js/index.js')
-    );
-  }
+export function createIndexFile(folderName) {
+  fs.writeFileSync(
+    `${folderName}/src/index.js`,
+    loadTemplate('./../../templates/js/index.js')
+  );
 }

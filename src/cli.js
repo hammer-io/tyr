@@ -114,14 +114,14 @@ export function initProject(config) {
     fs.mkdirSync(`${config.projectName}/src`);
 
     const dependencies = {};
-    let usingExpress = false;
     if (config.web === constants.express.name) {
       dependencies.express = constants.express.version;
-      usingExpress = true;
+      utils.express.createJsFiles(config.projectName);
+    } else {
+      utils.file.createIndexFile(config.projectName);
     }
 
     utils.file.createPackageJson(config, dependencies);
-    utils.file.createIndexFile(config.projectName, usingExpress);
 
     if (config.container === constants.docker.name) {
       utils.docker.initDocker(config);
