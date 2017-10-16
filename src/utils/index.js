@@ -1,6 +1,7 @@
 import * as travis from './travis';
 import * as file from './file';
 import * as docker from './docker';
+import * as npm from './npm';
 import * as git from './git';
 import * as express from './express';
 
@@ -9,5 +10,6 @@ export default {
   file,
   docker,
   git,
-  express
+  express,
+  npm
 };

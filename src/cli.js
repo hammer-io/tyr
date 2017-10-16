@@ -265,6 +265,7 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
+
   await utils.git.setupGitHub(
     configs.projectName,
     configs.projectDescription,
@@ -309,4 +310,6 @@ export default async function run() {
       environmentVariables
     );
   }
+
+  utils.npm.npmInstall(`${configs.projectName}`);
 }
