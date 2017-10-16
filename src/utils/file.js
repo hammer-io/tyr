@@ -1,12 +1,19 @@
 import fs from 'fs';
+import path from 'path';
 
-import packageTemplate from '../templates/template-package';
-import constants from '../constants/constants'
+import packageTemplate from './../../templates/json/package.json';
+
+/**
+ * Load template file
+ */
+function loadTemplate(filepath) {
+  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+}
 
 /**
  * Generate a package.json file based on the user options selected
  */
-export function createPackageJson(config) {
+export function createPackageJson(config, dependencies) {
   const author = config.author.split(',');
 
   const packageJson = packageTemplate;
@@ -16,8 +23,9 @@ export function createPackageJson(config) {
   packageJson.description = config.description;
   packageJson.authors = author;
   packageJson.license = config.license;
+  packageJson.dependencies = dependencies;
 
-  const json = JSON.stringify(packageJson, null, '\t');
+  const json = JSON.stringify(packageJson, null, '  ');
 
   fs.writeFileSync(`${config.projectName}/package.json`, json);
 }
@@ -26,5 +34,8 @@ export function createPackageJson(config) {
  * Generate a simple index.js file
  */
 export function createIndexFile(folderName) {
-  fs.writeFileSync(`${folderName}/src/index.js`, constants.indexJS.fileContents);
+  fs.writeFileSync(
+    `${folderName}/src/index.js`,
+    loadTemplate('./../../templates/js/index.js')
+  );
 }

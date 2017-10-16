@@ -1,3 +1,4 @@
+import path from 'path';
 import assert from 'assert';
 import chalk from 'chalk';
 import fs from 'fs-extra';
@@ -14,6 +15,25 @@ const configs = {
   license: 'MIT',
   ci: 'TravisCI',
   container: 'Docker'
+};
+
+const configs2 = {
+  projectName: 'jack',
+  description: 'Jack\'s Test Project',
+  version: '0.0.1',
+  author: 'Jack Meyer',
+  license: 'MIT',
+  web: 'ExpressJS'
+};
+
+const configs3 = {
+  projectName: 'jack',
+  description: 'Jack\'s Test Project',
+  version: '0.0.1',
+  author: 'Jack Meyer',
+  license: 'MIT',
+  ci: 'TravisCI',
+  deployment: 'Heroku'
 };
 
 // Test strategy for capturing console output found here:
@@ -37,6 +57,13 @@ function captureStream(stream){
       buf = '';
     }
   };
+}
+
+/**
+ * Load template file
+ */
+function loadTemplate(filepath) {
+  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
 }
 
 describe('User Preferences:', () => {
@@ -119,8 +146,9 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../templates/travis/.travis.yml');
       const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
-      assert.equal(actualContents, constants.travisCI.fileContents);
+      assert.equal(actualContents, expectedContents);
     });
   });
 
@@ -131,11 +159,13 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
+      const dockerExpectedContents = loadTemplate('./../templates/docker/Dockerfile');
+      const dockerignoreExpectedContents = loadTemplate('./../templates/docker/.dockerignore');
       const dockerActualContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
       const dockerignoreActualContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
 
-      assert.equal(dockerActualContents, constants.docker.dockerFile.fileContents);
-      assert.equal(dockerignoreActualContents, constants.docker.dockerIgnore.fileContents);
+      assert.equal(dockerActualContents, dockerExpectedContents);
+      assert.equal(dockerignoreActualContents, dockerignoreExpectedContents);
     });
   });
 
@@ -146,24 +176,22 @@ describe('Initialize Project Files', () => {
 
     it('should create a package.json file with the proper contents', () => {
       const packageJsonExpectedContents = '{\n' +
-        '\t"name": "jack",\n' +
-        '\t"version": "0.0.1",\n' +
-        '\t"description": "Jack\'s Test Project",\n' +
-        '\t"main": "src/index.js",\n' +
-        '\t"scripts": {\n' +
-        '\t\t"start": "node src/index.js"\n' +
-        '\t},\n' +
-        '\t"repository": {},\n' +
-        '\t"authors": [\n' +
-        '\t\t"Jack Meyer"\n' +
-        '\t],\n' +
-        '\t"license": "MIT",\n' +
-        '\t"bin": {},\n' +
-        '\t"dependencies": {}\n' +
+        '  "name": "jack",\n' +
+        '  "version": "0.0.1",\n' +
+        '  "description": "Jack\'s Test Project",\n' +
+        '  "main": "src/index.js",\n' +
+        '  "scripts": {\n' +
+        '    "start": "node src/index.js"\n' +
+        '  },\n' +
+        '  "repository": {},\n' +
+        '  "authors": [\n' +
+        '    "Jack Meyer"\n' +
+        '  ],\n' +
+        '  "license": "MIT",\n' +
+        '  "bin": {},\n' +
+        '  "dependencies": {}\n' +
         '}';
-
-
-      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`);
+      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
     });
   });
@@ -174,8 +202,9 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create an index.js file with the proper contents', () => {
-      const indexJsContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
-      assert.equal(indexJsContents,constants.indexJS.fileContents);
+      const expectedContents = loadTemplate('./../templates/js/index.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      assert.equal(actualContents, expectedContents);
     });
   });
 
@@ -184,5 +213,98 @@ describe('Initialize Project Files', () => {
   });
 });
 
+describe('Initialize Project Files With ExpressJS', () => {
+  before(() => {
+    initProject(configs2);
+  });
 
+  describe('Initialize package.json', () => {
+    it('should create a package.json file with the proper contents', () => {
+      const packageJsonExpectedContents = '{\n' +
+        '  "name": "jack",\n' +
+        '  "version": "0.0.1",\n' +
+        '  "description": "Jack\'s Test Project",\n' +
+        '  "main": "src/index.js",\n' +
+        '  "scripts": {\n' +
+        '    "start": "node src/index.js"\n' +
+        '  },\n' +
+        '  "repository": {},\n' +
+        '  "authors": [\n' +
+        '    "Jack Meyer"\n' +
+        '  ],\n' +
+        '  "license": "MIT",\n' +
+        '  "bin": {},\n' +
+        '  "dependencies": {\n' +
+        '    "express": "4.16.0"\n' +
+        '  }\n' +
+        '}';
+      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
+      assert.equal(packageJsonActualContents, packageJsonExpectedContents);
+    });
+  });
 
+  describe('Initialize index.js', () => {
+    it('should create an index.js file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+    });
+
+    it('should create an index.js file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../templates/js/express/index.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  describe('Initialize routes.js', () => {
+    it('should create an routes.js file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+    });
+
+    it('should create an index.js file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../templates/js/express/routes.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/src/routes.js`);
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  after(() => {
+    fs.removeSync(configs.projectName);
+  });
+});
+
+describe('Initialize Project Files With Heroku', () => {
+  before(() => {
+    initProject(configs3);
+  });
+
+  describe('Initialize Travis CI', () => {
+    it('should create a .travis.yml file', () => {
+      assert.equal(fs.existsSync(`${configs.projectName}/.travis.yml`), true);
+    });
+
+    it('should create a .travis.yml file with the proper contents', () => {
+      const expectedContents = 'language: node_js\n' +
+        'node_js:\n' +
+        '  - \'5\'\n' +
+        'notifications:\n' +
+        '  email:\n' +
+        '    on_success: never\n' +
+        'before_install:\n' +
+        '  - docker build -t jack .\n' +
+        '  - docker ps -a\n' +
+        'after_success:\n' +
+        '  - |-\n' +
+        '    if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
+        '    docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+        '    docker tag jack registry.heroku.com/jack/web;\n' +
+        '    docker push registry.heroku.com/jack/web;\n' +
+        '    fi\n'
+      const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`, 'utf-8');
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  after(() => {
+    fs.removeSync(configs.projectName);
+  });
+});
