@@ -1,7 +1,3 @@
-import fs from 'fs';
-import constants from '../constants/constants';
-import gitignoreContents from '../constants/gitignore-contents';
-
 const superagent = require('superagent');
 const winston = require('winston');
 
@@ -17,9 +13,8 @@ const git = require('simple-git');
  * @returns {string}
  */
 function basicAuthorization(username, password) {
-  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
 }
-
 
 /**
  * Request GitHub OAuth token.
@@ -83,23 +78,6 @@ export function deleteGitHubToken(githubUrl, username, password) {
   });
 }
 
-
-/**
- * Create the .gitignore in the newly formed project folder with the basics for a node.js project.
- *
- * @param projectName
- */
-export function createGitIgnore(projectName) {
-  winston.log('verbose', 'createGitIgnore', { projectName });
-
-  try {
-    fs.writeFileSync(`${projectName}/${constants.github.gitIgnore.fileName}`, gitignoreContents.gitIgnore.fileContents);
-  } catch (err) {
-    winston.log('error', constants.github.gitIgnore.error.fileWrite, err);
-  }
-}
-
-
 /**
  * Initialize an empty repository within a git repo, add the gitignore, and the rest of the files.
  * Commit them, create the remote repository and push the commit to the remote repository.
@@ -160,28 +138,4 @@ export function initAddCommitAndPush(username, projectName) {
         }, 10000); // TODO: Find a better way to do this than a timeout
       });
   });
-}
-
-
-/**
- * Setups up a GitHub repo, by requesting a GitHub token, creating a .gitignore,
- * and initializing the local and remote repository
- *
- * @param projectName
- * @param projectDescription
- * @param username
- * @param password
- */
-export async function setupGitHub(projectName, projectDescription, username, password) {
-  winston.log('verbose', 'setupGitHub', { username });
-
-  try {
-    const githubResponse = await requestGitHubToken(username, password);
-    await createGitIgnore(projectName);
-    await createGitHubRepository(projectName, projectDescription, username, password);
-    await initAddCommitAndPush(username, projectName);
-    await deleteGitHubToken(githubResponse.url, username, password);
-  } catch (err) {
-    winston.log('error', 'setupGitHub failed for some reason', err);
-  }
 }

@@ -4,25 +4,6 @@ export default {
     name: 'Docker',
     dockerFile: {
       fileName: 'Dockerfile',
-      fileContents: '# Use the official Node runtime as a parent image\n' +
-      '# More info at https://hub.docker.com/_/node/\n' +
-      'FROM node:alpine\n' +
-      '    \n' +
-      '# Set the working directory\n' +
-      'WORKDIR /usr/src/app\n' +
-      '\n' +
-      '# Install app dependencies\n' +
-      'COPY package.json package-lock.json ./\n' +
-      'RUN npm install\n' +
-      '\n' +
-      '# Bundle app source\n' +
-      'COPY . .\n' +
-      '\n' +
-      '# Make port 8080 available to the world outside this container\n' +
-      'EXPOSE 8080\n' +
-      '\n' +
-      '# Run "npm start" when the container launches\n' +
-      'CMD ["npm", "start"]\n',
       error: {
         fileWrite: 'Failed to write Dockerfile!'
       }
@@ -30,8 +11,6 @@ export default {
 
     dockerIgnore: {
       fileName: '.dockerignore',
-      fileContents: 'node_modules\n' +
-      'npm-debug.log',
       error: {
         fileWrite: 'Failed to write .dockerignore!'
       }
@@ -41,14 +20,6 @@ export default {
   travisCI: {
     name: 'TravisCI',
     fileName: '.travis.yml',
-    fileContents: '' +
-    'language: node_js\n' +
-    'node_js:\n' +
-    '  - \'5\'\n' +
-    '\n' +
-    'notifications:\n' +
-    '  email:\n' +
-    '    on_success: never',
     error: {
       fileWrite: 'Failed to write .travis.yml!',
       enableTravisOnProject: 'Failed to enable TravisCI for the project!'
@@ -87,6 +58,7 @@ export default {
   },
 
   heroku: {
+    name: 'Heroku',
     email: {
       name: 'herokuEmail',
       message: 'Heroku Email:'
@@ -103,6 +75,11 @@ export default {
     }
   },
 
+  express: {
+    name: 'ExpressJS',
+    version: '4.16.0'
+  },
+
   tyr: {
     name: 'tyr',
     cliName: 'tyr',
@@ -111,16 +88,6 @@ export default {
         name: 'hasGithubAccount',
         message: 'Do you have a GitHub account?',
         responseIfNo: 'GitHub is currently the source control tool of choice. Please visit https://github.com/ to create a new account before proceeding.'
-      },
-      {
-        name: 'hasDockerhubAccount',
-        message: 'Do you have a Dockerhub account?',
-        responseIfNo: 'Docker and Docker Hub are used by default for creating your project\'s application container. Please visit https://hub.docker.com/ to create a new account before proceeding.'
-      },
-      {
-        name: 'hasHerokuAccount',
-        message: 'Do you have a Heroku account?',
-        responseIfNo: 'Heroku is used to deploy the built application. Please visit https://www.heroku.com/ to create a new account'
       }
     ],
     optionalPrereqs: {
@@ -128,18 +95,22 @@ export default {
         name: 'hasTravisAccount',
         message: 'Do you have a Travis account?',
         responseIfNo: 'If you want to use TravisCI as your continuous integration choice, please visit https://travis-ci.org/ and create an account before proceeding.'
+      },
+      dockerHub: {
+        name: 'hasDockerhubAccount',
+        message: 'Do you have a Dockerhub account?',
+        responseIfNo: 'Docker and Docker Hub are used by default for creating your project\'s application container. Please visit https://hub.docker.com/ to create a new account before proceeding.'
+      },
+      heroku: {
+        name: 'hasHerokuAccount',
+        message: 'Do you have a Heroku account?',
+        responseIfNo: 'Heroku is used to deploy the built application. Please visit https://www.heroku.com/ to create a new account'
       }
     }
   },
 
   indexJS: {
     fileName: 'index.js',
-    fileContents: '\n' +
-    'function main() {\n' +
-    '  console.log(\'Hello World\');\n' +
-    '}\n' +
-    '\n' +
-    'main();\n',
     error: {
       fileWrite: 'Failed to write index.js!',
       fileRead: 'Failed to read template-index.js!'
@@ -198,6 +169,11 @@ export default {
     deployment: {
       name: 'deployment',
       message: 'Choose your hosting service:'
+    },
+
+    web: {
+      name: 'web',
+      message: 'Choose your web application framework:'
     }
   }
-}
+};

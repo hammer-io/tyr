@@ -1,12 +1,44 @@
 import fs from 'fs';
 import winston from 'winston';
+import path from 'path';
+import yaml from 'js-yaml';
 
 import constants from '../constants/constants';
 import * as githubClient from '../clients/github';
-import * as travisClient from '../clients/travis-ci';
+import * as travisClient from '../clients/travis';
+
+/**
+ * Load template file
+ */
+function loadTemplate(filepath) {
+  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+}
 
 export function initTravisCI(config) {
-  fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, constants.travisCI.fileContents);
+  if (config.deployment === 'Heroku') {
+    try {
+      const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
+      const dockerBuild = `docker build -t ${config.projectName} .`;
+      const dockerPs = 'docker ps -a';
+      const afterSuccess =
+        'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
+        'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+        `docker tag ${config.projectName} registry.heroku.com/${config.projectName}/web;\n` +
+        `docker push registry.heroku.com/${config.projectName}/web;\n` +
+        'fi';
+
+      file.before_install = [dockerBuild, dockerPs];
+      file.after_success = [afterSuccess];
+      fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, yaml.safeDump(file, { lineWidth: 100 }));
+    } catch (e) {
+      winston.log('error', constants.travisCI.error.fileWrite, e);
+    }
+  } else {
+    fs.writeFileSync(
+      `${config.projectName}/${constants.travisCI.fileName}`,
+      loadTemplate('./../../templates/travis/.travis.yml')
+    );
+  }
 }
 
 /**
@@ -33,8 +65,14 @@ export async function enableTravisOnProject(username, password, projectName, env
     await travisClient.activateTravisHook(repoId, travisAccessToken);
 
     // Add environment variables
-    if (environmentVariables) {
-      await travisClient.setEnvironmentVariables(travisAccessToken, repoId, environmentVariables);
+    if (environmentVariables && environmentVariables.length !== 0) {
+      for (const env of environmentVariables) { // eslint-disable-line no-restricted-syntax
+        await travisClient.setEnvironmentVariable( // eslint-disable-line no-await-in-loop
+          travisAccessToken,
+          repoId,
+          env
+        );
+      }
     }
 
     winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);

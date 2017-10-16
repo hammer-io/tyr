@@ -13,34 +13,10 @@ import utils from './utils';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
+import webChoices from './constants/web-choices';
 import constants from './constants/constants';
-import { setupGitHub } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
-
-
-/**
- * Initializes the files and accounts needed to use or application
- * @param config the config object form the main inquirer prompt
- */
-export function initProject(config) {
-  // if the project doesn't already exist, intialize the files and accounts
-  if (!fs.existsSync(config.projectName)) {
-    fs.mkdirSync(config.projectName);
-    fs.mkdirSync(`${config.projectName}/src`);
-    utils.file.createPackageJson(config);
-    utils.file.createIndexFile(config.projectName);
-
-    if (config.container === constants.docker.name) {
-      utils.docker.initDocker(config);
-    }
-    if (config.ci === constants.travisCI.name) {
-      utils.travis.initTravisCI(config);
-    }
-  } else {
-    return constants.config.projectName.error.duplicateMessage;
-  }
-}
 
 /**
  * Gets the basic configuration settings for the user
@@ -115,9 +91,47 @@ function promptConfigs() {
     type: 'list',
     message: constants.config.deployment.message,
     choices: deploymentChoices.choices
-  }];
+  }, {
+    name: constants.config.web.name,
+    type: 'list',
+    message: constants.config.web.message,
+    choices: webChoices.choices
+  }
+
+  ];
 
   return inquirer.prompt(questions);
+}
+
+/**
+ * Initializes the files and accounts needed to use or application
+ * @param config the config object form the main inquirer prompt
+ */
+export function initProject(config) {
+  // if the project doesn't already exist, intialize the files and accounts
+  if (!fs.existsSync(config.projectName)) {
+    fs.mkdirSync(config.projectName);
+    fs.mkdirSync(`${config.projectName}/src`);
+
+    const dependencies = {};
+    if (config.web === constants.express.name) {
+      dependencies.express = constants.express.version;
+      utils.express.createJsFiles(config.projectName);
+    } else {
+      utils.file.createIndexFile(config.projectName);
+    }
+
+    utils.file.createPackageJson(config, dependencies);
+
+    if (config.container === constants.docker.name) {
+      utils.docker.initDocker(config);
+    }
+    if (config.ci === constants.travisCI.name) {
+      utils.travis.initTravisCI(config);
+    }
+  } else {
+    return constants.config.projectName.error.duplicateMessage;
+  }
 }
 
 /**
@@ -161,7 +175,7 @@ function promptHerokuCredentials() {
   const questions = [{
     name: constants.heroku.email.name,
     type: 'input',
-    message: constants.heroku.username.message,
+    message: constants.heroku.email.message,
   }, {
     name: constants.heroku.username.name,
     type: 'input',
@@ -233,7 +247,6 @@ export function isUserFinishedWithPrereqs(answers) {
   return finishedPrereqs;
 }
 
-
 /**
  * The main execution function for tyr.
  */
@@ -252,17 +265,16 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
-  if (githubCredentials.githubUsername && githubCredentials.githubPassword) {
-    await setupGitHub(
-      configs.projectName,
-      configs.projectDescription,
-      githubCredentials.githubUsername,
-      githubCredentials.githubPassword
-    );
-  }
+
+  await utils.git.setupGitHub(
+    configs.projectName,
+    configs.projectDescription,
+    githubCredentials.githubUsername,
+    githubCredentials.githubPassword
+  );
 
   const environmentVariables = [];
-  if (configs.docker) {
+  if (configs.containerization === constants.docker.name) {
     const dockerHubCredentials = await promptDockerHubCredentials();
     environmentVariables.push({
       name: 'DOCKER_USERNAME',
@@ -271,10 +283,10 @@ export default async function run() {
     environmentVariables.push({
       name: 'DOCKER_PASSWORD',
       value: dockerHubCredentials.dockerHubPassword
-    })
+    });
   }
 
-  if (configs.heroku) {
+  if (configs.deployment === constants.heroku.name) {
     const herokuCredentials = await promptHerokuCredentials();
     environmentVariables.push({
       name: 'HEROKU_EMAIL',
@@ -287,7 +299,7 @@ export default async function run() {
     environmentVariables.push({
       name: 'HEROKU_PASSWORD',
       value: herokuCredentials.herokuPassword
-    })
+    });
   }
 
   if (configs.ci === constants.travisCI.name) {
