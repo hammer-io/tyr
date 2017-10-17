@@ -175,5 +175,14 @@ export default {
       name: 'web',
       message: 'Choose your web application framework:'
     }
+  },
+
+  mocha: {
+    name: 'Mocha',
+    fileName: 'tests.js',
+    error: {
+      fileWrite: '',
+      fileRead: ''
+    }
   }
 };

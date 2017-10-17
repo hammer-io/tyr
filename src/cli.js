@@ -263,15 +263,15 @@ export default async function run() {
   const configs = await promptConfigs();
   initProject(configs);
 
-  const githubCredentials = await promptGithubCredentials();
-
-
-  await utils.git.setupGitHub(
-    configs.projectName,
-    configs.projectDescription,
-    githubCredentials.githubUsername,
-    githubCredentials.githubPassword
-  );
+  // const githubCredentials = await promptGithubCredentials();
+  //
+  //
+  // await utils.git.setupGitHub(
+  //   configs.projectName,
+  //   configs.projectDescription,
+  //   githubCredentials.githubUsername,
+  //   githubCredentials.githubPassword
+  // );
 
   const environmentVariables = [];
   if (configs.containerization === constants.docker.name) {
@@ -312,4 +312,5 @@ export default async function run() {
   }
 
   utils.npm.npmInstall(`${configs.projectName}`);
+  utils.mocha.createMochaTestSuite(`${configs.projectName}`);
 }

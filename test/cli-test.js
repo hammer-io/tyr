@@ -189,7 +189,10 @@ describe('Initialize Project Files', () => {
         '  ],\n' +
         '  "license": "MIT",\n' +
         '  "bin": {},\n' +
-        '  "dependencies": {}\n' +
+        '  "dependencies": {},\n' +
+        '  "devDependencies": {\n' +
+        '    "mocha": "3.5.3"\n' +
+        '  }\n' +
         '}';
       const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
@@ -236,6 +239,9 @@ describe('Initialize Project Files With ExpressJS', () => {
         '  "bin": {},\n' +
         '  "dependencies": {\n' +
         '    "express": "4.16.0"\n' +
+        '  },\n' +
+        '  "devDependencies": {\n' +
+        '    "mocha": "3.5.3"\n' +
         '  }\n' +
         '}';
       const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
@@ -298,7 +304,7 @@ describe('Initialize Project Files With Heroku', () => {
         '    docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
         '    docker tag jack registry.heroku.com/jack/web;\n' +
         '    docker push registry.heroku.com/jack/web;\n' +
-        '    fi\n'
+        '    fi\n';
       const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`, 'utf-8');
       assert.equal(actualContents, expectedContents);
     });

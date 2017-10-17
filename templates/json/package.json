@@ -4,11 +4,15 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "npm run build && mocha"
   },
   "repository": {},
   "authors": [],
   "license": "",
   "bin": {},
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "3.5.3"
+  }
 }
