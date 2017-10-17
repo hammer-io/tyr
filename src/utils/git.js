@@ -23,8 +23,7 @@ export function createGitIgnore(projectName) {
 
   writeFile(
     `${projectName}/${constants.github.gitIgnore.fileName}`,
-    loadTemplate('./../../templates/git/.gitignore', constants.github.gitIgnore.error.fileRead),
-    constants.github.gitIgnore.error.fileWrite
+    loadTemplate('./../../templates/git/.gitignore')
   );
 }
 

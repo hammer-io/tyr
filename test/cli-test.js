@@ -1,7 +1,9 @@
-import path from 'path';
 import assert from 'assert';
 import chalk from 'chalk';
 import fs from 'fs-extra';
+import {
+  loadTemplate
+} from '../src/utils/file';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
 import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
@@ -59,12 +61,12 @@ function captureStream(stream){
   };
 }
 
-/**
- * Load template file
- */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-}
+// /**
+//  * Load template file
+//  */
+// function loadTemplate(filepath) {
+//   return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+// }
 
 describe('User Preferences:', () => {
   describe('When the user is asked about completing the prerequisites:', () => {
@@ -146,7 +148,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../templates/travis/.travis.yml');
+      const expectedContents = loadTemplate('./../../templates/travis/.travis.yml');
       const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
       assert.equal(actualContents, expectedContents);
     });
@@ -159,8 +161,8 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
-      const dockerExpectedContents = loadTemplate('./../templates/docker/Dockerfile');
-      const dockerignoreExpectedContents = loadTemplate('./../templates/docker/.dockerignore');
+      const dockerExpectedContents = loadTemplate('./../../templates/docker/Dockerfile');
+      const dockerignoreExpectedContents = loadTemplate('./../../templates/docker/.dockerignore');
       const dockerActualContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
       const dockerignoreActualContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
 
@@ -206,7 +208,7 @@ describe('Initialize Project Files', () => {
     });
 
     it('should create an index.js file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../templates/js/index.js');
+      const expectedContents = loadTemplate('./../../templates/js/index.js');
       const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
       assert.equal(actualContents, expectedContents);
     });
@@ -214,7 +216,7 @@ describe('Initialize Project Files', () => {
 
   describe('Create Sample Mocha Test', () => {
     it('should create a mocha test file with a sample test inside', () => {
-      const expectedContents = loadTemplate('./../templates/mocha/test.js');
+      const expectedContents = loadTemplate('./../../templates/mocha/test.js');
       const actualContents = fs.readFileSync(`${configs.projectName}/${constants.mocha.fileName}`);
       assert.equal(actualContents, expectedContents);
     });
@@ -265,7 +267,7 @@ describe('Initialize Project Files With ExpressJS', () => {
     });
 
     it('should create an index.js file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../templates/js/express/index.js');
+      const expectedContents = loadTemplate('./../../templates/js/express/index.js');
       const actualContents = fs.readFileSync(`${configs2.projectName}/src/index.js`);
       assert.equal(actualContents, expectedContents);
     });
@@ -277,7 +279,7 @@ describe('Initialize Project Files With ExpressJS', () => {
     });
 
     it('should create an index.js file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../templates/js/express/routes.js');
+      const expectedContents = loadTemplate('./../../templates/js/express/routes.js');
       const actualContents = fs.readFileSync(`${configs2.projectName}/src/routes.js`);
       assert.equal(actualContents, expectedContents);
     });
@@ -322,5 +324,12 @@ describe('Initialize Project Files With Heroku', () => {
 
   after(() => {
     fs.removeSync(configs3.projectName);
+  });
+});
+
+
+describe('Incorrect input should result return undefined', () => {
+  it('loadFile should return undefined if the template doesn\'t exist', () => {
+    assert.equal(loadTemplate('template/xyz'), undefined);
   });
 });

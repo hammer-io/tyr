@@ -277,12 +277,14 @@ export default async function run() {
 
   const githubCredentials = await promptGithubCredentials();
 
-  await utils.git.setupGitHub(
-    configs.projectName,
-    configs.projectDescription,
-    githubCredentials.githubUsername,
-    githubCredentials.githubPassword
-  );
+  if (githubCredentials.githubUsername && githubCredentials.githubPassword) {
+    await utils.git.setupGitHub(
+      configs.projectName,
+      configs.projectDescription,
+      githubCredentials.githubUsername,
+      githubCredentials.githubPassword
+    );
+  }
 
   const environmentVariables = [];
   if (configs.containerization === constants.docker.name) {

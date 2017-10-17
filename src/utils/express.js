@@ -16,12 +16,10 @@ export function createJsFiles(folderName) { // eslint-disable-line import/prefer
 
   writeFile(
     `${folderName}/src/${constants.express.index.fileName}`,
-    loadTemplate('./../../templates/js/express/index.js', constants.express.index.error.fileRead),
-    constants.express.index.error.fileWrite
+    loadTemplate('./../../templates/js/express/index.js')
   );
   writeFile(
     `${folderName}/src/${constants.express.routes.fileName}`,
-    loadTemplate('./../../templates/js/express/routes.js', constants.express.routes.error.fileRead),
-    constants.express.routes.error.fileWrite
+    loadTemplate('./../../templates/js/express/routes.js')
   );
 }

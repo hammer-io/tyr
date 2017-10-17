@@ -5,16 +5,14 @@ export default {
     dockerFile: {
       fileName: 'Dockerfile',
       error: {
-        fileWrite: 'Failed to write Dockerfile!',
-        fileRead: 'Failed to read Dockerfile template!'
+        fileWrite: 'Failed to write Dockerfile!'
       }
     },
 
     dockerIgnore: {
       fileName: '.dockerignore',
       error: {
-        fileWrite: 'Failed to write .dockerignore!',
-        fileRead: 'Failed to read .dockerignore template!'
+        fileWrite: 'Failed to write .dockerignore!'
       }
     }
   },
@@ -24,7 +22,6 @@ export default {
     fileName: '.travis.yml',
     error: {
       fileWrite: 'Failed to write .travis.yml!',
-      fileRead: 'Failed to read .travis.yml template!',
       enableTravisOnProject: 'Failed to enable TravisCI for the project!'
     }
   },
@@ -42,10 +39,6 @@ export default {
 
     gitIgnore: {
       fileName: '.gitignore',
-      error: {
-        fileWrite: 'Failed to write .gitignore!',
-        fileRead: 'Failed to read .gitignore template!'
-      }
     }
   },
 
@@ -85,15 +78,13 @@ export default {
     index: {
       fileName: 'index.js',
       error: {
-        fileWrite: 'Failed to write express index.js!',
-        fileRead: 'Failed to read express index.js template!'
+        fileWrite: 'Failed to write express index.js!'
       }
     },
     routes: {
       fileName: 'routes.js',
       error: {
-        fileWrite: 'Failed to write express route.js!',
-        fileRead: 'Failed to read express index.js template!'
+        fileWrite: 'Failed to write express route.js!'
       }
     }
   },
@@ -132,12 +123,6 @@ export default {
     error: {
       fileWrite: 'Failed to write index.js!',
       fileRead: 'Failed to read template-index.js!'
-    }
-  },
-
-  packageJson: {
-    error: {
-      fileWrite: 'Failed to write package.json!'
     }
   },
 
@@ -203,10 +188,6 @@ export default {
 
   mocha: {
     name: 'Mocha',
-    fileName: 'test.js',
-    error: {
-      fileWrite: 'Failed to write tests.js!',
-      fileRead: 'Failed to read tests.js template!'
-    }
+    fileName: 'test.js'
   }
 };

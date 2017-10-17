@@ -16,7 +16,6 @@ export function createMochaTestSuite(filePath){
 
   writeFile(
     `${filePath}/${constants.mocha.fileName}`,
-    loadTemplate('./../../templates/mocha/test.js', constants.mocha.error.fileRead),
-    constants.mocha.error.fileWrite
+    loadTemplate('./../../templates/mocha/test.js')
   );
 }

@@ -18,13 +18,11 @@ export function initDocker(config) {
 
   writeFile(
     `${config.projectName}/${constants.docker.dockerFile.fileName}`,
-    loadTemplate('./../../templates/docker/Dockerfile', constants.docker.dockerFile.error.fileRead),
-    constants.docker.dockerFile.error.fileWrite
+    loadTemplate('./../../templates/docker/Dockerfile')
   );
 
   writeFile(
     `${config.projectName}/${constants.docker.dockerIgnore.fileName}`,
-    loadTemplate('./../../templates/docker/.dockerignore', constants.docker.dockerIgnore.fileRead),
-    constants.docker.dockerFile.error.fileRead
+    loadTemplate('./../../templates/docker/.dockerignore')
   );
 }

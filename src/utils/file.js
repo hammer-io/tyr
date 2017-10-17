@@ -10,17 +10,18 @@ import constants from './../constants/constants';
  * The given errMsg should be a constant.
  *
  * @param filePath
- * @param errMsg
  * @returns {*}
  */
-export function loadTemplate(filePath, errMsg) {
+export function loadTemplate(filePath) {
   winston.log('verbose', 'loadTemplate', { filePath });
 
   try {
+    console.log(path.join(__dirname, '/', filePath));
     return fs.readFileSync(path.join(__dirname, '/', filePath), 'utf-8');
   } catch (e) {
-    winston.log('error', errMsg, e);
-    throw e;
+    winston.log('error', `Failed to read template ${filePath}!`);
+    winston.log('verbose', `Failed to read template ${filePath}!`, e);
+    return undefined;
   }
 }
 
@@ -29,17 +30,17 @@ export function loadTemplate(filePath, errMsg) {
  *
  * @param filePath
  * @param fileContents
- * @param errMsg
  * @returns {*}
  */
-export function writeFile(filePath, fileContents, errMsg) {
+export function writeFile(filePath, fileContents) {
   winston.log('verbose', 'writeFile', { filePath });
 
   try {
     return fs.writeFileSync(filePath, fileContents);
   } catch (e) {
-    winston.log('error', errMsg, e);
-    throw e;
+    winston.log('error', `Failed to write ${filePath}!`);
+    winston.log('verbose', `Failed to write ${filePath}!`, e);
+    return undefined;
   }
 }
 
@@ -65,7 +66,7 @@ export function createPackageJson(config, dependencies) {
 
   const json = JSON.stringify(packageJson, null, '  ');
 
-  writeFile(`${config.projectName}/package.json`, json, constants.packageJson.error.fileWrite);
+  writeFile(`${config.projectName}/package.json`, json);
 }
 
 /**
@@ -78,7 +79,6 @@ export function createIndexFile(folderName) {
 
   writeFile(
     `${folderName}/src/${constants.indexJS.fileName}`,
-    loadTemplate('./../../templates/js/index.js', constants.indexJS.error.fileRead),
-    constants.indexJS.error.fileWrite
+    loadTemplate('./../../templates/js/index.js')
   );
 }
