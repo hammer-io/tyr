@@ -16,7 +16,7 @@ import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
 import constants from './constants/constants';
 import * as git from './utils/git';
-import { deleteGitHubToken } from './clients/github';
+// import { deleteGitHubToken } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
