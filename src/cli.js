@@ -123,6 +123,7 @@ export function initProject(config) {
     }
 
     utils.file.createPackageJson(config, dependencies);
+    utils.mocha.createMochaTestSuite(`${config.projectName}`);
 
     if (config.container === constants.docker.name) {
       utils.docker.initDocker(config);
