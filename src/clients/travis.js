@@ -5,6 +5,14 @@ const tyrAgent = 'Travis/1.0';
 const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
+/**
+ * Gets the user's account based on the access token provided
+ *
+ * See https://docs.travis-ci.com/api/#accounts for information about returns.
+ *
+ * @param travisAccessToken the access token to use to get account information
+ * @returns {Promise}
+ */
 export function getUserAccount(travisAccessToken) {
   winston.log('verbose', 'getUserAccount');
 
@@ -26,6 +34,15 @@ export function getUserAccount(travisAccessToken) {
   });
 }
 
+/**
+ * Get user information based on the account provided.
+ *
+ * See https://docs.travis-ci.com/api/#users for information about returns.
+ *
+ *  @param travisAccessToken the access token to get user information
+ * @param account the account to get user information about
+ * @returns {Promise}
+ */
 export async function getUserInformation(travisAccessToken, account) {
   winston.log('verbose', 'getUserInformation', account.login);
 

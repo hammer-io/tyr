@@ -73,8 +73,10 @@ export async function enableTravisOnProject(token, username, projectName, enviro
     // Use the GitHub token to get a Travis token
     const travisAccessToken = await travisClient.requestTravisToken(token);
 
+    // get the accounts for the user
     const response = await travisClient.getUserAccount(travisAccessToken);
     let account = {};
+    // a user may have many accounts, we should find the account associated with the github username
     for (let i = 0; i < response.accounts.length; i += 1) {
       if (response.accounts[i].login === username) {
         account = response.accounts[i];
