@@ -142,7 +142,7 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param username
  * @param projectName
  */
-export function initAddCommitAndPush(username, projectName, credentials) {
+export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
   winston.log('verbose', 'initAddCommitAndPush', { username, projectName });
   winston.log('info', 'Pushing all files to the new git repository...');
 
@@ -154,7 +154,7 @@ export function initAddCommitAndPush(username, projectName, credentials) {
       .commit('Initial commit')
       .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
 
-    if (!credentials.url && !credentials.token) {
+    if (!isTwoFactorAuth) {
       git(`${process.cwd()}/${projectName}`)
         .init()
         .add('.gitignore')

@@ -113,6 +113,7 @@ export async function signIntoGithub() {
     credentials.password = githubCredentials.password;
     credentials.token = token.token;
     credentials.url = token.url;
+    credentials.isTwoFactorAuth = false;
     return credentials;
   } catch (err) {
     // if the above call was not successful, we will end up here...
@@ -131,6 +132,7 @@ export async function signIntoGithub() {
         credentials.password = githubCredentials.password;
         credentials.token = token.token;
         credentials.url = token.url;
+        credentials.isTwoFactorAuth = true;
         return credentials;
       } catch (error) {
         winston.log('error', 'failed logging into github', error);
@@ -163,7 +165,7 @@ export async function setupGitHub(projectName, projectDescription, credentials) 
   try {
     await createGitIgnore(projectName);
     await createGitHubRepository(projectName, projectDescription, credentials.token);
-    await initAddCommitAndPush(credentials.username, projectName, credentials);
+    await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
   } catch (err) {
     winston.log('error', 'setupGitHub failed for some reason', err);
   }
