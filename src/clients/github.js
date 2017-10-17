@@ -147,13 +147,6 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
   winston.log('info', 'Pushing all files to the new git repository...');
 
   return new Promise((resolve) => {
-    git(`${process.cwd()}/${projectName}`)
-      .init()
-      .add('.gitignore')
-      .add('./*')
-      .commit('Initial commit')
-      .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
-
     if (!isTwoFactorAuth) {
       git(`${process.cwd()}/${projectName}`)
         .init()
@@ -175,7 +168,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .add('./*')
         .commit('Initial commit');
       console.log('We cannot push hammer-io generated code to your repository because you have 2fa enabled. ' +
-        'Please follow this link (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support. ')
+        'Please follow this link (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support. ');
     }
   });
 }
