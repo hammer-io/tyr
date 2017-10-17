@@ -181,7 +181,8 @@ describe('Initialize Project Files', () => {
         '  "description": "Jack\'s Test Project",\n' +
         '  "main": "src/index.js",\n' +
         '  "scripts": {\n' +
-        '    "start": "node src/index.js"\n' +
+        '    "start": "node src/index.js",\n' +
+        '    "test": "mocha"\n' +
         '  },\n' +
         '  "repository": {},\n' +
         '  "authors": [\n' +
@@ -189,7 +190,10 @@ describe('Initialize Project Files', () => {
         '  ],\n' +
         '  "license": "MIT",\n' +
         '  "bin": {},\n' +
-        '  "dependencies": {}\n' +
+        '  "dependencies": {},\n' +
+        '  "devDependencies": {\n' +
+        '    "mocha": "3.5.3"\n' +
+        '  }\n' +
         '}';
       const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
@@ -204,6 +208,14 @@ describe('Initialize Project Files', () => {
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../templates/js/index.js');
       const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      assert.equal(actualContents, expectedContents);
+    });
+  });
+
+  describe('Create Sample Mocha Test', () => {
+    it('should create a mocha test file with a sample test inside', () => {
+      const expectedContents = loadTemplate('./../templates/mocha/test.js');
+      const actualContents = fs.readFileSync(`${configs.projectName}/${constants.mocha.fileName}`);
       assert.equal(actualContents, expectedContents);
     });
   });
@@ -226,7 +238,8 @@ describe('Initialize Project Files With ExpressJS', () => {
         '  "description": "Jack\'s Test Project",\n' +
         '  "main": "src/index.js",\n' +
         '  "scripts": {\n' +
-        '    "start": "node src/index.js"\n' +
+        '    "start": "node src/index.js",\n' +
+        '    "test": "mocha"\n' +
         '  },\n' +
         '  "repository": {},\n' +
         '  "authors": [\n' +
@@ -236,39 +249,42 @@ describe('Initialize Project Files With ExpressJS', () => {
         '  "bin": {},\n' +
         '  "dependencies": {\n' +
         '    "express": "4.16.0"\n' +
+        '  },\n' +
+        '  "devDependencies": {\n' +
+        '    "mocha": "3.5.3"\n' +
         '  }\n' +
         '}';
-      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
+      const packageJsonActualContents = fs.readFileSync(`${configs2.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
     });
   });
 
   describe('Initialize index.js', () => {
     it('should create an index.js file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+      assert.equal(fs.existsSync(`${configs2.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../templates/js/express/index.js');
-      const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      const actualContents = fs.readFileSync(`${configs2.projectName}/src/index.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   describe('Initialize routes.js', () => {
     it('should create an routes.js file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+      assert.equal(fs.existsSync(`${configs2.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../templates/js/express/routes.js');
-      const actualContents = fs.readFileSync(`${configs.projectName}/src/routes.js`);
+      const actualContents = fs.readFileSync(`${configs2.projectName}/src/routes.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   after(() => {
-    fs.removeSync(configs.projectName);
+    fs.removeSync(configs2.projectName);
   });
 });
 
@@ -279,7 +295,7 @@ describe('Initialize Project Files With Heroku', () => {
 
   describe('Initialize Travis CI', () => {
     it('should create a .travis.yml file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/.travis.yml`), true);
+      assert.equal(fs.existsSync(`${configs3.projectName}/.travis.yml`), true);
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
@@ -298,13 +314,13 @@ describe('Initialize Project Files With Heroku', () => {
         '    docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
         '    docker tag jack registry.heroku.com/jack/web;\n' +
         '    docker push registry.heroku.com/jack/web;\n' +
-        '    fi\n'
-      const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`, 'utf-8');
+        '    fi\n';
+      const actualContents = fs.readFileSync(`${configs3.projectName}/.travis.yml`, 'utf-8');
       assert.equal(actualContents, expectedContents);
     });
   });
 
   after(() => {
-    fs.removeSync(configs.projectName);
+    fs.removeSync(configs3.projectName);
   });
 });

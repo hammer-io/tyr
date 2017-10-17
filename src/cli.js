@@ -122,6 +122,7 @@ export function initProject(config) {
     }
 
     utils.file.createPackageJson(config, dependencies);
+    utils.mocha.createMochaTestSuite(`${config.projectName}`);
 
     if (config.container === constants.docker.name) {
       utils.docker.initDocker(config);
@@ -264,7 +265,6 @@ export default async function run() {
   initProject(configs);
 
   const githubCredentials = await promptGithubCredentials();
-
 
   await utils.git.setupGitHub(
     configs.projectName,
