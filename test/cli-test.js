@@ -6,7 +6,6 @@ import fs from 'fs-extra';
 // Tests need to import transpiled files that will be located in dist/ rather than src/
 import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
-import utils from '../dist/utils'
 
 const configs = {
   projectName: 'jack',
@@ -124,7 +123,6 @@ describe('User Preferences:', () => {
 describe('Initialize Project Files', () => {
   before(() => {
     initProject(configs);
-    utils.mocha.createMochaTestSuite(`${configs.projectName}`);
   });
 
   describe('Initialize Project Directories', () => {
@@ -184,7 +182,7 @@ describe('Initialize Project Files', () => {
         '  "main": "src/index.js",\n' +
         '  "scripts": {\n' +
         '    "start": "node src/index.js",\n' +
-        '    "test": "npm run build && mocha"\n' +
+        '    "test": "mocha"\n' +
         '  },\n' +
         '  "repository": {},\n' +
         '  "authors": [\n' +
@@ -241,7 +239,7 @@ describe('Initialize Project Files With ExpressJS', () => {
         '  "main": "src/index.js",\n' +
         '  "scripts": {\n' +
         '    "start": "node src/index.js",\n' +
-        '    "test": "npm run build && mocha"\n' +
+        '    "test": "mocha"\n' +
         '  },\n' +
         '  "repository": {},\n' +
         '  "authors": [\n' +

@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "npm run build && mocha"
+    "test": "mocha"
   },
   "repository": {},
   "authors": [],
