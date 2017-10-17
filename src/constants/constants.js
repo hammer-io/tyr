@@ -181,8 +181,8 @@ export default {
     name: 'Mocha',
     fileName: 'tests.js',
     error: {
-      fileWrite: '',
-      fileRead: ''
+      fileWrite: 'Failed to write tests.js!',
+      fileRead: 'Failed to read tests.js template!'
     }
   }
 };
