@@ -163,9 +163,7 @@ export async function setupGitHub(projectName, projectDescription, credentials) 
   try {
     await createGitIgnore(projectName);
     await createGitHubRepository(projectName, projectDescription, credentials.token);
-    await initAddCommitAndPush(credentials.username, projectName);
-    console.log('Your project files have been generated, staged, and committed. Please use `git push origin master` to ' +
-      'push your code. If you have two factor authentication enabled, please checkout https://help.github.com/articles/providing-your-2fa-authentication-code/ ');
+    await initAddCommitAndPush(credentials.username, projectName, credentials);
   } catch (err) {
     winston.log('error', 'setupGitHub failed for some reason', err);
   }

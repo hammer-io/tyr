@@ -142,16 +142,40 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param username
  * @param projectName
  */
-export function initAddCommitAndPush(username, projectName) {
+export function initAddCommitAndPush(username, projectName, credentials) {
   winston.log('verbose', 'initAddCommitAndPush', { username, projectName });
   winston.log('info', 'Pushing all files to the new git repository...');
 
-  return new Promise(() => {
+  return new Promise((resolve) => {
     git(`${process.cwd()}/${projectName}`)
       .init()
       .add('.gitignore')
       .add('./*')
       .commit('Initial commit')
-      .addRemote('origin', `https://github.com/${username}/${projectName}.git`);
+      .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
+
+    if (!credentials.url && !credentials.token) {
+      git(`${process.cwd()}/${projectName}`)
+        .init()
+        .add('.gitignore')
+        .add('./*')
+        .commit('Initial commit')
+        .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
+        .push('origin', 'master')
+        .exec(() => {
+          console.log('Please wait while the files are uploaded...');
+          setTimeout(() => {
+            resolve();
+          }, 10000); // TODO: Find a better way to do this than a timeout
+        });
+    } else {
+      git(`${process.cwd()}/${projectName}`)
+        .init()
+        .add('.gitignore')
+        .add('./*')
+        .commit('Initial commit');
+      console.log('We cannot push hammer-io generated code to your repository because you have 2fa enabled. ' +
+        'Please follow this link (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support. ')
+    }
   });
 }

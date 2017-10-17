@@ -288,7 +288,7 @@ export default async function run() {
   if (configs.ci === constants.travisCI.name) {
     try {
       await utils.travis.enableTravisOnProject(
-        credentials.token.token,
+        credentials.token,
         configs.projectName,
         environmentVariables
       );
