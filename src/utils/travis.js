@@ -4,7 +4,6 @@ import path from 'path';
 import yaml from 'js-yaml';
 
 import constants from '../constants/constants';
-import * as githubClient from '../clients/github';
 import * as travisClient from '../clients/travis';
 
 /**
@@ -44,18 +43,10 @@ export function initTravisCI(config) {
 /**
  * Initialize Travis-CI on the created project
  */
-export async function enableTravisOnProject(username, password, projectName, environmentVariables) {
+export async function enableTravisOnProject(token, username, projectName, environmentVariables) {
   try {
-    // Create a temporary GitHub oauth token
-    const githubResponse = await githubClient.requestGitHubToken(username, password);
-    const githubToken = githubResponse.token;
-    const githubUrl = githubResponse.url;
-
     // Use the GitHub token to get a Travis token
-    const travisAccessToken = await travisClient.requestTravisToken(githubToken);
-
-    // Delete the temporary GitHub token
-    await githubClient.deleteGitHubToken(githubUrl, username, password);
+    const travisAccessToken = await travisClient.requestTravisToken(token);
 
     // Sync Travis with GitHub, which must be done before activating the repository
     await travisClient.syncTravisWithGithub(travisAccessToken);
