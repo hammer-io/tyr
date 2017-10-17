@@ -175,5 +175,14 @@ export default {
       name: 'web',
       message: 'Choose your web application framework:'
     }
+  },
+
+  mocha: {
+    name: 'Mocha',
+    fileName: 'test.js',
+    error: {
+      fileWrite: 'Failed to write tests.js!',
+      fileRead: 'Failed to read tests.js template!'
+    }
   }
 };
