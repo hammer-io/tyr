@@ -296,7 +296,7 @@ export default async function run() {
         environmentVariables
       );
     } catch (err) {
-      winston.log('error', 'enabling travis failed', err);
+      winston.log('error', 'enabling travis failed', JSON.stringify(err));
     }
   }
   //

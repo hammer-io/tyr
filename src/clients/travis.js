@@ -5,6 +5,48 @@ const tyrAgent = 'Travis/1.0';
 const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
+export function getUserAccount(travisAccessToken) {
+  winston.log('verbose', 'getUserAccount');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/accounts/`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+export async function getUserInformation(travisAccessToken, account) {
+  winston.log('verbose', 'getUserInformation', account.login);
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/users/${account.id}`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
 /**
  * Get github repo id from Travis-CI
  */
