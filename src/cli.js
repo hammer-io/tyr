@@ -22,6 +22,8 @@ const preferences = new Preferences(constants.tyr.name);
  * Gets the basic configuration settings for the user
  */
 function promptConfigs() {
+  winston.log('verbose', 'promptConfigs');
+
   const questions = [{
     name: constants.config.projectName.name,
     type: 'input',
@@ -105,9 +107,12 @@ function promptConfigs() {
 
 /**
  * Initializes the files and accounts needed to use or application
+ *
  * @param config the config object form the main inquirer prompt
  */
 export function initProject(config) {
+  winston.log('verbose', 'initProject');
+
   // if the project doesn't already exist, intialize the files and accounts
   if (!fs.existsSync(config.projectName)) {
     fs.mkdirSync(config.projectName);
@@ -228,8 +233,13 @@ function promptGlobalPrerequisites() {
 /**
  * Returns true if all answers are 'true' (i.e. if the user said YES to
  * having completed all prerequisites).
+ *
+ * @param answers
+ * @return finishedPrereqs
  */
 export function isUserFinishedWithPrereqs(answers) {
+  winston.log('verbose', 'isUserFinishedWithPrereqs');
+
   let finishedPrereqs = true;
 
   initPreferencesIfUninitialized();
@@ -252,6 +262,7 @@ export function isUserFinishedWithPrereqs(answers) {
  * The main execution function for tyr.
  */
 export default async function run() {
+  winston.log('verbose', 'run');
   console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
   winston.log('debug', preferences);
 

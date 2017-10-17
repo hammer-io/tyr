@@ -7,6 +7,11 @@ const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
 /**
  * Get github repo id from Travis-CI
+ *
+ * @param travisAccessToken
+ * @param username
+ * @param projectName
+ * @returns {Promise}
  */
 export function getRepositoryId(travisAccessToken, username, projectName) {
   winston.log('verbose', 'getRepositoryId', { username, projectName });
@@ -31,6 +36,10 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
 
 /**
  * Activate Travis hook on a Github repository
+ *
+ * @param repositoryId
+ * @param travisAccessToken
+ * @returns {Promise}
  */
 export function activateTravisHook(repositoryId, travisAccessToken) {
   winston.log('verbose', 'activateTravisHook', { repositoryId });
@@ -61,6 +70,9 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
 
 /**
  * Triggers a new sync with GitHub. Needed to see the newly-created repository
+ *
+ * @param travisAccessToken
+ * @returns {Promise}
  */
 export function syncTravisWithGithub(travisAccessToken) {
   winston.log('verbose', 'syncTravisWithGithub');
@@ -89,6 +101,9 @@ export function syncTravisWithGithub(travisAccessToken) {
 
 /**
  * Request Travis-CI auth token
+ *
+ * @param githubToken
+ * @returns {Promise}
  */
 export function requestTravisToken(githubToken) {
   winston.log('verbose', 'requestTravisToken');
@@ -113,6 +128,11 @@ export function requestTravisToken(githubToken) {
 
 /**
  * Set environment variables on a Travis-CI project
+ *
+ * @param travisAccessToken
+ * @param repoId
+ * @param environmentVariable
+ * @returns {Promise}
  */
 export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
   winston.log('verbose', 'setEnvironmentVariable', { repoId });

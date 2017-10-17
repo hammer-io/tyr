@@ -5,14 +5,16 @@ export default {
     dockerFile: {
       fileName: 'Dockerfile',
       error: {
-        fileWrite: 'Failed to write Dockerfile!'
+        fileWrite: 'Failed to write Dockerfile!',
+        fileRead: 'Failed to read Dockerfile template!'
       }
     },
 
     dockerIgnore: {
       fileName: '.dockerignore',
       error: {
-        fileWrite: 'Failed to write .dockerignore!'
+        fileWrite: 'Failed to write .dockerignore!',
+        fileRead: 'Failed to read .dockerignore template!'
       }
     }
   },
@@ -22,6 +24,7 @@ export default {
     fileName: '.travis.yml',
     error: {
       fileWrite: 'Failed to write .travis.yml!',
+      fileRead: 'Failed to read .travis.yml template!',
       enableTravisOnProject: 'Failed to enable TravisCI for the project!'
     }
   },
@@ -40,7 +43,8 @@ export default {
     gitIgnore: {
       fileName: '.gitignore',
       error: {
-        fileWrite: 'Failed to write .gitignore!'
+        fileWrite: 'Failed to write .gitignore!',
+        fileRead: 'Failed to read .gitignore template!'
       }
     }
   },
@@ -77,7 +81,21 @@ export default {
 
   express: {
     name: 'ExpressJS',
-    version: '4.16.0'
+    version: '4.16.0',
+    index: {
+      fileName: 'index.js',
+      error: {
+        fileWrite: 'Failed to write express index.js!',
+        fileRead: 'Failed to read express index.js template!'
+      }
+    },
+    routes: {
+      fileName: 'routes.js',
+      error: {
+        fileWrite: 'Failed to write express route.js!',
+        fileRead: 'Failed to read express index.js template!'
+      }
+    }
   },
 
   tyr: {
@@ -114,6 +132,12 @@ export default {
     error: {
       fileWrite: 'Failed to write index.js!',
       fileRead: 'Failed to read template-index.js!'
+    }
+  },
+
+  packageJson: {
+    error: {
+      fileWrite: 'Failed to write package.json!'
     }
   },
 

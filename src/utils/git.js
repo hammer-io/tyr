@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import winston from 'winston';
 
 import {
@@ -8,14 +6,12 @@ import {
   initAddCommitAndPush,
   deleteGitHubToken
 } from './../clients/github';
+import {
+  loadTemplate,
+  writeFile
+} from './file';
 import constants from '../constants/constants';
 
-/**
- * Load template file
- */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-}
 
 /**
  * Create the .gitignore in the newly formed project folder with the basics for a node.js project.
@@ -25,14 +21,11 @@ function loadTemplate(filepath) {
 export function createGitIgnore(projectName) {
   winston.log('verbose', 'createGitIgnore', { projectName });
 
-  try {
-    fs.writeFileSync(
-      `${projectName}/${constants.github.gitIgnore.fileName}`,
-      loadTemplate('./../../templates/git/.gitignore')
-    );
-  } catch (err) {
-    winston.log('error', constants.github.gitIgnore.error.fileWrite, err);
-  }
+  writeFile(
+    `${projectName}/${constants.github.gitIgnore.fileName}`,
+    loadTemplate('./../../templates/git/.gitignore', constants.github.gitIgnore.error.fileRead),
+    constants.github.gitIgnore.error.fileWrite
+  );
 }
 
 /**
