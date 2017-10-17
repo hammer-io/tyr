@@ -77,7 +77,6 @@ export function syncTravisWithGithub(travisAccessToken) {
         if (err) {
           reject(err);
         } else {
-          // TODO: Might return status 409 if the user is currently syncing.
           console.log('Please wait while we sync TravisCI with GitHub...');
           setTimeout(() => {
             resolve();
