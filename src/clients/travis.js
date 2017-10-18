@@ -6,6 +6,65 @@ const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
 /**
+ * Gets the user's account based on the access token provided
+ *
+ * See https://docs.travis-ci.com/api/#accounts for information about returns.
+ *
+ * @param travisAccessToken the access token to use to get account information
+ * @returns {Promise}
+ */
+export function getUserAccount(travisAccessToken) {
+  winston.log('verbose', 'getUserAccount');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/accounts/`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+/**
+ * Get user information based on the account provided.
+ *
+ * See https://docs.travis-ci.com/api/#users for information about returns.
+ *
+ *  @param travisAccessToken the access token to get user information
+ * @param account the account to get user information about
+ * @returns {Promise}
+ */
+export async function getUserInformation(travisAccessToken, account) {
+  winston.log('verbose', 'getUserInformation', account.login);
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/users/${account.id}`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+/**
  * Get github repo id from Travis-CI
  *
  * @param travisAccessToken
@@ -89,7 +148,6 @@ export function syncTravisWithGithub(travisAccessToken) {
         if (err) {
           reject(err);
         } else {
-          // TODO: Might return status 409 if the user is currently syncing.
           console.log('Please wait while we sync TravisCI with GitHub...');
           setTimeout(() => {
             resolve();
