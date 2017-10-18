@@ -1,42 +1,45 @@
 /* eslint-disable no-await-in-loop */
-import fs from 'fs';
 import winston from 'winston';
-import path from 'path';
 import yaml from 'js-yaml';
 
+import {
+  loadTemplate,
+  writeFile
+} from './file';
 import constants from '../constants/constants';
 import * as travisClient from '../clients/travis';
 
 /**
- * Load template file
+ * Initialize TravisCI.  Creates the default travis.yml file with optional heroku information.
+ *
+ * @param config - Refer to README for the structure of the config object
  */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-}
-
 export function initTravisCI(config) {
-  if (config.deployment === 'Heroku') {
-    try {
-      const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
-      const dockerBuild = `docker build -t ${config.projectName} .`;
-      const dockerPs = 'docker ps -a';
-      const afterSuccess =
-        'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
-        'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
-        `docker tag ${config.projectName} registry.heroku.com/${config.projectName}/web;\n` +
-        `docker push registry.heroku.com/${config.projectName}/web;\n` +
-        'fi';
+  winston.log('verbose', 'initTravisCI');
 
-      file.before_install = [dockerBuild, dockerPs];
-      file.after_success = [afterSuccess];
-      fs.writeFileSync(`${config.projectName}/${constants.travisCI.fileName}`, yaml.safeDump(file, { lineWidth: 100 }));
-    } catch (e) {
-      winston.log('error', constants.travisCI.error.fileWrite, e);
-    }
-  } else {
-    fs.writeFileSync(
+  if (config.deployment === 'Heroku') {
+    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', constants.travisCI.error.fileRead));
+    const dockerBuild = `docker build -t ${config.projectName} .`;
+    const dockerPs = 'docker ps -a';
+    const afterSuccess =
+      'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
+      'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+      `docker tag ${config.projectName} registry.heroku.com/${config.projectName}/web;\n` +
+      `docker push registry.heroku.com/${config.projectName}/web;\n` +
+      'fi';
+
+    file.before_install = [dockerBuild, dockerPs];
+    file.after_success = [afterSuccess];
+    writeFile(
       `${config.projectName}/${constants.travisCI.fileName}`,
-      loadTemplate('./../../templates/travis/.travis.yml')
+      yaml.safeDump(file, { lineWidth: 100 }),
+      constants.travisCI.error.fileWrite
+    );
+  } else {
+    writeFile(
+      `${config.projectName}/${constants.travisCI.fileName}`,
+      loadTemplate('./../../templates/travis/.travis.yml', constants.travisCI.error.fileRead),
+      constants.travisCI.error.fileWrite
     );
   }
 }
@@ -53,6 +56,8 @@ export function initTravisCI(config) {
  * @returns {Promise}
  */
 export async function waitForSync(travisAccessToken, account) {
+  winston.log('verbose', 'waitForSync');
+
   return new Promise(async (resolve) => {
     setTimeout(async () => {
       const user = await travisClient.getUserInformation(travisAccessToken, account);
@@ -67,8 +72,16 @@ export async function waitForSync(travisAccessToken, account) {
 
 /**
  * Initialize Travis-CI on the created project
+ *
+ * @param token
+ * @param username
+ * @param projectName
+ * @param environmentVariables
+ * @returns {Promise.<void>}
  */
 export async function enableTravisOnProject(token, username, projectName, environmentVariables) {
+  winston.log('verbose', 'enableTravisOnProject');
+
   try {
     // Use the GitHub token to get a Travis token
     const travisAccessToken = await travisClient.requestTravisToken(token);

@@ -1,26 +1,27 @@
-import fs from 'fs';
-import path from 'path';
+import winston from 'winston';
 
 import constants from '../constants/constants';
+import {
+  loadTemplate,
+  writeFile
+} from './file';
 
-/**
- * Load template file
- */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-}
 
 /**
  * Generate the required Docker files
+ *
+ * @param config
  */
 // eslint-disable-next-line
 export function initDocker(config) {
-  fs.writeFileSync(
+  winston.log('verbose', 'initDocker');
+
+  writeFile(
     `${config.projectName}/${constants.docker.dockerFile.fileName}`,
     loadTemplate('./../../templates/docker/Dockerfile')
   );
 
-  fs.writeFileSync(
+  writeFile(
     `${config.projectName}/${constants.docker.dockerIgnore.fileName}`,
     loadTemplate('./../../templates/docker/.dockerignore')
   );

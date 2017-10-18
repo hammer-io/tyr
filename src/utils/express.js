@@ -1,23 +1,25 @@
-import fs from 'fs';
-import path from 'path';
+import winston from 'winston';
 
-/**
- * Load template file
- */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-}
+import {
+  loadTemplate,
+  writeFile
+} from './file';
+import constants from './../constants/constants';
 
 /**
  * Generate Express files - index.js and routes.js
+ *
+ * @param folderName
  */
 export function createJsFiles(folderName) { // eslint-disable-line import/prefer-default-export
-  fs.writeFileSync(
-    `${folderName}/src/index.js`,
+  winston.log('verbose', 'createJsFiles', { folderName });
+
+  writeFile(
+    `${folderName}/src/${constants.express.index.fileName}`,
     loadTemplate('./../../templates/js/express/index.js')
   );
-  fs.writeFileSync(
-    `${folderName}/src/routes.js`,
+  writeFile(
+    `${folderName}/src/${constants.express.routes.fileName}`,
     loadTemplate('./../../templates/js/express/routes.js')
   );
 }

@@ -81,7 +81,19 @@ export default {
 
   express: {
     name: 'ExpressJS',
-    version: '4.16.0'
+    version: '4.16.0',
+    index: {
+      fileName: 'index.js',
+      error: {
+        fileWrite: 'Failed to write express index.js!'
+      }
+    },
+    routes: {
+      fileName: 'routes.js',
+      error: {
+        fileWrite: 'Failed to write express route.js!'
+      }
+    }
   },
 
   tyr: {
@@ -183,10 +195,6 @@ export default {
 
   mocha: {
     name: 'Mocha',
-    fileName: 'test.js',
-    error: {
-      fileWrite: 'Failed to write tests.js!',
-      fileRead: 'Failed to read tests.js template!'
-    }
+    fileName: 'test.js'
   }
 };

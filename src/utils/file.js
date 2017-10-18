@@ -1,19 +1,58 @@
 import fs from 'fs';
 import path from 'path';
+import winston from 'winston';
 
 import packageTemplate from './../../templates/json/package.json';
+import constants from './../constants/constants';
 
 /**
- * Load template file
+ * Load template file.  IF an error is thrown, it will be caught, logged, then thrown again.
+ * The given errMsg should be a constant.
+ *
+ * @param filePath
+ * @returns {*}
  */
-function loadTemplate(filepath) {
-  return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
+export function loadTemplate(filePath) {
+  winston.log('verbose', 'loadTemplate', { filePath });
+
+  try {
+    console.log(path.join(__dirname, '/', filePath));
+    return fs.readFileSync(path.join(__dirname, '/', filePath), 'utf-8');
+  } catch (e) {
+    winston.log('error', `Failed to read template ${filePath}!`);
+    winston.log('verbose', `Failed to read template ${filePath}!`, e);
+    return undefined;
+  }
+}
+
+/**
+ * Write to the given filePath with the contents of a file.  The given errMsg should be a constant.
+ *
+ * @param filePath
+ * @param fileContents
+ * @returns {*}
+ */
+export function writeFile(filePath, fileContents) {
+  winston.log('verbose', 'writeFile', { filePath });
+
+  try {
+    return fs.writeFileSync(filePath, fileContents);
+  } catch (e) {
+    winston.log('error', `Failed to write ${filePath}!`);
+    winston.log('verbose', `Failed to write ${filePath}!`, e);
+    return undefined;
+  }
 }
 
 /**
  * Generate a package.json file based on the user options selected
+ *
+ * @param config
+ * @param dependencies
  */
 export function createPackageJson(config, dependencies) {
+  winston.log('verbose', 'createPackageJson');
+
   const author = config.author.split(',');
 
   const packageJson = packageTemplate;
@@ -27,15 +66,19 @@ export function createPackageJson(config, dependencies) {
 
   const json = JSON.stringify(packageJson, null, '  ');
 
-  fs.writeFileSync(`${config.projectName}/package.json`, json);
+  writeFile(`${config.projectName}/package.json`, json);
 }
 
 /**
  * Generate a simple index.js file
+ *
+ * @param folderName
  */
 export function createIndexFile(folderName) {
-  fs.writeFileSync(
-    `${folderName}/src/index.js`,
+  winston.log('verbose', 'createIndexFile', { folderName });
+
+  writeFile(
+    `${folderName}/src/${constants.indexJS.fileName}`,
     loadTemplate('./../../templates/js/index.js')
   );
 }
