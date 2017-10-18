@@ -135,7 +135,7 @@ export async function signIntoGithub() {
         credentials.isTwoFactorAuth = true;
         return credentials;
       } catch (error) {
-        winston.log('error', 'failed logging into github', error);
+        winston.log('error', constants.github.error.signInFail, error);
       }
     } else if (err.status === 401) {
       // if the user had a bad username and password combination,
@@ -143,7 +143,7 @@ export async function signIntoGithub() {
       await signIntoGithub();
     } else {
       // something bad has happened if we get here.
-      winston.log('error', 'failed logging into github', err);
+      winston.log('error', constants.github.error.signInFail, err);
     }
   }
 

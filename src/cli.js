@@ -16,7 +16,6 @@ import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
 import constants from './constants/constants';
 import * as git from './utils/git';
-// import { deleteGitHubToken } from './clients/github';
 
 const preferences = new Preferences(constants.tyr.name);
 
@@ -296,15 +295,9 @@ export default async function run() {
         environmentVariables
       );
     } catch (err) {
-      winston.log('error', 'enabling travis failed', JSON.stringify(err));
+      winston.log('error', constants.travisCI.error.enableTravisOnProject, err);
     }
   }
-  //
-  // try {
-  //   await deleteGitHubToken(credentials.token);
-  // } catch (err) {
-  //   winston.log('error', 'deleting git token failed', err);
-  // }
 
   utils.npm.npmInstall(`${configs.projectName}`);
 }

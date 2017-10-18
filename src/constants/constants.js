@@ -42,6 +42,10 @@ export default {
       error: {
         fileWrite: 'Failed to write .gitignore!'
       }
+    },
+
+    error: {
+      signInFail: 'Failed to sign into github'
     }
   },
 
