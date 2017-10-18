@@ -12,7 +12,7 @@ import * as travisClient from '../clients/travis';
 /**
  * Initialize TravisCI.  Creates the default travis.yml file with optional heroku information.
  *
- * @param config
+ * @param config - Refer to README for the structure of the config object
  */
 export function initTravisCI(config) {
   winston.log('verbose', 'initTravisCI');

@@ -7,7 +7,7 @@ import shell from 'shelljs';
  * is executed, the working directory returns to it's original state so as to not confuse
  * other parts of the program.
  *
- * @param path
+ * @param path - String of the path to the new project directory where we need to call npm install
  */
 // eslint-disable-next-line
 export function npmInstall (path) {
