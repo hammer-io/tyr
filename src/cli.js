@@ -15,6 +15,7 @@ import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
 import constants from './constants/constants';
+import * as git from './utils/git';
 
 const preferences = new Preferences(constants.tyr.name);
 
@@ -136,23 +137,6 @@ export function initProject(config) {
 }
 
 /**
- * Gets the user's github credentials
- */
-function promptGithubCredentials() {
-  const questions = [{
-    name: constants.github.username.name,
-    type: 'input',
-    message: constants.github.username.message,
-  }, {
-    name: constants.github.password.name,
-    type: 'password',
-    message: constants.github.password.message
-  }];
-
-  return inquirer.prompt(questions);
-}
-
-/**
  * Gets the user's docker hub credentials
  */
 function promptDockerHubCredentials() {
@@ -255,23 +239,23 @@ export default async function run() {
   console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
   winston.log('debug', preferences);
 
+  const configs = await promptConfigs();
   const prereqAnswers = await promptGlobalPrerequisites();
   const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
   if (!canContinue) {
     return;
   }
 
-  const configs = await promptConfigs();
-  initProject(configs);
+  // initialize the basic project files
+  await initProject(configs);
 
-  const githubCredentials = await promptGithubCredentials();
+  // sign the user into github
+  const credentials = await git.signIntoGithub();
 
-  await utils.git.setupGitHub(
-    configs.projectName,
-    configs.projectDescription,
-    githubCredentials.githubUsername,
-    githubCredentials.githubPassword
-  );
+  // if the sign was successful, initialize local and remote github repositories
+  if (credentials) {
+    await git.setupGitHub(configs.projectName, configs.description, credentials);
+  }
 
   const environmentVariables = [];
   if (configs.containerization === constants.docker.name) {
@@ -303,12 +287,16 @@ export default async function run() {
   }
 
   if (configs.ci === constants.travisCI.name) {
-    await utils.travis.enableTravisOnProject(
-      githubCredentials.githubUsername,
-      githubCredentials.githubPassword,
-      configs.projectName,
-      environmentVariables
-    );
+    try {
+      await utils.travis.enableTravisOnProject(
+        credentials.token,
+        credentials.username,
+        configs.projectName,
+        environmentVariables
+      );
+    } catch (err) {
+      winston.log('error', constants.travisCI.error.enableTravisOnProject, err);
+    }
   }
 
   utils.npm.npmInstall(`${configs.projectName}`);
