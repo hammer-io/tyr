@@ -15,7 +15,6 @@ function basicAuthorization(username, password) {
 }
 
 export function login(dockerCredentials) {
-  console.log(dockerCredentials);
   const request = superagent
     .get(`${dockerAuthApiUrl}`)
     .set({
