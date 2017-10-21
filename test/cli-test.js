@@ -20,6 +20,7 @@ const configs = {
   },
 
   tooling: {
+    sourceControl: 'GitHub',
     ci: 'TravisCI',
     container: 'Docker'
   }
@@ -77,7 +78,7 @@ function captureStream(stream){
   };
 }
 
-describe('Initialize Project Files', () => {
+describe('Initialize Project Files with GitHub, Travis, Docker', () => {
   before(async () => {
     await generateProjectFiles(configs);
   });
@@ -95,6 +96,18 @@ describe('Initialize Project Files', () => {
       const actualResult = await generateProjectFiles(configs); // run initProject again to see
       // if it fails
       assert.equal(actualResult, 'Project already exists!');
+    });
+  });
+
+  describe('Intialize GitHub', () => {
+    it('should create a .gitignore file', () => {
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/.gitignore`), true);
+    });
+
+    it('should create a .gitignore file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../../templates/git/.gitignore');
+      const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.gitignore`);
+      assert.equal(actualContents, expectedContents);
     });
   });
 
