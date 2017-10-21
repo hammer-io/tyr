@@ -40,7 +40,7 @@ export async function generateProjectFiles(config) {
 
     // create .gitignore
     if (config.tooling.sourceControl === constants.github.name) {
-      await utils.git.createGitIgnore();
+      await utils.git.createGitIgnore(config.projectConfigurations.projectName);
     }
 
     // create .travis.yml
@@ -109,7 +109,6 @@ export async function initProject(config) {
   // create .travis.yml file and enable travis on project
   if (config.tooling.ci === constants.travisCI.name) {
     try {
-      console.log(config.credentials.github);
       await utils.travis.enableTravisOnProject(
         config.credentials.github.token,
         config.credentials.github.username,
