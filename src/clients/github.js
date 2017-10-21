@@ -1,5 +1,6 @@
-const superagent = require('superagent');
-const winston = require('winston');
+import superagent from 'superagent';
+import winston from 'winston';
+import chalk from 'chalk';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
@@ -152,11 +153,11 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial commit')
+        .commit('Initial Commit w/ <3 by @hammer-io.')
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
-          console.log('Please wait while the files are uploaded...');
+          console.log(chalk.yellow('Please wait while files are pushed to GitHub...'));
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout
@@ -166,9 +167,11 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial commit');
-      console.log('We cannot push hammer-io generated code to your repository because you have 2fa enabled. ' +
-        'Please follow this link (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support.');
+        .commit('Initial Commit w/ <3 by @hammer-io.');
+      console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
+      ' you have 2fa enabled. ' +
+        'Please follow this link' +
+        ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support.'));
       resolve();
     }
   });

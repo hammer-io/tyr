@@ -1,4 +1,4 @@
-const superagent = require('superagent');
+import superagent from 'superagent';
 
 const dockerAuthApiUrl = 'index.docker.io/v1/users';
 
@@ -29,7 +29,7 @@ export function login(dockerCredentials) {
     .get(`${dockerAuthApiUrl}`)
     .set({
       'Content-Type': 'application/json',
-      Authorization: basicAuthorization(dockerCredentials.email, dockerCredentials.password)
+      Authorization: basicAuthorization(dockerCredentials.username, dockerCredentials.password)
     });
 
   return new Promise((resolve, reject) => {
