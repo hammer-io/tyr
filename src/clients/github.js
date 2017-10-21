@@ -144,8 +144,8 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param projectName
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('verbose', 'initAddCommitAndPush', { username, projectName });
-  winston.log('info', 'Pushing all files to the new git repository...');
+  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName });
+  console.log(chalk.yellow('Pushing all files to the new git repository...'));
 
   return new Promise((resolve) => {
     if (!isTwoFactorAuth) {
@@ -153,7 +153,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial Commit w/ <3 by @hammer-io.')
+        .commit('Initial Commit w/ :heart: by @hammer-io.')
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
@@ -167,7 +167,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial Commit w/ <3 by @hammer-io.');
+        .commit('Initial Commit w/ :heart: by @hammer-io.');
       console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
       ' you have 2fa enabled. ' +
         'Please follow this link' +
