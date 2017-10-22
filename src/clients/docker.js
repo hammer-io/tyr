@@ -19,7 +19,7 @@ export function login(username, password) {
   winston.log('verbose', 'logging in to docker', username);
 
   const request = superagent
-    .get(`${dockerAuthApiUrl}`)
+    .get(dockerAuthApiUrl)
     .set({
       'Content-Type': 'application/json',
       Authorization:
