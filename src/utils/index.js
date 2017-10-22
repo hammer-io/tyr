@@ -5,6 +5,7 @@ import * as npm from './npm';
 import * as git from './git';
 import * as express from './express';
 import * as mocha from './mocha';
+import * as heroku from './heroku';
 
 export default {
   travis,
@@ -13,5 +14,6 @@ export default {
   git,
   express,
   npm,
-  mocha
+  mocha,
+  heroku
 };

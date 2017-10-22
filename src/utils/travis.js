@@ -15,31 +15,35 @@ import * as travisClient from '../clients/travis';
  * @param config - Refer to README for the structure of the config object
  */
 export function initTravisCI(config) {
-  winston.log('verbose', 'initTravisCI');
+  winston.log('verbose', 'initializing TravisCI');
 
-  if (config.deployment === 'Heroku') {
-    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', constants.travisCI.error.fileRead));
-    const dockerBuild = `docker build -t ${config.projectName} .`;
+  if (config.tooling.deployment === constants.heroku.name) {
+    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', 'Failed to' +
+      ' read from .travis.yml template file!'));
+    const dockerBuild = `docker build -t ${config.projectConfigurations.projectName} .`;
     const dockerPs = 'docker ps -a';
     const afterSuccess =
       'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
       'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
-      `docker tag ${config.projectName} registry.heroku.com/${config.projectName}/web;\n` +
-      `docker push registry.heroku.com/${config.projectName}/web;\n` +
+      `docker tag ${config.projectConfigurations.projectName} registry.heroku.com/${config.projectConfigurations.projectName}/web;\n` +
+      `docker push registry.heroku.com/${config.projectConfigurations.projectName}/web;\n` +
       'fi';
 
     file.before_install = [dockerBuild, dockerPs];
     file.after_success = [afterSuccess];
     writeFile(
-      `${config.projectName}/${constants.travisCI.fileName}`,
+      `${config.projectConfigurations.projectName}/${constants.travisCI.fileName}`,
       yaml.safeDump(file, { lineWidth: 100 }),
-      constants.travisCI.error.fileWrite
+      'Failed to write to .travis.yml'
     );
   } else {
     writeFile(
-      `${config.projectName}/${constants.travisCI.fileName}`,
-      loadTemplate('./../../templates/travis/.travis.yml', constants.travisCI.error.fileRead),
-      constants.travisCI.error.fileWrite
+      `${config.projectConfigurations.projectName}/${constants.travisCI.fileName}`,
+      loadTemplate(
+        './../../templates/travis/.travis.yml',
+        'Failed to read from .travis.yml template file',
+        'Failed to write to .travis.yml'
+      )
     );
   }
 }
@@ -56,7 +60,7 @@ export function initTravisCI(config) {
  * @returns {Promise}
  */
 export async function waitForSync(travisAccessToken, account) {
-  winston.log('verbose', 'waitForSync');
+  winston.log('verbose', 'waiting for sync');
 
   return new Promise(async (resolve) => {
     setTimeout(async () => {
@@ -80,7 +84,7 @@ export async function waitForSync(travisAccessToken, account) {
  * @returns {Promise.<void>}
  */
 export async function enableTravisOnProject(token, username, projectName, environmentVariables) {
-  winston.log('verbose', 'enableTravisOnProject');
+  winston.log('verbose', 'enabling travis for project');
 
   try {
     // Use the GitHub token to get a Travis token
@@ -119,6 +123,6 @@ export async function enableTravisOnProject(token, username, projectName, enviro
 
     winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);
   } catch (err) {
-    winston.log('error', constants.travisCI.error.enableTravisOnProject, JSON.string(err));
+    winston.log('error', `failed to enable TravisCI on ${username}/${projectName}`, JSON.stringify(err));
   }
 }

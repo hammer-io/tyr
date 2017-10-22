@@ -1,47 +1,24 @@
-const superagent = require('superagent');
-const winston = require('winston');
+import superagent from 'superagent';
+import winston from 'winston';
+import chalk from 'chalk';
+import * as authorizationUtil from './../utils/authorization';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
 
 /**
- * Returns the string used for the basic authorization header in a POST request.
- *
- * @param username
- * @param password
- * @returns {string}
- */
-function basicAuthorization(username, password) {
-  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-}
-
-/**
- * Returns the string used for the token authorization header in a POST request
- *
- * @param token
- * @returns {string}
- */
-function tokenAuthorization(token) {
-  return `token ${token}`;
-}
-
-/**
  * Request GitHub OAuth token.
  *
- * @param credentials a users github credentials
- *    {
- *      username: 'username',
- *      password: 'password'
- *    }
- *
- *  @param otpCode the user's two factor authentication code.
+ * @param username github username
+ * @param password github password
+ * @param otpCode the user's two factor authentication code.
  *                  If user does not use two factor authentication, otpCode
  *                 will be null or their two factor authentication has not been
  *                 provided.
- * @returns {Promise}
+ * @returns github token information if successful, error information otherwise
  */
-export function requestGitHubToken(credentials, otpCode) {
-  winston.log('verbose', 'requestGitHubToken', credentials.username);
+export function requestGitHubToken(username, password, otpCode) {
+  winston.log('verbose', 'requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -62,7 +39,7 @@ export function requestGitHubToken(credentials, otpCode) {
 
   request = request.set({
     'Content-Type': 'application/json',
-    Authorization: basicAuthorization(credentials.username, credentials.password)
+    Authorization: authorizationUtil.basicAuthorization(username, password)
   });
 
   return new Promise((resolve, reject) => {
@@ -91,7 +68,7 @@ export function deleteGitHubToken(githubUrl, token) {
   return new Promise((resolve, reject) => {
     superagent
       .delete(githubUrl)
-      .set({ Authorization: tokenAuthorization(token) })
+      .set({ Authorization: authorizationUtil.tokenAuthorization(token) })
       .end((err) => {
         if (err) {
           reject(err);
@@ -112,13 +89,14 @@ export function deleteGitHubToken(githubUrl, token) {
  * @param password
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
-  winston.log('verbose', 'createGitHubRepository', { projectName });
+  winston.log('debug', 'createGitHubRepository', { projectName });
+  winston.log('verbose', 'creating github repository', { projectName });
 
   return new Promise((resolve, reject) => {
     superagent
       .post(`${githubApiUrl}/user/repos`)
       .set({
-        Authorization: tokenAuthorization(token)
+        Authorization: authorizationUtil.tokenAuthorization(token)
       })
       .send({
         name: projectName,
@@ -143,8 +121,9 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param projectName
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('verbose', 'initAddCommitAndPush', { username, projectName });
-  winston.log('info', 'Pushing all files to the new git repository...');
+  winston.log('debug', 'initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
+  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
+  console.log(chalk.yellow('Pushing all files to the new git repository...'));
 
   return new Promise((resolve) => {
     if (!isTwoFactorAuth) {
@@ -152,11 +131,11 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial commit')
+        .commit('Initial Commit w/ :heart: by @hammer-io.')
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
-          console.log('Please wait while the files are uploaded...');
+          console.log(chalk.yellow('Please wait while files are pushed to GitHub...'));
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout
@@ -166,9 +145,13 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .init()
         .add('.gitignore')
         .add('./*')
-        .commit('Initial commit');
-      console.log('We cannot push hammer-io generated code to your repository because you have 2fa enabled. ' +
-        'Please follow this link (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support.');
+        .commit('Initial Commit w/ :heart: by @hammer-io.');
+      console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
+      ' you have 2fa enabled. ' +
+        'Please follow this link' +
+        ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for' +
+        ' support. Then manually add a new git remote and push your code using `git push origin' +
+        ' master`'));
       resolve();
     }
   });

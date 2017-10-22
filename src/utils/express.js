@@ -12,7 +12,7 @@ import constants from './../constants/constants';
  * @param folderName
  */
 export function createJsFiles(folderName) { // eslint-disable-line import/prefer-default-export
-  winston.log('verbose', 'createJsFiles', { folderName });
+  winston.log('verbose', 'creating javascript files for express', { folderName });
 
   writeFile(
     `${folderName}/src/${constants.express.index.fileName}`,

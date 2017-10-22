@@ -12,7 +12,7 @@ import constants from '../constants/constants';
  */
 // eslint-disable-next-line
 export function createMochaTestSuite(filePath){
-  winston.log('verbose', 'createMochaTestSuite', { filePath });
+  winston.log('verbose', 'creating mocha test suite', { filePath });
 
   writeFile(
     `${filePath}/${constants.mocha.fileName}`,
