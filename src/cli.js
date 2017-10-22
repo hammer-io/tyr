@@ -153,32 +153,6 @@ async function signInToGithub() {
 }
 
 /**
- * Wrapper to get docker credentials for the user
- * @returns the credentials structure
- *
- * {
- *  email: 'someemail@email.com',
- *  password: 'somethingsomething'
- * }
- */
-async function signInToDocker() {
-  console.log(chalk.green('>> Please login to Docker: '));
-  let dockerCredentials = await prompt.promptForDockerCredentials();
-  let isAuthenticated = await utils.docker.signInToDocker(dockerCredentials);
-
-  // if the user could not be authenticated, loop again
-  while (!isAuthenticated) {
-    console.log(chalk.red('>> Incorrect username/password!'));
-    console.log(chalk.green('>> Please login to Docker: '));
-    dockerCredentials = await prompt.promptForDockerCredentials();
-    isAuthenticated = await utils.docker.signInToDocker(dockerCredentials);
-  }
-
-  console.log(chalk.green('!! Successfully logged in to Docker!'));
-  return dockerCredentials;
-}
-
-/**
  * Wrapper to get heroku credentials for the user
  * @returns
  *
@@ -204,16 +178,16 @@ async function signInToHeroku() {
   return herokuCredentials;
 }
 
+/**
+ * Signs into all of the third party tools
+ * @param configs the project configurations
+ * @returns the credentials
+ */
 async function signInToThirdPartyTools(configs) {
   const credentials = {};
   if (configs.tooling.sourceControl === constants.github.name) {
     const githubCredentials = await signInToGithub();
     credentials.github = githubCredentials;
-  }
-
-  if (configs.tooling.containerization === constants.docker.name) {
-    const dockerCredentials = await signInToDocker();
-    credentials.docker = dockerCredentials;
   }
 
   if (configs.tooling.deployment === constants.heroku.name) {
