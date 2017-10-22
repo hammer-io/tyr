@@ -93,7 +93,8 @@ export function deleteGitHubToken(githubUrl, token) {
  * @param password
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
-  winston.log('verbose', 'createGitHubRepository', { projectName });
+  winston.log('debug', 'createGitHubRepository', { projectName });
+  winston.log('verbose', 'creating github repository', { projectName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -124,7 +125,8 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param projectName
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName });
+  winston.log('debug', 'initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
+  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
   console.log(chalk.yellow('Pushing all files to the new git repository...'));
 
   return new Promise((resolve) => {

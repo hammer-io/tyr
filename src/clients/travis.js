@@ -16,8 +16,8 @@ const travisApiAccept = 'application/vnd.travis-ci.2+json';
  * @returns {Promise}
  */
 export function getUserAccount(travisAccessToken) {
+  winston.log('debug', 'getUserAccount');
   winston.log('verbose', 'getting user account from travis');
-
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/accounts/`)
@@ -46,6 +46,7 @@ export function getUserAccount(travisAccessToken) {
  * @returns {Promise}
  */
 export async function getUserInformation(travisAccessToken, account) {
+  winston.log('debug', 'getUserInformation', account);
   winston.log('verbose', 'getting user information from travis', account.login);
 
   return new Promise((resolve, reject) => {
@@ -75,6 +76,7 @@ export async function getUserInformation(travisAccessToken, account) {
  * @returns {Promise}
  */
 export function getRepositoryId(travisAccessToken, username, projectName) {
+  winston.log('debug', 'getRepositoryId', { username, projectName });
   winston.log('verbose', 'getting repository id from travis', { username, projectName });
 
   return new Promise((resolve, reject) => {
@@ -103,6 +105,7 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
  * @returns {Promise}
  */
 export function activateTravisHook(repositoryId, travisAccessToken) {
+  winston.log('verbose', 'activateTravisHook', { repositoryId });
   winston.log('verbose', 'activating travis', { repositoryId });
 
   return new Promise((resolve, reject) => {
@@ -136,6 +139,7 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
  * @returns {Promise}
  */
 export function syncTravisWithGithub(travisAccessToken) {
+  winston.log('debug', 'syncTravisWithGithub');
   winston.log('verbose', 'syncing travis with github');
 
   return new Promise((resolve, reject) => {
@@ -166,6 +170,7 @@ export function syncTravisWithGithub(travisAccessToken) {
  * @returns {Promise}
  */
 export function requestTravisToken(githubToken) {
+  winston.log('debug', 'requestTravisToken');
   winston.log('verbose', 'requesting token from travis');
 
   return new Promise((resolve, reject) => {
@@ -195,6 +200,7 @@ export function requestTravisToken(githubToken) {
  * @returns {Promise}
  */
 export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
+  winston.log('debug', 'setEnvironmentVariable', { repoId, environmentVariable });
   winston.log('verbose', 'setEnvironmentVariable', { repoId });
 
   return new Promise((resolve, reject) => {
