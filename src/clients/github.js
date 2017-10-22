@@ -149,7 +149,9 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
       console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
       ' you have 2fa enabled. ' +
         'Please follow this link' +
-        ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for support.'));
+        ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for' +
+        ' support. Then manually add a new git remote and push your code using `git push origin' +
+        ' master`'));
       resolve();
     }
   });
