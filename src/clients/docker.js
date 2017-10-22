@@ -8,25 +8,22 @@ const dockerAuthApiUrl = 'index.docker.io/v1/users';
 /**
  * Logs the user into docker: https://docs.docker.com/v1.4/reference/api/docker-io_api/
  *
- * @param dockerCredentials
- * {
- *  email: 'someemail@email.com',
- *  password: 'somethingsomething'
- * }
+ * @param username docker username
+ * @param password docker password
  *
  * @returns 'ok' if successful, otherwise returns the error
  */
 // eslint-disable-next-line import/prefer-default-export
-export function login(dockerCredentials) {
-  winston.log('debug', 'login', dockerCredentials.username);
-  winston.log('verbose', 'logging in to docker', dockerCredentials.username);
+export function login(username, password) {
+  winston.log('debug', 'login', username);
+  winston.log('verbose', 'logging in to docker', username);
 
   const request = superagent
     .get(`${dockerAuthApiUrl}`)
     .set({
       'Content-Type': 'application/json',
       Authorization:
-        authorizationUtil.basicAuthorization(dockerCredentials.username, dockerCredentials.password)
+        authorizationUtil.basicAuthorization(username, password)
     });
 
   return new Promise((resolve, reject) => {

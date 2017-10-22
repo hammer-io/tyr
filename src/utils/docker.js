@@ -7,18 +7,15 @@ import * as dockerClient from '../clients/docker';
 
 /**
  * Wrapper for the sign in to docker command
- * @param credentials the docker credentials
  *
- * {
- *  email: 'someemail@email.com',
- *  password: 'somethingsomething"
- * }
+ * @param username docker username
+ * @param password docker password
  *
  * @returns true if the login was successful, false if it was not
  */
-export async function signInToDocker(credentials) {
+export async function signInToDocker(username, password) {
   try {
-    await dockerClient.login(credentials);
+    await dockerClient.login(username, password);
     return true;
   } catch (err) {
     if (err.status === 401) {

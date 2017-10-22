@@ -138,14 +138,22 @@ export async function initProject(config) {
 async function signInToGithub() {
   console.log(chalk.green('>> Please login to GitHub: '));
   let githubCredentials = await prompt.promptForGithubCredentials();
-  let finalCredentials = await utils.git.signIntoGithub(githubCredentials);
+  let finalCredentials =
+    await utils.git.signIntoGithub(
+      githubCredentials.username,
+      githubCredentials.password
+    );
 
   // if the user could not be authenticated, loop again
   while (!finalCredentials) {
     console.log(chalk.red('>> Incorrect username/password!'));
     console.log(chalk.green('>> Please login to GitHub: '));
     githubCredentials = await prompt.promptForGithubCredentials();
-    finalCredentials = await utils.git.signIntoGithub(githubCredentials);
+    finalCredentials =
+      await utils.git.signIntoGithub(
+        githubCredentials.username,
+        githubCredentials.password
+      );
   }
 
   console.log(chalk.green('!! Successfully logged in to GitHub!'));
@@ -164,14 +172,22 @@ async function signInToGithub() {
 async function signInToHeroku() {
   console.log(chalk.green('>> Please login to Heroku: '));
   let herokuCredentials = await prompt.promptForHerokuCredentials();
-  let credentials = await utils.heroku.signInToHeroku(herokuCredentials);
+  let credentials =
+    await utils.heroku.signInToHeroku(
+      herokuCredentials.email,
+      herokuCredentials.password
+    );
 
   // if the user could not be authenticated, loop again
   while (!credentials) {
     console.log(chalk.red('>> Incorrect email/password!'));
     console.log(chalk.green('>> Please login to Heroku: '));
     herokuCredentials = await prompt.promptForHerokuCredentials();
-    credentials = await utils.heroku.signInToHeroku(herokuCredentials);
+    credentials =
+      await utils.heroku.signInToHeroku(
+        herokuCredentials.email,
+        herokuCredentials.password
+      );
   }
 
   console.log(chalk.green('!! Successfully logged in to Heroku!'));

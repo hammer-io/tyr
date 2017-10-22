@@ -59,15 +59,15 @@ function prompt2fa() {
  *    url: 'www.github.com/hello/world'
  *  } or returns false if the user's request could not be authenticated
  */
-export async function signIntoGithub(githubCredentials) {
+export async function signIntoGithub(username, password) {
   const credentials = {};
   try {
     // request a token using only username and password
-    const token = await requestGitHubToken(githubCredentials, null);
+    const token = await requestGitHubToken(username, password, null);
 
     // if the above call was successful, set the important information and return their credentials
-    credentials.username = githubCredentials.username;
-    credentials.password = githubCredentials.password;
+    credentials.username = username;
+    credentials.password = password;
     credentials.token = token.token;
     credentials.url = token.url;
     credentials.isTwoFactorAuth = false;
@@ -84,9 +84,9 @@ export async function signIntoGithub(githubCredentials) {
       const code = await prompt2fa();
 
       try {
-        const token = await requestGitHubToken(githubCredentials, code.code);
-        credentials.username = githubCredentials.username;
-        credentials.password = githubCredentials.password;
+        const token = await requestGitHubToken(username, password, code.code);
+        credentials.username = username;
+        credentials.password = password;
         credentials.token = token.token;
         credentials.url = token.url;
         credentials.isTwoFactorAuth = true;

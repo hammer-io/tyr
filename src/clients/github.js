@@ -9,20 +9,16 @@ const git = require('simple-git');
 /**
  * Request GitHub OAuth token.
  *
- * @param credentials a users github credentials
- *    {
- *      username: 'username',
- *      password: 'password'
- *    }
- *
- *  @param otpCode the user's two factor authentication code.
+ * @param username github username
+ * @param password github password
+ * @param otpCode the user's two factor authentication code.
  *                  If user does not use two factor authentication, otpCode
  *                 will be null or their two factor authentication has not been
  *                 provided.
- * @returns {Promise}
+ * @returns github token information if successful, error information otherwise
  */
-export function requestGitHubToken(credentials, otpCode) {
-  winston.log('verbose', 'requestGitHubToken', credentials.username);
+export function requestGitHubToken(username, password, otpCode) {
+  winston.log('verbose', 'requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -43,7 +39,7 @@ export function requestGitHubToken(credentials, otpCode) {
 
   request = request.set({
     'Content-Type': 'application/json',
-    Authorization: authorizationUtil.basicAuthorization(credentials.username, credentials.password)
+    Authorization: authorizationUtil.basicAuthorization(username, password)
   });
 
   return new Promise((resolve, reject) => {

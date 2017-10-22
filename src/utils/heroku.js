@@ -19,11 +19,11 @@ import * as herokuClient from './../clients/heroku';
  * }
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function signInToHeroku(herokuCredentials) {
-  winston.log('verbose', 'signing into to heroku', herokuCredentials.email);
+export async function signInToHeroku(email, password) {
+  winston.log('verbose', 'signing into to heroku', email);
   try {
-    await herokuClient.requestHerokuToken(herokuCredentials);
-    return herokuCredentials;
+    await herokuClient.requestHerokuToken(email, password);
+    return { email, password };
   } catch (err) {
     if (err.status === 401) {
       return false;

@@ -8,26 +8,23 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
 /**
  * Exchanges a username/password pair for a token
- * @param herokuCredentials
  *
- * {
- *  'username': 'something',
- *  'password': 'somethingsomething'
- * }
+ * @param email heroku email
+ * @param password heroku password
  *
- * @returns {Promise}
+ * @returns token information if successful, otherwise the error
  */
 // eslint-disable-next-line import/prefer-default-export
-export function requestHerokuToken(herokuCredentials) {
-  winston.log('debug', 'requestHerokuToken', herokuCredentials.email);
-  winston.log('verbose', 'requesting heroku token', herokuCredentials.email);
+export function requestHerokuToken(email, password) {
+  winston.log('debug', 'requestHerokuToken', email);
+  winston.log('verbose', 'requesting heroku token', password);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/oauth/authorizations`)
       .set({
         Accept: herokuApiAccept,
         Authorization:
-          authorizationUtil.basicAuthorization(herokuCredentials.email, herokuCredentials.password),
+          authorizationUtil.basicAuthorization(email, password),
         'Content-Type': 'application/json',
         scopes: ['identity', 'read']
       })
