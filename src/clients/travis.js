@@ -1,6 +1,7 @@
 import superagent from 'superagent';
 import winston from 'winston';
 import chalk from 'chalk';
+import * as authorizationUtil from './../utils/authorization';
 
 const tyrAgent = 'Travis/1.0';
 const travisApiUrl = 'https://api.travis-ci.org';
@@ -23,7 +24,7 @@ export function getUserAccount(travisAccessToken) {
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
-        Authorization: `token ${travisAccessToken}`
+        Authorization: authorizationUtil.tokenAuthorization(travisAccessToken)
       })
       .end((err, res) => {
         if (err) {

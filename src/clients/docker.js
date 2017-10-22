@@ -1,17 +1,7 @@
 import superagent from 'superagent';
+import * as authorizationUtil from './../utils/authorization';
 
 const dockerAuthApiUrl = 'index.docker.io/v1/users';
-
-/**
- * Returns the string used for the basic authorization header in a GET request.
- *
- * @param username the username
- * @param password the password
- * @returns {string} the basic authentication string
- */
-export function basicAuthorization(username, password) {
-  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-}
 
 /**
  * Logs the user into docker: https://docs.docker.com/v1.4/reference/api/docker-io_api/
@@ -24,12 +14,14 @@ export function basicAuthorization(username, password) {
  *
  * @returns 'ok' if successful, otherwise returns the error
  */
+// eslint-disable-next-line import/prefer-default-export
 export function login(dockerCredentials) {
   const request = superagent
     .get(`${dockerAuthApiUrl}`)
     .set({
       'Content-Type': 'application/json',
-      Authorization: basicAuthorization(dockerCredentials.username, dockerCredentials.password)
+      Authorization:
+        authorizationUtil.basicAuthorization(dockerCredentials.username, dockerCredentials.password)
     });
 
   return new Promise((resolve, reject) => {

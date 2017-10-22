@@ -1,30 +1,10 @@
 import superagent from 'superagent';
 import winston from 'winston';
 import chalk from 'chalk';
+import * as authorizationUtil from './../utils/authorization';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
-
-/**
- * Returns the string used for the basic authorization header in a POST request.
- *
- * @param username
- * @param password
- * @returns {string}
- */
-function basicAuthorization(username, password) {
-  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-}
-
-/**
- * Returns the string used for the token authorization header in a POST request
- *
- * @param token
- * @returns {string}
- */
-function tokenAuthorization(token) {
-  return `token ${token}`;
-}
 
 /**
  * Request GitHub OAuth token.
@@ -63,7 +43,7 @@ export function requestGitHubToken(credentials, otpCode) {
 
   request = request.set({
     'Content-Type': 'application/json',
-    Authorization: basicAuthorization(credentials.username, credentials.password)
+    Authorization: authorizationUtil.basicAuthorization(credentials.username, credentials.password)
   });
 
   return new Promise((resolve, reject) => {
@@ -92,7 +72,7 @@ export function deleteGitHubToken(githubUrl, token) {
   return new Promise((resolve, reject) => {
     superagent
       .delete(githubUrl)
-      .set({ Authorization: tokenAuthorization(token) })
+      .set({ Authorization: authorizationUtil.tokenAuthorization(token) })
       .end((err) => {
         if (err) {
           reject(err);
