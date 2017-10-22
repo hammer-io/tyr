@@ -99,7 +99,7 @@ export function createGitHubRepository(projectName, projectDescription, token) {
     superagent
       .post(`${githubApiUrl}/user/repos`)
       .set({
-        Authorization: tokenAuthorization(token)
+        Authorization: authorizationUtil.tokenAuthorization(token)
       })
       .send({
         name: projectName,
