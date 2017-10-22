@@ -209,7 +209,6 @@ export async function promptForDockerCredentials() {
  * }
  */
 export async function promptForHerokuCredentials() {
-  winston.log('error', 'prompting for Heroku credentials');
   const questions = [{
     name: 'email',
     type: 'input',
