@@ -1,6 +1,7 @@
 import assert from 'assert';
 import chalk from 'chalk';
 import fs from 'fs-extra';
+import winston from 'winston';
 import {
   loadTemplate
 } from '../src/utils/file';
@@ -71,13 +72,17 @@ function captureStream(stream){
 describe('User Preferences:', () => {
   describe('When the user is asked about completing the prerequisites:', () => {
     let hook;
+    let previousLevel;
 
     beforeEach(() => {
       hook = captureStream(process.stdout);
+      previousLevel = winston.level;
+      winston.level = 'info';
     });
 
     afterEach(() => {
       hook.unhook();
+      winston.level = previousLevel;
     });
 
     it('should output prereq-specific error if user answers NO for a single prereq', () => {

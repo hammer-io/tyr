@@ -110,8 +110,7 @@ export function deleteGitHubToken(githubUrl, username, password) {
  *
  * @param projectName
  * @param projectDescription
- * @param username
- * @param password
+ * @param token
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
   winston.log('verbose', 'createGitHubRepository', { projectName });
@@ -126,6 +125,54 @@ export function createGitHubRepository(projectName, projectDescription, token) {
         name: projectName,
         description: projectDescription,
         private: false
+      })
+      .end((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+  });
+}
+
+/**
+ * List repositories that are accessible to the authenticated user
+ *
+ * @param token
+ */
+export function listUserRepositories(token) {
+  winston.log('debug', 'listUserRepositories');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${githubApiUrl}/user/repos`)
+      .set({
+        Authorization: tokenAuthorization(token)
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+  });
+}
+
+/**
+ * Deleting a repository requires admin access.
+ * If OAuth is used, the 'delete_repo' scope is required.
+ * That's why we're using basic auth instead.
+ */
+export function deleteRepository(repositoryName, username, password) {
+  winston.log('debug', 'deleteRepository', { repositoryName });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .delete(`${githubApiUrl}/repos/${username}/${repositoryName}`)
+      .set({
+        Authorization: basicAuthorization(username, password)
       })
       .end((err) => {
         if (err) {
