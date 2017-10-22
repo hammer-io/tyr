@@ -217,6 +217,6 @@ export default async function run() {
     await initProject(configs);
     console.log(chalk.green('!! Successfully generated your project!'));
   } catch (err) {
-    console.log(chalk.red('!! Failed to gerneate your project!'));
+    console.log(chalk.red('!! Failed to generate your project!'));
   }
 }
