@@ -1,6 +1,14 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 import path from 'path';
+import winston from 'winston';
+
+import {
+  requestGitHubToken,
+  deleteGitHubToken,
+  createGitHubRepository,
+  initAddCommitAndPush
+} from '../src/clients/github';
 
 const credentialsFilename = 'github-test-credentials.txt';
 
@@ -29,18 +37,34 @@ function loadCredentials(filepath) {
 }
 
 describe('GitHub API:', () => {
-  describe('When some condition is met:', () => {
-    before(() => {
-      loadCredentials(credentialsFilename);
-      assert.notEqual(configs.username, '',
-        `The credentials file '${credentialsFilename}' needs to be filled in with a valid username!`);
-      assert.notEqual(configs.password, '',
-        `The credentials file '${credentialsFilename}' needs to be filled in with a valid password!`);
-    });
+  before(() => {
+    winston.level = 'debug';
+    loadCredentials(credentialsFilename);
+    assert.notEqual(configs.username, '',
+      `The credentials file '${credentialsFilename}' needs to be filled in with a valid username!`);
+    assert.notEqual(configs.password, '',
+      `The credentials file '${credentialsFilename}' needs to be filled in with a valid password!`);
+  });
 
-    it('should exhibit some behavior', () => {
-      // TODO
-    });
+  after(() => {
+    winston.level = 'info';
+  });
 
+  it('Should be able to create and delete oauth tokens', async () => {
+    try {
+      const date = new Date();
+      const dateString = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+      const randomNumber = Math.floor(Math.random() * 1000000);
+      const tokenNote = `hammer-io testing ${dateString} :  If I exist online, delete me! (${randomNumber})`;
+      console.log(`TOKEN NOTE:  ${tokenNote}`);
+      const resp = await requestGitHubToken(configs, null, tokenNote);
+      assert.ok(resp.token, 'The response should include a token!');
+      assert.ok(resp.url, 'The response should include a url!');
+      if (resp.token && resp.url) {
+        await deleteGitHubToken(resp.url, configs.username, configs.password);
+      }
+    } catch (err) {
+      assert.fail(`Unable to create or delete the oauth token!\n${err}`);
+    }
   });
 });

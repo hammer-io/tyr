@@ -38,9 +38,11 @@ function tokenAuthorization(token) {
  *                  If user does not use two factor authentication, otpCode
  *                 will be null or their two factor authentication has not been
  *                 provided.
+ *  @param note the remark assigned to the given token in the user's GitHub account
+ *
  * @returns {Promise}
  */
-export function requestGitHubToken(credentials, otpCode) {
+export function requestGitHubToken(credentials, otpCode, note = 'hammer-io token') {
   winston.log('verbose', 'requestGitHubToken', credentials.username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
@@ -50,7 +52,7 @@ export function requestGitHubToken(credentials, otpCode) {
         'repo:status', 'public_repo', 'write:repo_hook',
         'user', 'repo'
       ],
-      note: 'hammer-io token'
+      note
     });
 
   // if the user is using
@@ -85,13 +87,13 @@ export function requestGitHubToken(credentials, otpCode) {
  * @param password
  * @returns {Promise}
  */
-export function deleteGitHubToken(githubUrl, token) {
+export function deleteGitHubToken(githubUrl, username, password) {
   winston.log('verbose', 'deleteGitHubToken');
 
   return new Promise((resolve, reject) => {
     superagent
       .delete(githubUrl)
-      .set({ Authorization: tokenAuthorization(token) })
+      .set({ Authorization: basicAuthorization(username, password) })
       .end((err) => {
         if (err) {
           reject(err);
