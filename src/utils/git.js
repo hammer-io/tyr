@@ -19,43 +19,12 @@ import constants from '../constants/constants';
  * @param projectName
  */
 export function createGitIgnore(projectName) {
-  winston.log('verbose', 'createGitIgnore', { projectName });
+  winston.log('verbose', 'creating .gitignore file', { projectName });
 
   writeFile(
     `${projectName}/${constants.github.gitIgnore.fileName}`,
     loadTemplate('./../../templates/git/.gitignore')
   );
-}
-
-/**
- * Gets the user's github credentials
- */
-function promptGithubCredentials() {
-  const questions = [{
-    name: 'username',
-    type: 'input',
-    message: constants.github.username.message,
-    validate: (value) => {
-      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
-        return 'Username cannot be blank!';
-      }
-
-      return true;
-    }
-  }, {
-    name: 'password',
-    type: 'password',
-    message: constants.github.password.message,
-    validate: (value) => {
-      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
-        return 'Password cannot be blank!';
-      }
-
-      return true;
-    }
-  }];
-
-  return inquirer.prompt(questions);
 }
 
 /**
@@ -88,21 +57,17 @@ function prompt2fa() {
  *    password: 'password',
  *    token: 'token',
  *    url: 'www.github.com/hello/world'
- *  }
+ *  } or returns false if the user's request could not be authenticated
  */
-export async function signIntoGithub() {
+export async function signIntoGithub(username, password) {
   const credentials = {};
-
-  // prompt user for github username and password
-  const githubCredentials = await promptGithubCredentials();
-
   try {
     // request a token using only username and password
-    const token = await requestGitHubToken(githubCredentials, null);
+    const token = await requestGitHubToken(username, password, null);
 
-    // if the above call was successful, set the important information and returns
-    credentials.username = githubCredentials.username;
-    credentials.password = githubCredentials.password;
+    // if the above call was successful, set the important information and return their credentials
+    credentials.username = username;
+    credentials.password = password;
     credentials.token = token.token;
     credentials.url = token.url;
     credentials.isTwoFactorAuth = false;
@@ -119,23 +84,22 @@ export async function signIntoGithub() {
       const code = await prompt2fa();
 
       try {
-        const token = await requestGitHubToken(githubCredentials, code.code);
-        credentials.username = githubCredentials.username;
-        credentials.password = githubCredentials.password;
+        const token = await requestGitHubToken(username, password, code.code);
+        credentials.username = username;
+        credentials.password = password;
         credentials.token = token.token;
         credentials.url = token.url;
         credentials.isTwoFactorAuth = true;
         return credentials;
       } catch (error) {
-        winston.log('error', constants.github.error.signInFail, error);
+        winston.log('error', 'failed to sign into github', error);
       }
     } else if (err.status === 401) {
-      // if the user had a bad username and password combination,
-      // we wil go here. We prompt them for their credentials
-      await signIntoGithub();
+      // the user's request could not be authenticated, so return false.
+      return false;
     } else {
       // something bad has happened if we get here.
-      winston.log('error', constants.github.error.signInFail, err);
+      winston.log('error', 'failed to sign in to github', err);
     }
   }
 
@@ -152,13 +116,12 @@ export async function signIntoGithub() {
  * @param password
  */
 export async function setupGitHub(projectName, projectDescription, credentials) {
-  winston.log('verbose', 'setupGitHub', credentials.username);
+  winston.log('verbose', 'setting up github', credentials.username);
 
   try {
-    await createGitIgnore(projectName);
     await createGitHubRepository(projectName, projectDescription, credentials.token);
     await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
   } catch (err) {
-    winston.log('error', 'setupGitHub failed for some reason', err);
+    winston.log('error', 'failed to set up github', err);
   }
 }

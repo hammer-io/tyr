@@ -1,109 +1,59 @@
+/* eslint-disable no-await-in-loop */
 /**
  * The Cli class.
  */
 import chalk from 'chalk';
 import figlet from 'figlet';
-import inquirer from 'inquirer';
-import isValid from 'is-valid-path';
 import fs from 'fs';
-import Preferences from 'preferences';
 import winston from 'winston';
 
 import utils from './utils';
-import ciChoices from './constants/ci-choices';
-import containerizationChoices from './constants/containerization-choices';
-import deploymentChoices from './constants/deployment-choices';
-import webChoices from './constants/web-choices';
+import * as prompt from './prompt';
 import constants from './constants/constants';
-import * as git from './utils/git';
-
-const preferences = new Preferences(constants.tyr.name);
 
 /**
- * Gets the basic configuration settings for the user
+ * Generates all of the local files for th user
+ * @param config the project configurations
+ * @returns
  */
-function promptConfigs() {
-  winston.log('verbose', 'promptConfigs');
+export async function generateProjectFiles(config) {
+  // if the project doesn't already exist, initialize the files and accounts
+  if (!fs.existsSync(config.projectConfigurations.projectName)) {
+    fs.mkdirSync(config.projectConfigurations.projectName);
+    fs.mkdirSync(`${config.projectConfigurations.projectName}/src`);
 
-  const questions = [{
-    name: constants.config.projectName.name,
-    type: 'input',
-    message: constants.config.projectName.message,
-    validate: (value) => {
-      const isItValid = isValid(value);
+    const dependencies = {};
 
-      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
-        return constants.config.projectName.error.invalidMessage;
-      }
-
-      if (!isItValid) {
-        return constants.config.projectName.error.invalidMessage;
-      }
-
-      if (fs.existsSync(value)) {
-        return constants.config.projectName.error.duplicateMessage;
-      }
-
-      return true;
+    // enable an express project or a basic node project
+    if (config.tooling.web === constants.express.name) {
+      dependencies.express = constants.express.version;
+      await utils.express.createJsFiles(config.projectConfigurations.projectName);
+    } else {
+      await utils.file.createIndexFile(config.projectConfigurations.projectName);
     }
-  }, {
-    name: constants.config.description.name,
-    type: 'input',
-    message: constants.config.description.message,
-  }, {
-    name: constants.config.version.name,
-    type: 'input',
-    message: constants.config.version.message,
-    default: '0.0.0',
-    validate: (value) => {
-      // tests for valid version number.
-      // any combination of (number) (.number)* will work
-      if (/^(\d+\.)?(\d+\.)?(\*|\d+)/.test(value)) {
-        return true;
-      }
 
-      return constants.config.version.error.invalidMessage;
-    }
-  }, {
-    name: constants.config.author.name,
-    type: 'input',
-    message: constants.config.author.message
-  }, {
-    name: constants.config.license.name,
-    type: 'input',
-    message: constants.config.license.message,
-    validate: (value) => {
-      if (typeof value === 'undefined' || value === '') {
-        return constants.config.license.error.invalidMessage;
-      }
+    // create package.json
+    await utils.file.createPackageJson(config.projectConfigurations, dependencies);
 
-      return true;
+    // create mocha test suite
+    await utils.mocha.createMochaTestSuite(`${config.projectConfigurations.projectName}`);
+
+    // create .gitignore
+    if (config.tooling.sourceControl === constants.github.name) {
+      await utils.git.createGitIgnore(config.projectConfigurations.projectName);
     }
-  }, {
-    name: constants.config.ci.name,
-    type: 'list',
-    message: constants.config.ci.message,
-    choices: ciChoices.choices
-  }, {
-    name: constants.config.container.name,
-    type: 'list',
-    message: constants.config.container.message,
-    choices: containerizationChoices.choices
-  }, {
-    name: constants.config.deployment.name,
-    type: 'list',
-    message: constants.config.deployment.message,
-    choices: deploymentChoices.choices
-  }, {
-    name: constants.config.web.name,
-    type: 'list',
-    message: constants.config.web.message,
-    choices: webChoices.choices
+
+    // create .travis.yml
+    if (config.tooling.ci === constants.travisCI.name) {
+      await utils.travis.initTravisCI(config);
+    }
+
+    // create Dockerfile and .dockerignore
+    if (config.tooling.container === constants.docker.name) {
+      await utils.docker.initDocker(config.projectConfigurations);
+    }
   }
-
-  ];
-
-  return inquirer.prompt(questions);
+  return 'Project already exists!';
 }
 
 /**
@@ -111,204 +61,178 @@ function promptConfigs() {
  *
  * @param config the config object form the main inquirer prompt
  */
-export function initProject(config) {
-  winston.log('verbose', 'initProject');
+export async function initProject(config) {
+  winston.log('verbose', 'initializing project');
 
-  // if the project doesn't already exist, intialize the files and accounts
-  if (!fs.existsSync(config.projectName)) {
-    fs.mkdirSync(config.projectName);
-    fs.mkdirSync(`${config.projectName}/src`);
-
-    const dependencies = {};
-    if (config.web === constants.express.name) {
-      dependencies.express = constants.express.version;
-      utils.express.createJsFiles(config.projectName);
-    } else {
-      utils.file.createIndexFile(config.projectName);
-    }
-
-    utils.file.createPackageJson(config, dependencies);
-    utils.mocha.createMochaTestSuite(`${config.projectName}`);
-
-    if (config.container === constants.docker.name) {
-      utils.docker.initDocker(config);
-    }
-    if (config.ci === constants.travisCI.name) {
-      utils.travis.initTravisCI(config);
-    }
-  } else {
-    return constants.config.projectName.error.duplicateMessage;
+  const areFilesGenerated = await generateProjectFiles(config);
+  if (!areFilesGenerated) {
+    return;
   }
-}
 
-/**
- * Gets the user's docker hub credentials
- */
-function promptDockerHubCredentials() {
-  const questions = [{
-    name: constants.dockerHub.username.name,
-    type: 'input',
-    message: constants.dockerHub.username.message,
-  }, {
-    name: constants.dockerHub.password.name,
-    type: 'password',
-    message: constants.dockerHub.password.message
-  }];
-
-  return inquirer.prompt(questions);
-}
-
-/**
- * Gets the user's heroku credentials
- */
-function promptHerokuCredentials() {
-  const questions = [{
-    name: constants.heroku.email.name,
-    type: 'input',
-    message: constants.heroku.email.message,
-  }, {
-    name: constants.heroku.username.name,
-    type: 'input',
-    message: constants.heroku.username.message,
-  }, {
-    name: constants.heroku.password.name,
-    type: 'password',
-    message: constants.heroku.password.message
-  }];
-
-  return inquirer.prompt(questions);
-}
-
-/**
- * When the user first uses the application, the user preferences file
- * has not been created or initialized. Any initialization code that needs
- * to happen should be placed here.
- */
-function initPreferencesIfUninitialized() {
-  if (!preferences.prereqs) {
-    preferences.prereqs = {};
+  // create github repository and push files
+  if (config.tooling.sourceControl === constants.github.name) {
+    await utils.git.setupGitHub(
+      config.projectConfigurations.projectName,
+      config.projectConfigurations.description,
+      config.credentials.github
+    );
   }
-}
 
-/**
- * Make sure the user has all requirements satisfied before allowing
- * them to continue creating a project.
- */
-function promptGlobalPrerequisites() {
-  const questions = [];
+  const environmentVariables = [];
+  // create Dockerfile and .dockerignore
+  if (config.tooling.container === constants.docker.name) {
+    environmentVariables.push({
+      name: 'DOCKER_USERNAME',
+      value: config.credentials.docker.username
+    });
+    environmentVariables.push({
+      name: 'DOCKER_PASSWORD',
+      value: config.credentials.docker.password
+    });
+  }
 
-  initPreferencesIfUninitialized();
+  if (config.tooling.deployment === constants.heroku.name) {
+    environmentVariables.push({
+      name: 'HEROKU_EMAIL',
+      value: config.credentials.heroku.email
+    });
+    environmentVariables.push({
+      name: 'HEROKU_USERNAME',
+      value: config.credentials.heroku.email
+    });
+    environmentVariables.push({
+      name: 'HEROKU_PASSWORD',
+      value: config.credentials.heroku.password
+    });
+  }
 
-  constants.tyr.globalPrereqs.forEach((prereq) => {
-    // Only ask them if they haven't said YES in the past (i.e. if it's not complete)
-    if (!preferences.prereqs[prereq.name]) {
-      questions.push({
-        name: prereq.name,
-        type: 'confirm',
-        message: prereq.message,
-        default: false
-      });
+  // create .travis.yml file and enable travis on project
+  if (config.tooling.ci === constants.travisCI.name) {
+    try {
+      await utils.travis.enableTravisOnProject(
+        config.credentials.github.token,
+        config.credentials.github.username,
+        config.projectConfigurations.projectName,
+        environmentVariables
+      );
+    } catch (err) {
+      winston.log('error', `failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
-  });
+  }
 
-  return inquirer.prompt(questions);
+  // run npm install on project
+  utils.npm.npmInstall(`${config.projectConfigurations.projectName}`);
 }
 
 /**
- * Returns true if all answers are 'true' (i.e. if the user said YES to
- * having completed all prerequisites).
+ * Wrapper to get github credentials for the user
+ * @returns the credentials structure
  *
- * @param answers
- * @return finishedPrereqs
+ * {
+ *  username: 'jack',
+ *  password: 'somethingsomething',
+ *  token: 'your private token',
+ *  isTwoFactorAuth: 'false'
+ * }
  */
-export function isUserFinishedWithPrereqs(answers) {
-  winston.log('verbose', 'isUserFinishedWithPrereqs');
+async function signInToGithub() {
+  console.log(chalk.green('>> Please login to GitHub: '));
+  let githubCredentials = await prompt.promptForGithubCredentials();
+  let finalCredentials =
+    await utils.git.signIntoGithub(
+      githubCredentials.username,
+      githubCredentials.password
+    );
 
-  let finishedPrereqs = true;
+  // if the user could not be authenticated, loop again
+  while (!finalCredentials) {
+    console.log(chalk.red('>> Incorrect username/password!'));
+    console.log(chalk.green('>> Please login to GitHub: '));
+    githubCredentials = await prompt.promptForGithubCredentials();
+    finalCredentials =
+      await utils.git.signIntoGithub(
+        githubCredentials.username,
+        githubCredentials.password
+      );
+  }
 
-  initPreferencesIfUninitialized();
+  console.log(chalk.green('!! Successfully logged in to GitHub!'));
+  return finalCredentials;
+}
 
-  constants.tyr.globalPrereqs.forEach((prereq) => {
-    // If they answered 'No' for something, display the appropriate response
-    if (answers[prereq.name] === false) {
-      console.log(chalk.red(prereq.responseIfNo));
-      finishedPrereqs = false;
-      preferences.prereqs[prereq.name] = false;
-    } else if (answers[prereq.name] === true) {
-      preferences.prereqs[prereq.name] = true;
-    }
-  });
+/**
+ * Wrapper to get heroku credentials for the user
+ * @returns
+ *
+ * {
+ *  email: 'someemail@email.com',
+ *  password: 'somethingsomething'
+ * }
+ */
+async function signInToHeroku() {
+  console.log(chalk.green('>> Please login to Heroku: '));
+  let herokuCredentials = await prompt.promptForHerokuCredentials();
+  let credentials =
+    await utils.heroku.signInToHeroku(
+      herokuCredentials.email,
+      herokuCredentials.password
+    );
 
-  return finishedPrereqs;
+  // if the user could not be authenticated, loop again
+  while (!credentials) {
+    console.log(chalk.red('>> Incorrect email/password!'));
+    console.log(chalk.green('>> Please login to Heroku: '));
+    herokuCredentials = await prompt.promptForHerokuCredentials();
+    credentials =
+      await utils.heroku.signInToHeroku(
+        herokuCredentials.email,
+        herokuCredentials.password
+      );
+  }
+
+  console.log(chalk.green('!! Successfully logged in to Heroku!'));
+  return herokuCredentials;
+}
+
+/**
+ * Signs into all of the third party tools
+ * @param configs the project configurations
+ * @returns the credentials
+ */
+async function signInToThirdPartyTools(configs) {
+  const credentials = {};
+  if (configs.tooling.sourceControl === constants.github.name) {
+    const githubCredentials = await signInToGithub();
+    credentials.github = githubCredentials;
+  }
+
+  if (configs.tooling.deployment === constants.heroku.name) {
+    const herokuCredentials = await signInToHeroku();
+    credentials.heroku = herokuCredentials;
+  }
+
+  return credentials;
 }
 
 /**
  * The main execution function for tyr.
  */
 export default async function run() {
-  winston.log('verbose', 'run');
-  console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
-  winston.log('debug', preferences);
+  try {
+    winston.log('verbose', 'run');
+    console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
 
-  const configs = await promptConfigs();
-  const prereqAnswers = await promptGlobalPrerequisites();
-  const canContinue = await isUserFinishedWithPrereqs(prereqAnswers);
-  if (!canContinue) {
-    return;
+    // get the project configurations
+    const configs = await prompt.prompt();
+
+    // sign in to third party tools
+    const credentials = await signInToThirdPartyTools(configs);
+    configs.credentials = credentials;
+
+    // initialize the basic project files
+    await initProject(configs);
+    console.log(chalk.green('!! Successfully generated your project!'));
+  } catch (err) {
+    console.log(chalk.red('!! Failed to generate your project!'));
   }
-
-  // initialize the basic project files
-  await initProject(configs);
-
-  // sign the user into github
-  const credentials = await git.signIntoGithub();
-
-  // if the sign was successful, initialize local and remote github repositories
-  if (credentials) {
-    await git.setupGitHub(configs.projectName, configs.description, credentials);
-  }
-
-  const environmentVariables = [];
-  if (configs.containerization === constants.docker.name) {
-    const dockerHubCredentials = await promptDockerHubCredentials();
-    environmentVariables.push({
-      name: 'DOCKER_USERNAME',
-      value: dockerHubCredentials.dockerHubUsername
-    });
-    environmentVariables.push({
-      name: 'DOCKER_PASSWORD',
-      value: dockerHubCredentials.dockerHubPassword
-    });
-  }
-
-  if (configs.deployment === constants.heroku.name) {
-    const herokuCredentials = await promptHerokuCredentials();
-    environmentVariables.push({
-      name: 'HEROKU_EMAIL',
-      value: herokuCredentials.herokuEmail
-    });
-    environmentVariables.push({
-      name: 'HEROKU_USERNAME',
-      value: herokuCredentials.herokuUsername
-    });
-    environmentVariables.push({
-      name: 'HEROKU_PASSWORD',
-      value: herokuCredentials.herokuPassword
-    });
-  }
-
-  if (configs.ci === constants.travisCI.name) {
-    try {
-      await utils.travis.enableTravisOnProject(
-        credentials.token,
-        credentials.username,
-        configs.projectName,
-        environmentVariables
-      );
-    } catch (err) {
-      winston.log('error', constants.travisCI.error.enableTravisOnProject, err);
-    }
-  }
-
-  utils.npm.npmInstall(`${configs.projectName}`);
 }

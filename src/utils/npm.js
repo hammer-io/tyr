@@ -11,7 +11,7 @@ import shell from 'shelljs';
  */
 // eslint-disable-next-line
 export function npmInstall (path) {
-  winston.log('verbose', 'npmInstall', { directoryPath: path });
+  winston.log('verbose', 'executing npm install', { directoryPath: path });
 
   const originalPath = process.cwd();
   shell.cd(path);

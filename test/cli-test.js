@@ -9,34 +9,51 @@ import {
 // Tests need to import transpiled files that will be located in dist/ rather than src/
 import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
+import { generateProjectFiles } from '../src/cli';
 
 const configs = {
-  projectName: 'jack',
-  description: 'Jack\'s Test Project',
-  version: '0.0.1',
-  author: 'Jack Meyer',
-  license: 'MIT',
-  ci: 'TravisCI',
-  container: 'Docker'
+  projectConfigurations: {
+    projectName: 'jack',
+    description: 'Jack\'s Test Project',
+    version: '0.0.1',
+    author: 'Jack Meyer',
+    license: 'MIT'
+  },
+
+  tooling: {
+    sourceControl: 'GitHub',
+    ci: 'TravisCI',
+    container: 'Docker'
+  }
+
 };
 
 const configs2 = {
-  projectName: 'jack',
-  description: 'Jack\'s Test Project',
-  version: '0.0.1',
-  author: 'Jack Meyer',
-  license: 'MIT',
-  web: 'ExpressJS'
+  projectConfigurations: {
+    projectName: 'jack',
+    description: 'Jack\'s Test Project',
+    version: '0.0.1',
+    author: 'Jack Meyer',
+    license: 'MIT',
+  },
+  tooling: {
+    web: 'ExpressJS'
+  }
 };
 
 const configs3 = {
-  projectName: 'jack',
-  description: 'Jack\'s Test Project',
-  version: '0.0.1',
-  author: 'Jack Meyer',
-  license: 'MIT',
-  ci: 'TravisCI',
-  deployment: 'Heroku'
+  projectConfigurations: {
+    projectName: 'jack',
+    description: 'Jack\'s Test Project',
+    version: '0.0.1',
+    author: 'Jack Meyer',
+    license: 'MIT',
+  },
+
+  tooling: {
+    ci: 'TravisCI',
+    deployment: 'Heroku'
+  }
 };
 
 // Test strategy for capturing console output found here:
@@ -62,114 +79,62 @@ function captureStream(stream){
   };
 }
 
-// /**
-//  * Load template file
-//  */
-// function loadTemplate(filepath) {
-//   return fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8');
-// }
-
-describe('User Preferences:', () => {
-  describe('When the user is asked about completing the prerequisites:', () => {
-    let hook;
-    let previousLevel;
-
-    beforeEach(() => {
-      hook = captureStream(process.stdout);
-      previousLevel = winston.level;
-      winston.level = 'info';
-    });
-
-    afterEach(() => {
-      hook.unhook();
-      winston.level = previousLevel;
-    });
-
-    it('should output prereq-specific error if user answers NO for a single prereq', () => {
-      constants.tyr.globalPrereqs.forEach((prereq) => {
-        const promptAnswers = {};
-        promptAnswers[prereq.name] = false;
-        isUserFinishedWithPrereqs(promptAnswers);
-        assert.equal(hook.captured(), chalk.red(prereq.responseIfNo) + '\n');
-        hook.clear();
-      });
-    });
-
-    it('should output all the prereq-specific errors if user answers NO for all the prereqs', () => {
-      const promptAnswers = {};
-      let expected = '';
-      constants.tyr.globalPrereqs.forEach((prereq) => {
-        promptAnswers[prereq.name] = false;
-        expected += chalk.red(prereq.responseIfNo) + '\n';
-      });
-      isUserFinishedWithPrereqs(promptAnswers);
-      assert.equal(hook.captured(), expected);
-    });
-
-    it('should return \'false\' if any of the prereq questions are NO', () => {
-      // Check for single NO's
-      constants.tyr.globalPrereqs.forEach((prereq) => {
-        const promptAnswers = {};
-        promptAnswers[prereq.name] = false;
-        const actual = isUserFinishedWithPrereqs(promptAnswers);
-        assert.equal(actual, false);
-      });
-    });
-
-    it('should return \'true\' if all of the prereq questions are YES', () => {
-      const promptAnswers = {};
-      constants.tyr.globalPrereqs.forEach((prereq) => {
-        promptAnswers[prereq.name] = true;
-      });
-      const actual = isUserFinishedWithPrereqs(promptAnswers);
-      assert.equal(actual, true);
-    });
-  });
-});
-
-describe('Initialize Project Files', () => {
-  before(() => {
-    initProject(configs);
+describe('Initialize Project Files with GitHub, Travis, Docker', () => {
+  before(async () => {
+    await generateProjectFiles(configs);
   });
 
   describe('Initialize Project Directories', () => {
     it('should create a new directory with the project name', () => {
-      assert.equal(fs.existsSync(configs.projectName), true);
+      assert.equal(fs.existsSync(configs.projectConfigurations.projectName), true);
     });
 
     it('should create a src directory underneath the project directory', () => {
-      assert.equal(fs.existsSync(configs.projectName + '/src'), true);
+      assert.equal(fs.existsSync(configs.projectConfigurations.projectName + '/src'), true);
     });
 
-    it('should return an error if a directory with the project name already exists', () => {
-      const actualResult = initProject(configs); // run initProject again to see if it fails
-      assert.equal(actualResult, constants.config.projectName.error.duplicateMessage);
+    it('should return an error if a directory with the project name already exists', async () => {
+      const actualResult = await generateProjectFiles(configs); // run initProject again to see
+      // if it fails
+      assert.equal(actualResult, 'Project already exists!');
+    });
+  });
+
+  describe('Intialize GitHub', () => {
+    it('should create a .gitignore file', () => {
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/.gitignore`), true);
+    });
+
+    it('should create a .gitignore file with the proper contents', () => {
+      const expectedContents = loadTemplate('./../../templates/git/.gitignore');
+      const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.gitignore`);
+      assert.equal(actualContents, expectedContents);
     });
   });
 
   describe('Initialize Travis CI', () => {
     it('should create a .travis.yml file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/.travis.yml`), true);
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/.travis.yml`), true);
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
       const expectedContents = loadTemplate('./../../templates/travis/.travis.yml');
-      const actualContents = fs.readFileSync(`${configs.projectName}/.travis.yml`);
+      const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.travis.yml`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   describe('Initialize Docker', () => {
     it('should create a Dockerfile and .dockerignore', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/Dockerfile`), true);
-      assert.equal(fs.existsSync(`${configs.projectName}/.dockerignore`), true);
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/Dockerfile`), true);
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/.dockerignore`), true);
     });
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
       const dockerExpectedContents = loadTemplate('./../../templates/docker/Dockerfile');
       const dockerignoreExpectedContents = loadTemplate('./../../templates/docker/.dockerignore');
-      const dockerActualContents = fs.readFileSync(`${configs.projectName}/Dockerfile`);
-      const dockerignoreActualContents = fs.readFileSync(`${configs.projectName}/.dockerignore`);
+      const dockerActualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/Dockerfile`);
+      const dockerignoreActualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.dockerignore`);
 
       assert.equal(dockerActualContents, dockerExpectedContents);
       assert.equal(dockerignoreActualContents, dockerignoreExpectedContents);
@@ -178,7 +143,7 @@ describe('Initialize Project Files', () => {
 
   describe('Initialize package.json', () => {
     it('should create a package.json file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/package.json`), true);
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/package.json`), true);
     });
 
     it('should create a package.json file with the proper contents', () => {
@@ -202,19 +167,19 @@ describe('Initialize Project Files', () => {
         '    "mocha": "3.5.3"\n' +
         '  }\n' +
         '}';
-      const packageJsonActualContents = fs.readFileSync(`${configs.projectName}/package.json`, 'utf-8');
+      const packageJsonActualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
     });
   });
 
   describe('Initialize index.js', () => {
     it('should create an index.js file', () => {
-      assert.equal(fs.existsSync(`${configs.projectName}/src/index.js`), true);
+      assert.equal(fs.existsSync(`${configs.projectConfigurations.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../../templates/js/index.js');
-      const actualContents = fs.readFileSync(`${configs.projectName}/src/index.js`);
+      const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/src/index.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
@@ -222,19 +187,19 @@ describe('Initialize Project Files', () => {
   describe('Create Sample Mocha Test', () => {
     it('should create a mocha test file with a sample test inside', () => {
       const expectedContents = loadTemplate('./../../templates/mocha/test.js');
-      const actualContents = fs.readFileSync(`${configs.projectName}/${constants.mocha.fileName}`);
+      const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/${constants.mocha.fileName}`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   after(() => {
-    fs.removeSync(configs.projectName);
+    fs.removeSync(configs.projectConfigurations.projectName);
   });
 });
 
 describe('Initialize Project Files With ExpressJS', () => {
-  before(() => {
-    initProject(configs2);
+  before(async () => {
+    await generateProjectFiles(configs2);
   });
 
   describe('Initialize package.json', () => {
@@ -261,48 +226,48 @@ describe('Initialize Project Files With ExpressJS', () => {
         '    "mocha": "3.5.3"\n' +
         '  }\n' +
         '}';
-      const packageJsonActualContents = fs.readFileSync(`${configs2.projectName}/package.json`, 'utf-8');
+      const packageJsonActualContents = fs.readFileSync(`${configs2.projectConfigurations.projectName}/package.json`, 'utf-8');
       assert.equal(packageJsonActualContents, packageJsonExpectedContents);
     });
   });
 
   describe('Initialize index.js', () => {
     it('should create an index.js file', () => {
-      assert.equal(fs.existsSync(`${configs2.projectName}/src/index.js`), true);
+      assert.equal(fs.existsSync(`${configs2.projectConfigurations.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../../templates/js/express/index.js');
-      const actualContents = fs.readFileSync(`${configs2.projectName}/src/index.js`);
+      const actualContents = fs.readFileSync(`${configs2.projectConfigurations.projectName}/src/index.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   describe('Initialize routes.js', () => {
     it('should create an routes.js file', () => {
-      assert.equal(fs.existsSync(`${configs2.projectName}/src/index.js`), true);
+      assert.equal(fs.existsSync(`${configs2.projectConfigurations.projectName}/src/index.js`), true);
     });
 
     it('should create an index.js file with the proper contents', () => {
       const expectedContents = loadTemplate('./../../templates/js/express/routes.js');
-      const actualContents = fs.readFileSync(`${configs2.projectName}/src/routes.js`);
+      const actualContents = fs.readFileSync(`${configs2.projectConfigurations.projectName}/src/routes.js`);
       assert.equal(actualContents, expectedContents);
     });
   });
 
   after(() => {
-    fs.removeSync(configs2.projectName);
+    fs.removeSync(configs2.projectConfigurations.projectName);
   });
 });
 
 describe('Initialize Project Files With Heroku', () => {
-  before(() => {
-    initProject(configs3);
+  before(async () => {
+    await generateProjectFiles(configs3);
   });
 
   describe('Initialize Travis CI', () => {
     it('should create a .travis.yml file', () => {
-      assert.equal(fs.existsSync(`${configs3.projectName}/.travis.yml`), true);
+      assert.equal(fs.existsSync(`${configs3.projectConfigurations.projectName}/.travis.yml`), true);
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
@@ -322,13 +287,13 @@ describe('Initialize Project Files With Heroku', () => {
         '    docker tag jack registry.heroku.com/jack/web;\n' +
         '    docker push registry.heroku.com/jack/web;\n' +
         '    fi\n';
-      const actualContents = fs.readFileSync(`${configs3.projectName}/.travis.yml`, 'utf-8');
+      const actualContents = fs.readFileSync(`${configs3.projectConfigurations.projectName}/.travis.yml`, 'utf-8');
       assert.equal(actualContents, expectedContents);
     });
   });
 
   after(() => {
-    fs.removeSync(configs3.projectName);
+    fs.removeSync(configs3.projectConfigurations.projectName);
   });
 });
 

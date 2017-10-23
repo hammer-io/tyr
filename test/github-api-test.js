@@ -92,7 +92,7 @@ async function createTestToken() {
     configs.description = tokenNote;
 
     // Create the token, and then update configs
-    const resp = await requestGitHubToken(configs, null, tokenNote);
+    const resp = await requestGitHubToken(configs.username, configs.password, null, tokenNote);
     configs.token = resp.token;
     configs.authUrl = resp.url;
   } catch (err) {
