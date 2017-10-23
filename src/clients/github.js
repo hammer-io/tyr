@@ -15,9 +15,10 @@ const git = require('simple-git');
  *                  If user does not use two factor authentication, otpCode
  *                 will be null or their two factor authentication has not been
  *                 provided.
+ * @param note the remark assigned to the given token in the user's GitHub account
  * @returns github token information if successful, error information otherwise
  */
-export function requestGitHubToken(username, password, otpCode) {
+export function requestGitHubToken(username, password, otpCode, note = 'hammer-io token') {
   winston.log('verbose', 'requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
@@ -27,7 +28,7 @@ export function requestGitHubToken(username, password, otpCode) {
         'repo:status', 'public_repo', 'write:repo_hook',
         'user', 'repo'
       ],
-      note: 'hammer-io token'
+      note
     });
 
   // if the user is using
@@ -62,13 +63,13 @@ export function requestGitHubToken(username, password, otpCode) {
  * @param password
  * @returns {Promise}
  */
-export function deleteGitHubToken(githubUrl, token) {
+export function deleteGitHubToken(githubUrl, username, password) {
   winston.log('verbose', 'deleteGitHubToken');
 
   return new Promise((resolve, reject) => {
     superagent
       .delete(githubUrl)
-      .set({ Authorization: authorizationUtil.tokenAuthorization(token) })
+      .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
       .end((err) => {
         if (err) {
           reject(err);
@@ -85,8 +86,7 @@ export function deleteGitHubToken(githubUrl, token) {
  *
  * @param projectName
  * @param projectDescription
- * @param username
- * @param password
+ * @param token
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
   winston.log('debug', 'createGitHubRepository', { projectName });
@@ -102,6 +102,54 @@ export function createGitHubRepository(projectName, projectDescription, token) {
         name: projectName,
         description: projectDescription,
         private: false
+      })
+      .end((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+  });
+}
+
+/**
+ * List repositories that are accessible to the authenticated user
+ *
+ * @param token
+ */
+export function listUserRepositories(token) {
+  winston.log('debug', 'listUserRepositories');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${githubApiUrl}/user/repos`)
+      .set({
+        Authorization: authorizationUtil.tokenAuthorization(token)
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+  });
+}
+
+/**
+ * Deleting a repository requires admin access.
+ * If OAuth is used, the 'delete_repo' scope is required.
+ * That's why we're using basic auth instead.
+ */
+export function deleteRepository(repositoryName, username, password) {
+  winston.log('debug', 'deleteRepository', { repositoryName });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .delete(`${githubApiUrl}/repos/${username}/${repositoryName}`)
+      .set({
+        Authorization: authorizationUtil.basicAuthorization(username, password)
       })
       .end((err) => {
         if (err) {
