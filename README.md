@@ -43,8 +43,49 @@ tyr [OPTIONS]
 ```
 
 ### Options:
+* `-h, --help`       output usage information
+* `--config <file>`  configure project from configuration file
 
-- Coming soon!
+## Configuration File
+### Project Configurations
+| Name          | Required | Note                                                                           |
+|---------------|----------|--------------------------------------------------------------------------------|
+| `projectName` | Yes      | Must be a valid directory name and cannot be a directory that already exists.  |
+| `description` | Yes      |                                                                                |
+| `version`     | No       | Must match `/^(\d+\.)?(\d+\.)?(\*|\d+)/` or (number)(.number)*                 |
+| `author`      | No       | For multiple authors, use comma separated values                               |
+| `license`     | No       |                                                                                |
+
+### Tooling Choices
+| Name               | Required | Description                                    | Valid Choices         |
+|--------------------|----------|------------------------------------------------|-----------------------|
+| `ci`               | Yes      | The Continuous Integration Tool you want to use | `<None>`, `TravisCI`  |
+| `containerization` | Yes      | The Containerization tool you want to use      | `<None>`, `Docker`    |
+| `deployment`       | Yes      | The deployment tool you want to use            | `<None>`, `Heroku`    |
+| `sourceControl`    | Yes      | The source control tool you want to use        | `<None>`, `GitHub`    |
+| `web`              | Yes      | The web framework you want to use              | `<None>`, `ExpressJS` |
+
+
+```json
+{
+  projectConfigurations:
+    {
+      projectName: '${project name}',
+      description: '${project description}',
+      version: '${version number}',
+      author: ['{author}'],
+      license: '{license}'
+    },
+  tooling:
+    {
+      sourceControl: '${source control choice}',
+      web: '${web framework choice}>',
+      ci: '${ci choice}',
+      containerization: '${containerization choice}',
+      deployment: '${deployment choice}'
+    }
+}
+```
 
 
 ## Contributing
