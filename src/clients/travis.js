@@ -222,3 +222,49 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
       });
   });
 }
+
+/**
+ * Set environment variables on a Travis-CI project
+ *
+ * @param travisAccessToken
+ * @param username
+ * @param repositoryName
+ * @returns Promise (example shown below)
+ * {
+ *   "repo": {
+ *     "id": 82,
+ *     "slug": "sinatra/sinatra",
+ *     "description": "Classy web-development dressed in a DSL",
+ *     "last_build_id": 23436881,
+ *     "last_build_number": "792",
+ *     "last_build_state": "passed",
+ *     "last_build_duration": 2542,
+ *     "last_build_started_at": "2014-04-21T15:27:14Z",
+ *     "last_build_finished_at": "2014-04-21T15:40:04Z",
+ *     "active": "true"
+ *   }
+ * }
+ */
+export function fetchRepository(travisAccessToken, username, repositoryName) {
+  const repoSlug = `${username}/${repositoryName}`;
+  winston.debug('fetchRepository', repoSlug);
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/repos/${repoSlug}`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else if (!res.body.repo) {
+          reject(new Error(`Unable to find the repository '${repoSlug}'!`));
+        } else {
+          resolve(res.body.repo);
+        }
+      });
+  });
+}

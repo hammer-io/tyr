@@ -10,6 +10,12 @@ import {
   listUserRepositories,
   deleteRepository
 } from '../src/clients/github';
+import {
+  enableTravisOnProject
+} from '../src/utils/travis';
+import {
+  fetchRepository
+} from '../src/clients/travis';
 
 // You need to fill in these credentials before running the tests
 const credentialsFilename = 'github-test-credentials.txt';
@@ -151,4 +157,24 @@ describe('GitHub API:', function() {
     // Delete the new repository
     await deleteRepository(configs.projectName, configs.username, configs.password);
   });
+
+  it('Should be able to enable TravisCI on a GitHub repository', async function() {
+    // Lengthen the timeout, since it could take a while to sync Travis
+    this.timeout(60 * 1000);
+
+    // Create the repo
+    await createGitHubRepository(configs.projectName, configs.description, configs.token);
+
+    // Enable TravisCI on the new repository, and fetch info for assertion
+    const travisToken = await enableTravisOnProject(configs.token, configs.username, configs.projectName, null);
+    const repo = await fetchRepository(travisToken, configs.username, configs.projectName);
+
+    // Delete the repository
+    await deleteRepository(configs.projectName, configs.username, configs.password);
+
+    // Verify it was initialized
+    const expectedSlug = `${configs.username}/${configs.projectName}`;
+    assert.equal(repo.slug, expectedSlug);
+  });
+
 });
