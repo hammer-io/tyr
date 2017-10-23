@@ -1,12 +1,10 @@
 /* eslint-disable no-await-in-loop */
-/**
- * The Cli class.
- */
 import chalk from 'chalk';
 import figlet from 'figlet';
 import fs from 'fs';
 import winston from 'winston';
 
+import * as configFileReader from './utils/config-file-reader';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
@@ -217,13 +215,22 @@ async function signInToThirdPartyTools(configs) {
 /**
  * The main execution function for tyr.
  */
-export default async function run() {
+export default async function run(tyr) {
   try {
+    let configs = {};
     winston.log('verbose', 'run');
     console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
 
-    // get the project configurations
-    const configs = await prompt.prompt();
+    if (tyr.config) {
+      if (fs.existsSync(tyr.config)) {
+        configs = configFileReader.parseConfigsFromFile(tyr.config);
+      } else {
+        console.log(chalk.red('!! Configuration File does not exist'));
+      }
+    } else {
+      // get the project configurations
+      configs = await prompt.prompt();
+    }
 
     // sign in to third party tools
     const credentials = await signInToThirdPartyTools(configs);
