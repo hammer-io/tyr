@@ -66,5 +66,9 @@ export default {
   mocha: {
     name: 'Mocha',
     fileName: 'test.js'
+  },
+
+  readme: {
+    fileName: 'README.md'
   }
 };

@@ -12,7 +12,7 @@ import * as prompt from './prompt';
 import constants from './constants/constants';
 
 /**
- * Generates all of the local files for th user
+ * Generates all of the local files for the user
  * @param config the project configurations
  * @returns
  */
@@ -34,6 +34,9 @@ export async function generateProjectFiles(config) {
 
     // create package.json
     await utils.file.createPackageJson(config.projectConfigurations, dependencies);
+
+    // create README.md
+    await utils.file.createReadMe(config.projectConfigurations.projectName, config);
 
     // create mocha test suite
     await utils.mocha.createMochaTestSuite(`${config.projectConfigurations.projectName}`);
