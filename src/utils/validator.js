@@ -1,7 +1,6 @@
 import isValid from 'is-valid-path';
 import fs from 'fs';
 
-import * as validator from './../utils/validator';
 import sourceControlChoices from './../constants/source-control-choices';
 import ciChoices from './../constants/ci-choices';
 import containerizationChoices from './../constants/containerization-choices';
