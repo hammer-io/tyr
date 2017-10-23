@@ -8,6 +8,32 @@ const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
 
 /**
+ * Filters out sensitive header information (such as authentication headers or post data)
+ *
+ * @param err
+ * @returns {Error}
+ */
+function filterErrorResponse(err) {
+  if (err && err.response) {
+    // Filters out sensitive header information
+    const filteredError = {
+      status: err.response.status,
+      text: err.response.text,
+      req: {}
+    };
+    if (err.response.req) {
+      filteredError.req = {
+        method: err.response.req.method,
+        url: err.response.req.url
+      };
+    }
+    return new Error(filteredError);
+  }
+
+  return err;
+}
+
+/**
  * Gets the user's account based on the access token provided
  *
  * See https://docs.travis-ci.com/api/#accounts for information about returns.
@@ -28,7 +54,7 @@ export function getUserAccount(travisAccessToken) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res.body);
         }
@@ -59,7 +85,7 @@ export async function getUserInformation(travisAccessToken, account) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res.body);
         }
@@ -89,7 +115,7 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res.body.repo.id);
         }
@@ -124,7 +150,7 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
       })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve();
         }
@@ -152,7 +178,7 @@ export function syncTravisWithGithub(travisAccessToken) {
       })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           console.log(chalk.yellow('Please wait while we sync TravisCI with GitHub...'));
           setTimeout(() => {
@@ -183,7 +209,7 @@ export function requestTravisToken(githubToken) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res.body.access_token);
         }
@@ -215,7 +241,7 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res.body.env_var);
         }
@@ -224,25 +250,67 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
 }
 
 /**
- * Set environment variables on a Travis-CI project
+ * Lists environment variables for a repository that's been enabled in TravisCI.
+ *
+ * @param travisAccessToken
+ * @param repoId
+ * @returns Promise (example shown below)
+ * [
+ *   {
+ *     "id": "018e66f2-cd3a-4295-aa1d-018fe9aa0fb4",
+ *     "name": "example",
+ *     "value": "foobar",
+ *     "public": true,
+ *     "repository_id": 124920
+ *   },
+ *   {
+ *     "id": "ec9423da-9658-4cd6-b282-fd0e5f6ed2df",
+ *     "name": "secret_example",
+ *     "public": false,
+ *     "repository_id": 124920
+ *   }
+ * ]
+ */
+export function listEnvironmentVariables(travisAccessToken, repoId) {
+  winston.log('debug', 'listEnvironmentVariables', { repoId });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/settings/env_vars`)
+      .query({ repository_id: repoId })
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(filterErrorResponse(err));
+        } else {
+          resolve(res.body.env_vars);
+        }
+      });
+  });
+}
+
+/**
+ * Fetch information for a given repository
  *
  * @param travisAccessToken
  * @param username
  * @param repositoryName
  * @returns Promise (example shown below)
  * {
- *   "repo": {
- *     "id": 82,
- *     "slug": "sinatra/sinatra",
- *     "description": "Classy web-development dressed in a DSL",
- *     "last_build_id": 23436881,
- *     "last_build_number": "792",
- *     "last_build_state": "passed",
- *     "last_build_duration": 2542,
- *     "last_build_started_at": "2014-04-21T15:27:14Z",
- *     "last_build_finished_at": "2014-04-21T15:40:04Z",
- *     "active": "true"
- *   }
+ *   "id": 82,
+ *   "slug": "sinatra/sinatra",
+ *   "description": "Classy web-development dressed in a DSL",
+ *   "last_build_id": 23436881,
+ *   "last_build_number": "792",
+ *   "last_build_state": "passed",
+ *   "last_build_duration": 2542,
+ *   "last_build_started_at": "2014-04-21T15:27:14Z",
+ *   "last_build_finished_at": "2014-04-21T15:40:04Z",
+ *   "active": "true"
  * }
  */
 export function fetchRepository(travisAccessToken, username, repositoryName) {
@@ -259,7 +327,7 @@ export function fetchRepository(travisAccessToken, username, repositoryName) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else if (!res.body.repo) {
           reject(new Error(`Unable to find the repository '${repoSlug}'!`));
         } else {

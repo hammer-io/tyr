@@ -14,7 +14,8 @@ import {
   enableTravisOnProject
 } from '../src/utils/travis';
 import {
-  fetchRepository
+  fetchRepository,
+  listEnvironmentVariables
 } from '../src/clients/travis';
 
 // You need to fill in these credentials before running the tests
@@ -158,23 +159,51 @@ describe('GitHub API:', function() {
     await deleteRepository(configs.projectName, configs.username, configs.password);
   });
 
-  it('Should be able to enable TravisCI on a GitHub repository', async function() {
+  it('Should be able to enable TravisCI on a GitHub repository with environment variables', async function() {
     // Lengthen the timeout, since it could take a while to sync Travis
-    this.timeout(60 * 1000);
+    this.timeout(120 * 1000);
 
     // Create the repo
     await createGitHubRepository(configs.projectName, configs.description, configs.token);
 
     // Enable TravisCI on the new repository, and fetch info for assertion
-    const travisToken = await enableTravisOnProject(configs.token, configs.username, configs.projectName, null);
-    const repo = await fetchRepository(travisToken, configs.username, configs.projectName);
-
-    // Delete the repository
-    await deleteRepository(configs.projectName, configs.username, configs.password);
+    const environmentVariables = [
+      {
+        name: 'MEANING_OF_LIFE',
+        value: '42'
+      },
+      {
+        name: 'HOLMGANG',
+        value: 'A Viking trial-by-combat',
+        public: true
+      }
+    ];
+    let travisToken, repo, envVarsRetrieved;
+    try {
+      travisToken = await enableTravisOnProject(
+        configs.token,
+        configs.username,
+        configs.projectName,
+        environmentVariables
+      );
+      repo = await fetchRepository(travisToken, configs.username, configs.projectName);
+      envVarsRetrieved = await listEnvironmentVariables(travisToken, repo.id);
+    } finally {
+      // Delete the repository
+      await deleteRepository(configs.projectName, configs.username, configs.password);
+    }
 
     // Verify it was initialized
     const expectedSlug = `${configs.username}/${configs.projectName}`;
     assert.equal(repo.slug, expectedSlug);
+
+    // Verify the environment variables were properly set
+    for (let i = 0; i < environmentVariables.length; i++) {
+      assert.equal(envVarsRetrieved[i].name, environmentVariables[i].name);
+      const expectedValue = (environmentVariables[i].public) ? environmentVariables[i].value : null;
+      assert.equal(envVarsRetrieved[i].value, expectedValue);
+      assert.equal(envVarsRetrieved[i].public, (environmentVariables[i].public || false));
+    }
   });
 
 });
