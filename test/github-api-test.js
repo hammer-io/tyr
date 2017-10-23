@@ -16,12 +16,12 @@ const credentialsFilename = 'github-test-credentials.txt';
 
 // These get filled and used dynamically
 const configs = {
-  username: '',
-  password: '',
-  projectName: '',
-  description: '',
-  token: '',
-  authUrl: ''
+  username: undefined,
+  password: undefined,
+  projectName: undefined,
+  description: undefined,
+  token: undefined,
+  authUrl: undefined
 };
 
 /**
@@ -88,7 +88,6 @@ async function createTestToken() {
     const tokenNote = `hammer-io testing ${dateString} :  If I exist online, delete me!`;
 
     // Set project name and description
-    console.log(`TOKEN NOTE:  ${tokenNote}`);
     configs.projectName = `Test_${dateString}`;
     configs.description = tokenNote;
 
@@ -112,12 +111,8 @@ describe('GitHub API:', function() {
     // Enable 'debug' level logging
     winston.level = 'debug';
 
-    // Load credentials from a file
+    // Load credentials
     await loadCredentials(credentialsFilename);
-    assert.notEqual(configs.username, '',
-      `The credentials file '${credentialsFilename}' needs to be filled in with a valid username!`);
-    assert.notEqual(configs.password, '',
-      `The credentials file '${credentialsFilename}' needs to be filled in with a valid password!`);
 
     // Create a token for use in testing
     await createTestToken();

@@ -19,8 +19,8 @@ npm run lint  # runs the linter
 ## Running the Tests
 
 There's a small amount of configuration needed to run the tests locally.
-Observe the bottom of the `.gitignore` file, where it ignores the
-file `/test/github-test-credentials.txt`. You need to create this
+Observe the bottom of the [.gitignore](https://github.com/hammer-io/tyr/blob/master/.gitignore)
+file, where it ignores the file `/test/github-test-credentials.txt`. You need to create this
 file on your local machine and populate it as follows:
 
 ```bash
