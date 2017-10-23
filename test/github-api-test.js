@@ -25,20 +25,32 @@ const configs = {
 };
 
 /**
- * Load credentials from a file
+ * Loads credentials. First checks for a local file. If that doesn't
+ * exist, check the environment variables. If those aren't set
+ * either, throws an Error.
  */
 function loadCredentials(filepath) {
+  // Try first loading from a file
   const contents = fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8').split('\n');
   if (!contents) {
-    throw new Error(`Failed to read file: ${filepath}`);
-  }
-  contents.forEach((line) => {
-    line = line.trim();
-    if (line !== '' && !line.startsWith('#')) {
-      const keyValue = line.split('=');
-      configs[keyValue[0]] = keyValue[1];
+    // If the file fails, try loading from environment variables
+    configs.username = process.env.GITHUB_TEST_USERNAME;
+    configs.password = process.env.GITHUB_TEST_PASSWORD;
+
+    // If those are null too, throw an error
+    if (!configs.username || !configs.password) {
+      throw new Error(`Failed to read file: '${filepath}'\n`
+        + '    and unable to get GitHub test environment variables!');
     }
-  });
+  } else {
+    contents.forEach((line) => {
+      line = line.trim();
+      if (line !== '' && !line.startsWith('#')) {
+        const keyValue = line.split('=');
+        configs[keyValue[0]] = keyValue[1];
+      }
+    });
+  }
 }
 
 /**
