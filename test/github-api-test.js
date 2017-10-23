@@ -25,31 +25,40 @@ const configs = {
 };
 
 /**
- * Loads credentials. First checks for a local file. If that doesn't
- * exist, check the environment variables. If those aren't set
- * either, throws an Error.
+ * Loads credentials from either a file or the environment variables.
+ * The local file trumps the environment variables. If neither one
+ * properly sets the username/password, it throws an error.
  */
 function loadCredentials(filepath) {
-  // Try first loading from a file
-  const contents = fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8').split('\n');
-  if (!contents) {
-    // If the file fails, try loading from environment variables
+  function fromFile() {
+    const contents = fs.readFileSync(path.join(__dirname, '/', filepath), 'utf-8').split('\n');
+    if (contents) {
+      contents.forEach((line) => {
+        line = line.trim();
+        if (line !== '' && !line.startsWith('#')) {
+          const keyValue = line.split('=');
+          configs[keyValue[0]] = keyValue[1];
+        }
+      });
+    }
+  }
+
+  function fromEnv() {
     configs.username = process.env.GITHUB_TEST_USERNAME;
     configs.password = process.env.GITHUB_TEST_PASSWORD;
+  }
 
-    // If those are null too, throw an error
-    if (!configs.username || !configs.password) {
-      throw new Error(`Failed to read file: '${filepath}'\n`
-        + '    and unable to get GitHub test environment variables!');
-    }
-  } else {
-    contents.forEach((line) => {
-      line = line.trim();
-      if (line !== '' && !line.startsWith('#')) {
-        const keyValue = line.split('=');
-        configs[keyValue[0]] = keyValue[1];
-      }
-    });
+  let errMsg;
+  try {
+    fromEnv();
+    fromFile();
+  } catch (_) {
+    errMsg = `Failed to read file: '${filepath}'\n`;
+  }
+
+  // Make sure the username/password is set before continuing
+  if (!configs.username || !configs.password) {
+    throw new Error('Failed to set GitHub username or password!\n' + errMsg);
   }
 }
 
