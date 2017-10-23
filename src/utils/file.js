@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import winston from 'winston';
+import chalk from 'chalk';
 
 import packageTemplate from './../../templates/json/package.json';
 import constants from './../constants/constants';
@@ -13,10 +14,9 @@ import constants from './../constants/constants';
  * @returns {*}
  */
 export function loadTemplate(filePath) {
-  winston.log('verbose', 'loadTemplate', { filePath });
+  winston.log('verbose', 'loading template file', { filePath });
 
   try {
-    console.log(path.join(__dirname, '/', filePath));
     return fs.readFileSync(path.join(__dirname, '/', filePath), 'utf-8');
   } catch (e) {
     winston.log('error', `Failed to read template ${filePath}!`);
@@ -33,9 +33,10 @@ export function loadTemplate(filePath) {
  * @returns {*}
  */
 export function writeFile(filePath, fileContents) {
-  winston.log('verbose', 'writeFile', { filePath });
+  winston.log('verbose', 'writing file', { filePath });
 
   try {
+    console.log(chalk.green(`Successfully created ${filePath}`));
     return fs.writeFileSync(filePath, fileContents);
   } catch (e) {
     winston.log('error', `Failed to write ${filePath}!`);
@@ -51,7 +52,7 @@ export function writeFile(filePath, fileContents) {
  * @param dependencies
  */
 export function createPackageJson(config, dependencies) {
-  winston.log('verbose', 'createPackageJson');
+  winston.log('verbose', 'creating package.json file');
 
   const author = config.author.split(',');
 
@@ -75,7 +76,7 @@ export function createPackageJson(config, dependencies) {
  * @param folderName
  */
 export function createIndexFile(folderName) {
-  winston.log('verbose', 'createIndexFile', { folderName });
+  winston.log('verbose', 'creating index.js file', { folderName });
 
   writeFile(
     `${folderName}/src/${constants.indexJS.fileName}`,

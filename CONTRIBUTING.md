@@ -16,6 +16,28 @@ npm run lint  # runs the linter
 ```
 
 
+## Running the Tests
+
+There's a small amount of configuration needed to run the tests locally.
+Observe the bottom of the [.gitignore](https://github.com/hammer-io/tyr/blob/master/.gitignore)
+file, where it ignores the file `/test/github-test-credentials.txt`. You need to create this
+file on your local machine and populate it as follows:
+
+```bash
+####   WARNING: Do not commit!!!   ####
+
+username=
+password=
+```
+
+The username and password need to be filled in with actual GitHub
+account credentials. This is used for tests that involve the
+GitHub API. We've got a test user named Holmgang on GitHub for
+this purpose. Reach out to one of the developers if you need the
+password for that account. Otherwise, any valid account information
+you use will work for the tests.
+
+
 ## Commits
 
 Please ensure that commits are descriptive and are free of any obvious grammatical errors.
