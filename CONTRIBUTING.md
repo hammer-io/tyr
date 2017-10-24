@@ -87,10 +87,3 @@ TYR_LOG_LEVEL=debug npm start
 # Instead, use 'verbose' to see more information
 TYR_LOG_LEVEL=verbose npm test
 ```
-
-If you want to save off the output from the console to a file, the `tee` command is
-very useful:
-
-```bash
-npm start | tee output.log
-```
