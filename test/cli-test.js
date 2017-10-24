@@ -21,7 +21,7 @@ const configs = {
   tooling: {
     sourceControl: 'GitHub',
     ci: 'TravisCI',
-    container: 'Docker'
+    containerization: 'Docker'
   }
 
 };
@@ -290,6 +290,8 @@ describe('Initialize Project Files With Heroku', () => {
         'notifications:\n' +
         '  email:\n' +
         '    on_success: never\n' +
+        'services:\n' +
+        '  - docker\n' +
         'before_install:\n' +
         '  - docker build -t jack .\n' +
         '  - docker ps -a\n' +
