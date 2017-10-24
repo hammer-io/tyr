@@ -52,7 +52,7 @@ tyr [OPTIONS]
 |---------------|----------|--------------------------------------------------------------------------------|
 | `projectName` | Yes      | Must be a valid directory name and cannot be a directory that already exists.  |
 | `description` | Yes      |                                                                                |
-| `version`     | No       | Must match ```\^(\d+\.)?(\d+\.)?(\*\\d+)\/``` or (number)(.number)*            |
+| `version`     | No       | Must match ```/^(\d+\.)?(\d+\.)?(\*|d+)/``` or `(number)(.number)*`          |
 | `author`      | No       | For multiple authors, use comma separated values                               |
 | `license`     | No       |                                                                                |
 
