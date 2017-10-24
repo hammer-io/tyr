@@ -1,4 +1,3 @@
-import winston from 'winston';
 import inquirer from 'inquirer';
 
 import {
@@ -11,7 +10,9 @@ import {
   writeFile
 } from './file';
 import constants from '../constants/constants';
+import { getActiveLogger } from '../utils/winston';
 
+const log = getActiveLogger();
 
 /**
  * Create the .gitignore in the newly formed project folder with the basics for a node.js project.
@@ -19,7 +20,7 @@ import constants from '../constants/constants';
  * @param projectName
  */
 export function createGitIgnore(projectName) {
-  winston.log('verbose', 'creating .gitignore file', { projectName });
+  log.verbose('creating .gitignore file', { projectName });
 
   writeFile(
     `${projectName}/${constants.github.gitIgnore.fileName}`,
@@ -92,14 +93,14 @@ export async function signIntoGithub(username, password) {
         credentials.isTwoFactorAuth = true;
         return credentials;
       } catch (error) {
-        winston.log('error', 'failed to sign into github', error);
+        log.error('failed to sign into github', error);
       }
     } else if (err.status === 401) {
       // the user's request could not be authenticated, so return false.
       return false;
     } else {
       // something bad has happened if we get here.
-      winston.log('error', 'failed to sign in to github', err);
+      log.error('failed to sign in to github', err);
     }
   }
 
@@ -116,12 +117,12 @@ export async function signIntoGithub(username, password) {
  * @param password
  */
 export async function setupGitHub(projectName, projectDescription, credentials) {
-  winston.log('verbose', 'setting up github', credentials.username);
+  log.verbose('setting up github', credentials.username);
 
   try {
     await createGitHubRepository(projectName, projectDescription, credentials.token);
     await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
   } catch (err) {
-    winston.log('error', 'failed to set up github', err);
+    log.error('failed to set up github', err);
   }
 }

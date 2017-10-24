@@ -1,9 +1,10 @@
-import winston from 'winston';
-
 import constants from '../constants/constants';
 import * as file from './file';
+import { getActiveLogger } from '../utils/winston';
 
 import * as dockerClient from '../clients/docker';
+
+const log = getActiveLogger();
 
 /**
  * Wrapper for the sign in to docker command
@@ -22,7 +23,7 @@ export async function signInToDocker(username, password) {
       return false;
     }
 
-    winston.log('error', 'failed to sign in to Docker', err);
+    log.error('failed to sign in to Docker', err);
   }
 }
 
@@ -32,7 +33,7 @@ export async function signInToDocker(username, password) {
  * @param config
  */
 export function initDocker(config) {
-  winston.log('verbose', 'initializing docker files');
+  log.verbose('initializing docker files');
 
   file.writeFile(
     `${config.projectName}/${constants.docker.dockerFile.fileName}`,

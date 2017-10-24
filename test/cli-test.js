@@ -1,7 +1,5 @@
 import assert from 'assert';
-import chalk from 'chalk';
 import fs from 'fs-extra';
-import winston from 'winston';
 import {
   loadTemplate
 } from '../src/utils/file';
@@ -55,29 +53,6 @@ const configs3 = {
     deployment: 'Heroku'
   }
 };
-
-// Test strategy for capturing console output found here:
-// https://stackoverflow.com/questions/18543047/mocha-monitor-application-output
-function captureStream(stream){
-  const oldWrite = stream.write;
-  let buf = '';
-  stream.write = function(chunk, encoding, callback){
-    buf += chunk.toString(); // chunk is a String or Buffer
-    oldWrite.apply(stream, arguments);
-  };
-
-  return {
-    unhook: function unhook(){
-      stream.write = oldWrite;
-    },
-    captured: function(){
-      return buf;
-    },
-    clear: function(){
-      buf = '';
-    }
-  };
-}
 
 describe('Initialize Project Files with GitHub, Travis, Docker', () => {
   before(async () => {

@@ -1,7 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 import path from 'path';
-import winston from 'winston';
 
 import {
   requestGitHubToken,
@@ -17,6 +16,7 @@ import {
   fetchRepository,
   listEnvironmentVariables
 } from '../src/clients/travis';
+import { setActiveLogger } from '../src/utils/winston';
 
 // You need to fill in these credentials before running the tests
 const credentialsFilename = 'github-test-credentials.txt';
@@ -115,8 +115,8 @@ describe('GitHub API:', function() {
   this.timeout(10000);
 
   before(async () => {
-    // Enable 'debug' level logging
-    winston.level = 'debug';
+    // Enable 'verbose' level logging
+    setActiveLogger('verbose');
 
     // Load credentials
     await loadCredentials(credentialsFilename);
@@ -127,7 +127,7 @@ describe('GitHub API:', function() {
 
   after(async () => {
     // Disable 'debug' level logging
-    winston.level = 'info';
+    setActiveLogger('info');
 
     // Delete the test token
     if (configs.authUrl) {
