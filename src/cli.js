@@ -242,8 +242,8 @@ export default async function run(tyr) {
     }
 
     // sign in to third party tools
-    // const credentials = await signInToThirdPartyTools(configs);
-    configs.credentials = { jack: 'jack' };
+    const credentials = await signInToThirdPartyTools(configs);
+    configs.credentials = credentials;
 
     // initialize the basic project files
     await initProject(configs);
