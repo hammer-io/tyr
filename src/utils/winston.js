@@ -6,34 +6,35 @@ import {
 
 const { printf } = format;
 
-let activeLogger = 'standard';
-
-// Info level is only appended to the message if it's out of the ordinary (not 'info')
-function formatLog(info) {
-  const level = (info.level === 'info') ? '' : `[${info.level.toUpperCase()}] `;
-  return `${level}${info.message}`;
+function isLoggerType(str) {
+  return (str === 'info' || str === 'verbose' || str === 'debug');
 }
-const normalFormatting = printf(formatLog);
-
-// The logging format for debug erases all verbose output.
-const debugFormatting = printf((info) => {
-  if (info.level === 'verbose') {
-    return '';
-  }
-  return formatLog(info);
-});
-
 
 /**
- * The standard logger
+ * The initial active logger attempts to read from environment variables.
+ * Otherwise, it defaults to 'info'.
  */
-loggers.add('standard', {
+let activeLogger = process.env.TYR_LOG_LEVEL || 'info';
+if (!isLoggerType(activeLogger)) {
+  activeLogger = 'info';
+}
+
+// Info level is only appended to the message if it's out of the ordinary (not 'info')
+const customFormatting = printf((info) => {
+  const level = (info.level === 'info') ? '' : `[${info.level.toUpperCase()}] `;
+  return `${level}${info.message}`;
+});
+
+/**
+ * The info logger
+ */
+loggers.add('info', {
   transports: [
     new transports.Console({
       level: 'info',
       format: format.combine(
         format.colorize({ message: true }),
-        normalFormatting
+        customFormatting
       ),
     })
   ]
@@ -48,30 +49,39 @@ loggers.add('verbose', {
       level: 'verbose',
       format: format.combine(
         format.colorize({ message: true }),
-        normalFormatting
+        customFormatting
       ),
     })
   ]
 });
+
+// Switches the order of debug and verbose so that verbose
+// doesn't show during debug.
+const customDebugLevels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  debug: 4,
+  verbose: 5,
+  silly: 6
+};
 
 /**
  * The debug logger
  */
 loggers.add('debug', {
+  levels: customDebugLevels,
   transports: [
     new transports.Console({
       level: 'debug',
       format: format.combine(
         format.colorize({ message: true }),
-        debugFormatting
+        customFormatting
       ),
     })
   ]
 });
-
-function isLoggerType(str) {
-  return (str === 'standard' || str === 'verbose' || str === 'debug');
-}
 
 /**
  * Returns the active logger instance.
@@ -83,11 +93,11 @@ export function getActiveLogger() {
 /**
  * Changes the active logger instance.
  *
- * @param loggerType can be 'standard', 'verbose', or 'debug'
+ * @param loggerType can be 'info', 'verbose', or 'debug'
  */
 export function setActiveLogger(loggerType) {
   if (!isLoggerType(loggerType)) {
-    throw new Error('Active logger must be set to either \'standard\', \'verbose\', or \'debug\'');
+    throw new Error('Active logger must be set to either \'info\', \'verbose\', or \'debug\'');
   }
   activeLogger = loggerType;
 }
@@ -99,6 +109,6 @@ export function enableLogFile(logFilename) {
   getActiveLogger().add(new transports.File({
     level: 'debug',
     filename: logFilename,
-    format: normalFormatting
+    format: customFormatting
   }));
 }

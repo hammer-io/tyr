@@ -1,7 +1,5 @@
 import assert from 'assert';
-import chalk from 'chalk';
 import fs from 'fs-extra';
-import winston from 'winston';
 import {
   loadTemplate
 } from '../src/utils/file';

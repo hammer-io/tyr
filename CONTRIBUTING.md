@@ -68,10 +68,24 @@ logging. There are several different log levels that we use:
 ```
 
 The `info` level is used by default. To increase the level for debugging, you can
-set the level by adding the following line.
+set the level by adding the following lines.
 
 ```javascript
-winston.level = 'debug';
+import { setActiveLogger } from '../utils/winston';
+
+setActiveLogger('debug');
+```
+
+Additionally, you set the log level with environment variables. It can currently be
+set either to 'info', 'verbose', or 'debug'.
+
+```bash
+# Example of how to run the app with debug-level logging
+TYR_LOG_LEVEL=debug npm start
+
+# When running the tests, 'debug' will not display, because it gets written to stderr.
+# Instead, use 'verbose' to see more information
+TYR_LOG_LEVEL=verbose npm test
 ```
 
 If you want to save off the output from the console to a file, the `tee` command is

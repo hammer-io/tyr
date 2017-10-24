@@ -49,8 +49,8 @@ describe('Winston:', () => {
     hook.unhook();
   });
 
-  it('Standard logger should print \'info\' level and below in color', () => {
-    setActiveLogger('standard');
+  it('Info logger should print \'info\' level and below in color', () => {
+    setActiveLogger('info');
     logAllLevels(getActiveLogger());
     const expected = '[WARN] \u001b[33mwarn\u001b[39m\n'
       + '\u001b[32minfo\u001b[39m\n';
@@ -70,8 +70,7 @@ describe('Winston:', () => {
     setActiveLogger('debug');
     logAllLevels(getActiveLogger());
     const expected = '[WARN] \u001b[33mwarn\u001b[39m\n'
-      + '\u001b[32minfo\u001b[39m\n'
-      + '\n'; // Verbose
+      + '\u001b[32minfo\u001b[39m\n';
     // NOTE: 'debug' level is also written to stderr
     // See https://github.com/winstonjs/winston/pull/558
     assert.equal(hook.captured(), expected);
