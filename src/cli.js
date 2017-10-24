@@ -2,7 +2,7 @@
 import figlet from 'figlet';
 import fs from 'fs';
 
-import * as configFileReader from './utils/config-file-reader';
+import * as configFile from './utils/config-file';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
@@ -20,6 +20,9 @@ export async function generateProjectFiles(config) {
   if (!fs.existsSync(config.projectConfigurations.projectName)) {
     fs.mkdirSync(config.projectConfigurations.projectName);
     fs.mkdirSync(`${config.projectConfigurations.projectName}/src`);
+
+    // write to config file
+    await configFile.writeToConfigFile(config);
 
     const dependencies = {};
 
@@ -229,7 +232,7 @@ export default async function run(tyr) {
 
     if (tyr.config) {
       if (fs.existsSync(tyr.config)) {
-        configs = configFileReader.parseConfigsFromFile(tyr.config);
+        configs = configFile.parseConfigsFromFile(tyr.config);
       } else {
         log.error('Configuration File does not exist!');
       }
@@ -239,8 +242,8 @@ export default async function run(tyr) {
     }
 
     // sign in to third party tools
-    const credentials = await signInToThirdPartyTools(configs);
-    configs.credentials = credentials;
+    // const credentials = await signInToThirdPartyTools(configs);
+    configs.credentials = { jack: 'jack' };
 
     // initialize the basic project files
     await initProject(configs);
