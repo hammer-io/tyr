@@ -4,8 +4,6 @@ import {
   transports
 } from 'winston';
 
-const { printf } = format;
-
 function isLoggerType(str) {
   return (str === 'info' || str === 'verbose' || str === 'debug');
 }
@@ -20,7 +18,7 @@ if (!isLoggerType(activeLogger)) {
 }
 
 // Info level is only appended to the message if it's out of the ordinary (not 'info')
-const customFormatting = printf((info) => {
+const customFormatting = format.printf((info) => {
   const level = (info.level === 'info') ? '' : `[${info.level.toUpperCase()}] `;
   return `${level}${info.message}`;
 });
