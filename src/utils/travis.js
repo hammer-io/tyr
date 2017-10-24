@@ -77,18 +77,18 @@ export async function waitForSync(travisAccessToken, account) {
 /**
  * Initialize Travis-CI on the created project
  *
- * @param token
+ * @param githubToken
  * @param username
  * @param projectName
- * @param environmentVariables
- * @returns {Promise.<void>}
+ * @param envVariables
+ * @returns Promise: { travisAccessToken }
  */
-export async function enableTravisOnProject(token, username, projectName, environmentVariables) {
+export async function enableTravisOnProject(githubToken, username, projectName, envVariables) {
   winston.log('verbose', 'enabling travis for project');
 
   try {
     // Use the GitHub token to get a Travis token
-    const travisAccessToken = await travisClient.requestTravisToken(token);
+    const travisAccessToken = await travisClient.requestTravisToken(githubToken);
 
     // get the accounts for the user
     const response = await travisClient.getUserAccount(travisAccessToken);
@@ -99,7 +99,7 @@ export async function enableTravisOnProject(token, username, projectName, enviro
         account = response.accounts[i];
       }
 
-      // wait for the user's account to be done dsyncing....
+      // Wait for the user's account to be done syncing....
       await waitForSync(travisAccessToken, account);
 
       // Sync Travis with GitHub, which must be done before activating the repository
@@ -110,8 +110,8 @@ export async function enableTravisOnProject(token, username, projectName, enviro
       await travisClient.activateTravisHook(repoId, travisAccessToken);
 
       // Add environment variables
-      if (environmentVariables && environmentVariables.length !== 0) {
-        for (const env of environmentVariables) { // eslint-disable-line no-restricted-syntax
+      if (envVariables && envVariables.length !== 0) {
+        for (const env of envVariables) { // eslint-disable-line no-restricted-syntax
           await travisClient.setEnvironmentVariable( // eslint-disable-line no-await-in-loop
             travisAccessToken,
             repoId,
@@ -122,6 +122,7 @@ export async function enableTravisOnProject(token, username, projectName, enviro
     }
 
     winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);
+    return travisAccessToken;
   } catch (err) {
     winston.log('error', `failed to enable TravisCI on ${username}/${projectName}`, JSON.stringify(err));
   }

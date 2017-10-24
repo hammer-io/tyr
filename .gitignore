@@ -42,3 +42,7 @@ jspm_packages
 *.iml
 # Transpiled files
 dist
+
+
+### CUSTOM IGNORES ###
+/test/github-test-credentials.txt
