@@ -2,12 +2,12 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import {
   loadTemplate
-} from '../src/utils/file';
+} from '../dist/utils/file';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
 import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
-import { generateProjectFiles } from '../src/cli';
+import { generateProjectFiles } from '../dist/cli';
 
 const configs = {
   projectConfigurations: {

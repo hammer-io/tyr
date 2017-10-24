@@ -8,18 +8,17 @@ import {
   createGitHubRepository,
   listUserRepositories,
   deleteRepository
-} from '../src/clients/github';
+} from '../../dist/clients/github';
 import {
   enableTravisOnProject
-} from '../src/utils/travis';
+} from '../../dist/utils/travis';
 import {
   fetchRepository,
   listEnvironmentVariables
-} from '../src/clients/travis';
-import { setActiveLogger } from '../src/utils/winston';
+} from '../../dist/clients/travis';
 
 // You need to fill in these credentials before running the tests
-const credentialsFilename = 'github-test-credentials.txt';
+const credentialsFilename = '../github-test-credentials.txt';
 
 // These get filled and used dynamically
 const configs = {
@@ -115,9 +114,6 @@ describe('GitHub API:', function() {
   this.timeout(10000);
 
   before(async () => {
-    // Enable 'verbose' level logging
-    setActiveLogger('verbose');
-
     // Load credentials
     await loadCredentials(credentialsFilename);
 
@@ -126,9 +122,6 @@ describe('GitHub API:', function() {
   });
 
   after(async () => {
-    // Disable 'debug' level logging
-    setActiveLogger('info');
-
     // Delete the test token
     if (configs.authUrl) {
       await deleteGitHubToken(configs.authUrl, configs.username, configs.password);

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 
-import { enableLogFile, setActiveLogger, getActiveLogger } from '../src/utils/winston';
+import { enableLogFile, setActiveLogger, getActiveLogger } from '../dist/utils/winston';
 import { beforeEach, afterEach } from 'mocha';
 
 // Test strategy for capturing console output found here:
