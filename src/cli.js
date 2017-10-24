@@ -2,12 +2,14 @@
 import chalk from 'chalk';
 import figlet from 'figlet';
 import fs from 'fs';
-import winston from 'winston';
 
 import * as configFileReader from './utils/config-file-reader';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
+import { getActiveLogger } from './utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Generates all of the local files for th user
@@ -60,7 +62,7 @@ export async function generateProjectFiles(config) {
  * @param config the config object form the main inquirer prompt
  */
 export async function initProject(config) {
-  winston.log('verbose', 'initializing project');
+  log.verbose('initializing project');
 
   const areFilesGenerated = await generateProjectFiles(config);
   if (!areFilesGenerated) {
@@ -114,7 +116,7 @@ export async function initProject(config) {
         environmentVariables
       );
     } catch (err) {
-      winston.log('error', `failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
+      log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
   }
 
@@ -223,7 +225,7 @@ async function signInToThirdPartyTools(configs) {
 export default async function run(tyr) {
   try {
     let configs = {};
-    winston.log('verbose', 'run');
+    log.verbose('run');
     console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
 
     if (tyr.config) {

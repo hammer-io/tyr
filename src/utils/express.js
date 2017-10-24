@@ -1,10 +1,11 @@
-import winston from 'winston';
-
 import {
   loadTemplate,
   writeFile
 } from './file';
 import constants from './../constants/constants';
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Generate Express files - index.js and routes.js
@@ -12,7 +13,7 @@ import constants from './../constants/constants';
  * @param folderName
  */
 export function createJsFiles(folderName) { // eslint-disable-line import/prefer-default-export
-  winston.log('verbose', 'creating javascript files for express', { folderName });
+  log.verbose('creating javascript files for express', { folderName });
 
   writeFile(
     `${folderName}/src/${constants.express.index.fileName}`,

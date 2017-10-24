@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import winston from 'winston';
 import yaml from 'js-yaml';
 
 import {
@@ -8,6 +7,9 @@ import {
 } from './file';
 import constants from '../constants/constants';
 import * as travisClient from '../clients/travis';
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Initialize TravisCI.  Creates the default travis.yml file with optional heroku information.
@@ -15,7 +17,7 @@ import * as travisClient from '../clients/travis';
  * @param config - Refer to README for the structure of the config object
  */
 export function initTravisCI(config) {
-  winston.log('verbose', 'initializing TravisCI');
+  log.verbose('initializing TravisCI');
 
   if (config.tooling.deployment === constants.heroku.name) {
     const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', 'Failed to' +
@@ -60,7 +62,7 @@ export function initTravisCI(config) {
  * @returns {Promise}
  */
 export async function waitForSync(travisAccessToken, account) {
-  winston.log('verbose', 'waiting for sync');
+  log.verbose('waiting for sync');
 
   return new Promise(async (resolve) => {
     setTimeout(async () => {
@@ -84,7 +86,7 @@ export async function waitForSync(travisAccessToken, account) {
  * @returns Promise: { travisAccessToken }
  */
 export async function enableTravisOnProject(githubToken, username, projectName, envVariables) {
-  winston.log('verbose', 'enabling travis for project');
+  log.verbose('enabling travis for project');
 
   try {
     // Use the GitHub token to get a Travis token
@@ -121,9 +123,9 @@ export async function enableTravisOnProject(githubToken, username, projectName, 
       }
     }
 
-    winston.log('info', `TravisCI successfully enabled on ${username}/${projectName}`);
+    log.info(`TravisCI successfully enabled on ${username}/${projectName}`);
     return travisAccessToken;
   } catch (err) {
-    winston.log('error', `failed to enable TravisCI on ${username}/${projectName}`, JSON.stringify(err));
+    log.error(`failed to enable TravisCI on ${username}/${projectName}`, JSON.stringify(err));
   }
 }

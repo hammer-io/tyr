@@ -1,8 +1,10 @@
-import winston from 'winston';
 import fs from 'fs';
 import chalk from 'chalk';
 
 import * as validator from './validator';
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Reads configurations from a file
@@ -29,6 +31,6 @@ export function parseConfigsFromFile(path) {
       console.log(chalk.red('Invalid JSON format'));
     }
   } catch (err) {
-    winston.log('error', 'failed to read from config file', err);
+    log.error('failed to read from config file', err);
   }
 }

@@ -1,5 +1,4 @@
 import inquirer from 'inquirer';
-import winston from 'winston';
 
 import * as validator from './utils/validator';
 import sourceControlChoices from './constants/source-control-choices';
@@ -7,6 +6,9 @@ import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
+import { getActiveLogger } from './utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Prompts the user for basic project configurations
@@ -51,7 +53,7 @@ async function promptForProjectConfigurations() {
     const projectConfigurations = await inquirer.prompt(projectConfigurationQuestions);
     return projectConfigurations;
   } catch (err) {
-    winston.log('error', 'failed to prompt project configurations', err);
+    log.error('failed to prompt project configurations', err);
   }
 }
 
@@ -126,7 +128,7 @@ async function promptForTooling() {
 
     return tooling;
   } catch (err) {
-    winston.log('error', 'failed to prompt tooling choices', err);
+    log.error('failed to prompt tooling choices', err);
   }
 }
 
@@ -141,7 +143,7 @@ async function promptForTooling() {
  * }
  */
 export async function promptForDockerCredentials() {
-  winston.log('verbose', 'prompting for Docker credentials');
+  log.verbose('prompting for Docker credentials');
   const questions = [{
     name: 'username',
     type: 'input',
@@ -170,7 +172,7 @@ export async function promptForDockerCredentials() {
     const dockerCredentials = await inquirer.prompt(questions);
     return dockerCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for Docker credentials', err);
+    log.error('failed to prompt for Docker credentials', err);
   }
 }
 
@@ -213,7 +215,7 @@ export async function promptForHerokuCredentials() {
     const herokuCredentials = await inquirer.prompt(questions);
     return herokuCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for Heroku credentials', err);
+    log.error('failed to prompt for Heroku credentials', err);
   }
 }
 
@@ -228,7 +230,7 @@ export async function promptForHerokuCredentials() {
  * }
  */
 export async function promptForGithubCredentials() {
-  winston.log('verbose', 'prompting for GitHub credentials');
+  log.verbose('prompting for GitHub credentials');
   const questions = [{
     name: 'username',
     type: 'input',
@@ -257,7 +259,7 @@ export async function promptForGithubCredentials() {
     const githubCredentials = await inquirer.prompt(questions);
     return githubCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for GitHub credentials', err);
+    log.error('failed to prompt for GitHub credentials', err);
   }
 }
 
@@ -267,7 +269,7 @@ export async function promptForGithubCredentials() {
  * @returns the project configurations and tooling configurations
  */
 export async function prompt() {
-  winston.log('verbose', 'prompting for configurations');
+  log.verbose('prompting for configurations');
   try {
     const configurations = {};
 
@@ -281,6 +283,6 @@ export async function prompt() {
 
     return configurations;
   } catch (err) {
-    winston.log('error', 'failed to prompt user for their configurations', err);
+    log.error('failed to prompt user for their configurations', err);
   }
 }

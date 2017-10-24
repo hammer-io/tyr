@@ -1,8 +1,9 @@
 import superagent from 'superagent';
-import winston from 'winston';
 import chalk from 'chalk';
 import * as authorizationUtil from './../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
+const log = getActiveLogger();
 const tyrAgent = 'Travis/1.0';
 const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
@@ -42,8 +43,8 @@ function filterErrorResponse(err) {
  * @returns {Promise}
  */
 export function getUserAccount(travisAccessToken) {
-  winston.log('debug', 'getUserAccount');
-  winston.log('verbose', 'getting user account from travis');
+  log.debug('getUserAccount');
+  log.verbose('getting user account from travis');
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/accounts/`)
@@ -72,8 +73,8 @@ export function getUserAccount(travisAccessToken) {
  * @returns {Promise}
  */
 export async function getUserInformation(travisAccessToken, account) {
-  winston.log('debug', 'getUserInformation', account);
-  winston.log('verbose', 'getting user information from travis', account.login);
+  log.debug('getUserInformation', account);
+  log.verbose('getting user information from travis', account.login);
 
   return new Promise((resolve, reject) => {
     superagent
@@ -102,8 +103,8 @@ export async function getUserInformation(travisAccessToken, account) {
  * @returns {Promise}
  */
 export function getRepositoryId(travisAccessToken, username, projectName) {
-  winston.log('debug', 'getRepositoryId', { username, projectName });
-  winston.log('verbose', 'getting repository id from travis', { username, projectName });
+  log.debug('getRepositoryId', { username, projectName });
+  log.verbose('getting repository id from travis', { username, projectName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -131,8 +132,8 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
  * @returns {Promise}
  */
 export function activateTravisHook(repositoryId, travisAccessToken) {
-  winston.log('verbose', 'activateTravisHook', { repositoryId });
-  winston.log('verbose', 'activating travis', { repositoryId });
+  log.verbose('activateTravisHook', { repositoryId });
+  log.verbose('activating travis', { repositoryId });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -165,8 +166,8 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
  * @returns {Promise}
  */
 export function syncTravisWithGithub(travisAccessToken) {
-  winston.log('debug', 'syncTravisWithGithub');
-  winston.log('verbose', 'syncing travis with github');
+  log.debug('syncTravisWithGithub');
+  log.verbose('syncing travis with github');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -196,8 +197,8 @@ export function syncTravisWithGithub(travisAccessToken) {
  * @returns {Promise}
  */
 export function requestTravisToken(githubToken) {
-  winston.log('debug', 'requestTravisToken');
-  winston.log('verbose', 'requesting token from travis');
+  log.debug('requestTravisToken');
+  log.verbose('requesting token from travis');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -226,8 +227,8 @@ export function requestTravisToken(githubToken) {
  * @returns {Promise}
  */
 export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
-  winston.log('debug', 'setEnvironmentVariable', { repoId, environmentVariable });
-  winston.log('verbose', 'setEnvironmentVariable', { repoId });
+  log.debug('setEnvironmentVariable', { repoId, environmentVariable });
+  log.verbose('setEnvironmentVariable', { repoId });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -272,7 +273,7 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
  * ]
  */
 export function listEnvironmentVariables(travisAccessToken, repoId) {
-  winston.log('debug', 'listEnvironmentVariables', { repoId });
+  log.debug('listEnvironmentVariables', { repoId });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -315,7 +316,7 @@ export function listEnvironmentVariables(travisAccessToken, repoId) {
  */
 export function fetchRepository(travisAccessToken, username, repositoryName) {
   const repoSlug = `${username}/${repositoryName}`;
-  winston.debug('fetchRepository', repoSlug);
+  log.debug('fetchRepository', repoSlug);
 
   return new Promise((resolve, reject) => {
     superagent

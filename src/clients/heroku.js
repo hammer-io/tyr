@@ -1,8 +1,9 @@
 import superagent from 'superagent';
-import winston from 'winston';
+import { getActiveLogger } from '../utils/winston';
 
 import * as authorizationUtil from './../utils/authorization';
 
+const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';
 const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
@@ -16,8 +17,8 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
  */
 // eslint-disable-next-line import/prefer-default-export
 export function requestHerokuToken(email, password) {
-  winston.log('debug', 'requestHerokuToken', email);
-  winston.log('verbose', 'requesting heroku token', password);
+  log.debug('requestHerokuToken', email);
+  log.verbose('requesting heroku token', password);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/oauth/authorizations`)

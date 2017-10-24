@@ -93,12 +93,12 @@ export function setActiveLogger(loggerType) {
 }
 
 /**
- * Write to all logs with level `debug` and below to `combined.log` with NO colors
+ * Write to all logs with level `debug` and below to the given file with NO colors
  */
-export function enableLogFile() {
+export function enableLogFile(logFilename) {
   getActiveLogger().add(new transports.File({
     level: 'debug',
-    filename: 'tyr.log',
+    filename: logFilename,
     format: normalFormatting
   }));
 }

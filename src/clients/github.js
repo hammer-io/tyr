@@ -1,10 +1,12 @@
 import superagent from 'superagent';
-import winston from 'winston';
 import chalk from 'chalk';
 import * as authorizationUtil from './../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
+
+const log = getActiveLogger();
 
 /**
  * Request GitHub OAuth token.
@@ -19,7 +21,7 @@ const git = require('simple-git');
  * @returns github token information if successful, error information otherwise
  */
 export function requestGitHubToken(username, password, otpCode, note = 'hammer-io token') {
-  winston.log('verbose', 'requestGitHubToken', username);
+  log.verbose('requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -64,7 +66,7 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
  * @returns {Promise}
  */
 export function deleteGitHubToken(githubUrl, username, password) {
-  winston.log('verbose', 'deleteGitHubToken');
+  log.verbose('deleteGitHubToken');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -89,8 +91,8 @@ export function deleteGitHubToken(githubUrl, username, password) {
  * @param token
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
-  winston.log('debug', 'createGitHubRepository', { projectName });
-  winston.log('verbose', 'creating github repository', { projectName });
+  log.debug('createGitHubRepository', { projectName });
+  log.verbose('creating github repository', { projectName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -119,7 +121,7 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param token
  */
 export function listUserRepositories(token) {
-  winston.log('debug', 'listUserRepositories');
+  log.debug('listUserRepositories');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -143,7 +145,7 @@ export function listUserRepositories(token) {
  * That's why we're using basic auth instead.
  */
 export function deleteRepository(repositoryName, username, password) {
-  winston.log('debug', 'deleteRepository', { repositoryName });
+  log.debug('deleteRepository', { repositoryName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -169,8 +171,8 @@ export function deleteRepository(repositoryName, username, password) {
  * @param projectName
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('debug', 'initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
-  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
+  log.debug('initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
+  log.verbose('initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
   console.log(chalk.yellow('Pushing all files to the new git repository...'));
 
   return new Promise((resolve) => {
