@@ -42,7 +42,7 @@
     "shelljs": "0.7.8",
     "simple-git": "1.79.0",
     "superagent": "3.6.2",
-    "winston": "2.4.0"
+    "winston": "^3.0.0-rc1"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
