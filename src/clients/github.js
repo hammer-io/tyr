@@ -173,7 +173,7 @@ export function deleteRepository(repositoryName, username, password) {
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
   log.debug('initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
   log.verbose('initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
-  console.log(chalk.yellow('Pushing all files to the new git repository...'));
+  log.info('Pushing all files to the new git repository...');
 
   return new Promise((resolve) => {
     if (!isTwoFactorAuth) {
@@ -185,7 +185,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
-          console.log(chalk.yellow('Please wait while files are pushed to GitHub...'));
+          log.info('Please wait while files are pushed to GitHub...');
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout
@@ -196,12 +196,12 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .add('.gitignore')
         .add('./*')
         .commit('Initial Commit w/ :heart: by @hammer-io.');
-      console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
+      log.warn('We cannot push hammer-io generated code to your repository because' +
       ' you have 2fa enabled. ' +
         'Please follow this link' +
         ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for' +
         ' support. Then manually add a new git remote and push your code using `git push origin' +
-        ' master`'));
+        ' master`');
       resolve();
     }
   });

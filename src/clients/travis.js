@@ -181,7 +181,7 @@ export function syncTravisWithGithub(travisAccessToken) {
         if (err) {
           reject(filterErrorResponse(err));
         } else {
-          console.log(chalk.yellow('Please wait while we sync TravisCI with GitHub...'));
+          log.info('Please wait while we sync TravisCI with GitHub...');
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout.

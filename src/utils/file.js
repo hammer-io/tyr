@@ -38,7 +38,7 @@ export function writeFile(filePath, fileContents) {
   log.verbose('writing file', { filePath });
 
   try {
-    console.log(chalk.green(`Successfully created ${filePath}`));
+    log.info(`Successfully created ${filePath}`);
     return fs.writeFileSync(filePath, fileContents);
   } catch (e) {
     log.error(`Failed to write ${filePath}!`);

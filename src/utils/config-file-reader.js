@@ -18,9 +18,9 @@ export function parseConfigsFromFile(path) {
       contents = JSON.parse(fs.readFileSync(path, 'utf-8'));
       const errors = validator.validateProjectConfigurations(contents);
       if (errors.length > 0) {
-        console.log(chalk.red('!! Invalid configuration file format'));
+        log.error('Invalid configuration file format!');
         errors.forEach((value) => {
-          console.log(chalk.red(`\t${value}`));
+          log.error(`\t${value}`);
         });
 
         return;
@@ -28,7 +28,7 @@ export function parseConfigsFromFile(path) {
 
       return contents;
     } catch (err) {
-      console.log(chalk.red('Invalid JSON format'));
+      log.error('Invalid JSON format!');
     }
   } catch (err) {
     log.error('failed to read from config file', err);

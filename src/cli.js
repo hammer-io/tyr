@@ -136,7 +136,7 @@ export async function initProject(config) {
  * }
  */
 async function signInToGithub() {
-  console.log(chalk.green('>> Please login to GitHub: '));
+  log.info('Please login to GitHub: ');
   let githubCredentials = await prompt.promptForGithubCredentials();
   let finalCredentials =
     await utils.git.signIntoGithub(
@@ -146,8 +146,8 @@ async function signInToGithub() {
 
   // if the user could not be authenticated, loop again
   while (!finalCredentials) {
-    console.log(chalk.red('>> Incorrect username/password!'));
-    console.log(chalk.green('>> Please login to GitHub: '));
+    log.error('Incorrect username/password!');
+    log.info('Please login to GitHub: ');
     githubCredentials = await prompt.promptForGithubCredentials();
     finalCredentials =
       await utils.git.signIntoGithub(
@@ -156,7 +156,7 @@ async function signInToGithub() {
       );
   }
 
-  console.log(chalk.green('!! Successfully logged in to GitHub!'));
+  log.info('Successfully logged into GitHub!');
   return finalCredentials;
 }
 
@@ -170,7 +170,7 @@ async function signInToGithub() {
  * }
  */
 async function signInToHeroku() {
-  console.log(chalk.green('>> Please login to Heroku: '));
+  log.info('Please login to Heroku: ');
   let herokuCredentials = await prompt.promptForHerokuCredentials();
   let credentials =
     await utils.heroku.signInToHeroku(
@@ -180,8 +180,8 @@ async function signInToHeroku() {
 
   // if the user could not be authenticated, loop again
   while (!credentials) {
-    console.log(chalk.red('>> Incorrect email/password!'));
-    console.log(chalk.green('>> Please login to Heroku: '));
+    log.error('Incorrect email/password!');
+    log.info('Please login to Heroku: ');
     herokuCredentials = await prompt.promptForHerokuCredentials();
     credentials =
       await utils.heroku.signInToHeroku(
@@ -190,7 +190,7 @@ async function signInToHeroku() {
       );
   }
 
-  console.log(chalk.green('!! Successfully logged in to Heroku!'));
+  log.info('Successfully logged into Heroku!');
   return herokuCredentials;
 }
 
@@ -226,13 +226,13 @@ export default async function run(tyr) {
   try {
     let configs = {};
     log.verbose('run');
-    console.log(chalk.yellow(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' })));
+    log.info(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' }));
 
     if (tyr.config) {
       if (fs.existsSync(tyr.config)) {
         configs = configFileReader.parseConfigsFromFile(tyr.config);
       } else {
-        console.log(chalk.red('!! Configuration File does not exist'));
+        log.error('Configuration File does not exist!');
       }
     } else {
       // get the project configurations
@@ -245,8 +245,8 @@ export default async function run(tyr) {
 
     // initialize the basic project files
     await initProject(configs);
-    console.log(chalk.green('!! Successfully generated your project!'));
+    log.info('Successfully generated your project!');
   } catch (err) {
-    console.log(chalk.red('!! Failed to generate your project!'));
+    log.error('Failed to generate your project!');
   }
 }
