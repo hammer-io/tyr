@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/hammer-io/tyr.svg?branch=master)](https://travis-ci.org/hammer-io/tyr)
+[![codecov](https://codecov.io/gh/hammer-io/tyr/branch/master/graph/badge.svg)](https://codecov.io/gh/hammer-io/tyr)
+
 
 # tyr
 
@@ -43,8 +45,9 @@ tyr [OPTIONS]
 ```
 
 ### Options:
-* `-h, --help`       output usage information
-* `--config <file>`  configure project from configuration file
+* `-h, --help`       Output usage information
+* `--config <file>`  Configure project from configuration file
+* `--logfile <file>` The filepath that logs will be written to
 
 ## Configuration File
 ### Project Configurations

@@ -6,7 +6,7 @@ import * as configFile from './utils/config-file';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
-import { getActiveLogger } from './utils/winston';
+import { enableLogFile, getActiveLogger } from './utils/winston';
 
 const log = getActiveLogger();
 
@@ -51,7 +51,7 @@ export async function generateProjectFiles(config) {
     }
 
     // create Dockerfile and .dockerignore
-    if (config.tooling.container === constants.docker.name) {
+    if (config.tooling.containerization === constants.docker.name) {
       await utils.docker.initDocker(config.projectConfigurations);
     }
   }
@@ -82,7 +82,7 @@ export async function initProject(config) {
 
   const environmentVariables = [];
   // create Dockerfile and .dockerignore
-  if (config.tooling.container === constants.docker.name) {
+  if (config.tooling.containerization === constants.docker.name) {
     environmentVariables.push({
       name: 'DOCKER_USERNAME',
       value: config.credentials.docker.username
@@ -225,6 +225,11 @@ async function signInToThirdPartyTools(configs) {
  *                For more information about commander: https://github.com/tj/commander.js
  */
 export default async function run(tyr) {
+  // Enable logging to file upon user request
+  if (tyr.logfile) {
+    enableLogFile(tyr.logfile);
+  }
+
   try {
     let configs = {};
     log.verbose('run');
