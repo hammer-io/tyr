@@ -1,4 +1,7 @@
-### Node ### 
+# tyr
+.tyrfile
+
+### Node ###
 # Logs
 logs
 *.log

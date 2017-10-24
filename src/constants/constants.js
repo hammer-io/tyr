@@ -50,6 +50,10 @@ export default {
     }
   },
 
+  tyrFile: {
+    fileName: '.tyrfile'
+  },
+
   tyr: {
     name: 'tyr',
     cliName: 'tyr',
