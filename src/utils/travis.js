@@ -66,12 +66,11 @@ export async function waitForSync(travisAccessToken, account) {
 
   return new Promise(async (resolve) => {
     setTimeout(async () => {
-      const user = await travisClient.getUserInformation(travisAccessToken, account);
-      if (!user.user.is_syncing) {
-        resolve(user);
-      } else {
-        waitForSync(travisAccessToken, account);
+      let user = await travisClient.getUserInformation(travisAccessToken, account);
+      if (user.user.is_syncing) {
+        user = await waitForSync(travisAccessToken, account);
       }
+      resolve(user);
     }, 2000);
   });
 }

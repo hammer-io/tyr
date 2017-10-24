@@ -9,6 +9,32 @@ const git = require('simple-git');
 const log = getActiveLogger();
 
 /**
+ * Filters out sensitive header information (such as authentication headers or post data)
+ *
+ * @param err
+ * @returns {Error}
+ */
+function filterErrorResponse(err) {
+  if (err && err.response) {
+    // GitHub API response.text returns a stringified JSON that needs to be parsed
+    const filteredError = {
+      status: err.response.status,
+      text: JSON.parse(err.response.text),
+      req: {}
+    };
+    if (err.response.req) {
+      filteredError.req = {
+        method: err.response.req.method,
+        url: err.response.req.url
+      };
+    }
+    return new Error(JSON.stringify(filteredError));
+  }
+
+  return err;
+}
+
+/**
  * Request GitHub OAuth token.
  *
  * @param username github username
@@ -49,7 +75,7 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     request.end((err, res) => {
       if (err) {
-        reject(err);
+        reject(filterErrorResponse(err));
       } else {
         resolve({ token: res.body.token, url: res.body.url });
       }
@@ -74,7 +100,7 @@ export function deleteGitHubToken(githubUrl, username, password) {
       .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve();
         }
@@ -107,7 +133,7 @@ export function createGitHubRepository(projectName, projectDescription, token) {
       })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve();
         }
@@ -131,7 +157,7 @@ export function listUserRepositories(token) {
       })
       .end((err, res) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve(res);
         }
@@ -155,7 +181,7 @@ export function deleteRepository(repositoryName, username, password) {
       })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
         } else {
           resolve();
         }
@@ -169,6 +195,7 @@ export function deleteRepository(repositoryName, username, password) {
  *
  * @param username
  * @param projectName
+ * @param isTwoFactorAuth
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
   log.debug('initAddCommitAndPush', { username, projectName, isTwoFactorAuth });

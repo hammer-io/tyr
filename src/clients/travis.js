@@ -16,7 +16,6 @@ const travisApiAccept = 'application/vnd.travis-ci.2+json';
  */
 function filterErrorResponse(err) {
   if (err && err.response) {
-    // Filters out sensitive header information
     const filteredError = {
       status: err.response.status,
       text: err.response.text,
@@ -28,7 +27,7 @@ function filterErrorResponse(err) {
         url: err.response.req.url
       };
     }
-    return new Error(filteredError);
+    return new Error(JSON.stringify(filteredError));
   }
 
   return err;
@@ -227,8 +226,8 @@ export function requestTravisToken(githubToken) {
  * @returns {Promise}
  */
 export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
-  log.debug('setEnvironmentVariable', { repoId, environmentVariable });
-  log.verbose('setEnvironmentVariable', { repoId });
+  log.debug('setEnvironmentVariable', { repoId });
+  log.verbose('setEnvironmentVariable');
 
   return new Promise((resolve, reject) => {
     superagent
