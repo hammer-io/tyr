@@ -214,6 +214,11 @@ async function signInToThirdPartyTools(configs) {
 
 /**
  * The main execution function for tyr.
+ *
+ * @param tyr tyr holds values about command line parameters
+ *                to access information about the config file, look at tyr.config
+ *
+ *                For more information about commander: https://github.com/tj/commander.js
  */
 export default async function run(tyr) {
   try {
