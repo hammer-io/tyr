@@ -1,5 +1,4 @@
 import superagent from 'superagent';
-import chalk from 'chalk';
 import * as authorizationUtil from './../utils/authorization';
 import { getActiveLogger } from '../utils/winston';
 

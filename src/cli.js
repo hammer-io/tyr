@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import chalk from 'chalk';
 import figlet from 'figlet';
 import fs from 'fs';
 

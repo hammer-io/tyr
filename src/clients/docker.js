@@ -1,5 +1,5 @@
 import superagent from 'superagent';
-import { getActiveLogger} from '../utils/winston';
+import { getActiveLogger } from '../utils/winston';
 
 import * as authorizationUtil from './../utils/authorization';
 

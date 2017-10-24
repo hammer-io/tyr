@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 
 import packageTemplate from './../../templates/json/package.json';
 import constants from './../constants/constants';

@@ -1,5 +1,4 @@
 import fs from 'fs';
-import chalk from 'chalk';
 
 import * as validator from './validator';
 import { getActiveLogger } from '../utils/winston';
