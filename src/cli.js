@@ -6,6 +6,7 @@ import * as configFileReader from './utils/config-file-reader';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
+import { deleteGitHubToken } from './clients/github';
 import { getActiveLogger } from './utils/winston';
 
 const log = getActiveLogger();
@@ -52,6 +53,7 @@ export async function generateProjectFiles(config) {
       await utils.docker.initDocker(config.projectConfigurations);
     }
   }
+
   return 'Project already exists!';
 }
 
@@ -117,6 +119,19 @@ export async function initProject(config) {
     } catch (err) {
       log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
+  }
+
+  if (!config.credentials.github.isTwoFactorAuth) {
+    await deleteGitHubToken(
+      config.credentials.github.url,
+      config.credentials.github.username,
+      config.credentials.github.password
+    );
+
+    log.info('Successfully deleted github token');
+  } else {
+    log.warn('Could not delete GitHub token since you are using two factor authentication.' +
+      ' Please visit https://github.com/settings/tokens to manually delete your token.');
   }
 
   // run npm install on project
