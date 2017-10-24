@@ -35,7 +35,10 @@ export async function generateProjectFiles(config) {
     await utils.file.createPackageJson(config.projectConfigurations, dependencies);
 
     // create README.md
-    await utils.file.createReadMe(config.projectConfigurations.projectName, config);
+    await utils.file.createReadMe(
+      config.projectConfigurations.projectName,
+      config.projectConfigurations.description
+    );
 
     // create mocha test suite
     await utils.mocha.createMochaTestSuite(`${config.projectConfigurations.projectName}`);
