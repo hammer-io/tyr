@@ -7,8 +7,7 @@ import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
 import { deleteGitHubToken } from './clients/github';
-import { getActiveLogger } from './utils/winston';
-import { enableLogFile, getActiveLogger } from './utils/winston';
+import { getActiveLogger, enableLogFile } from './utils/winston';
 
 const log = getActiveLogger();
 
