@@ -1,8 +1,9 @@
-import winston from 'winston';
 import fs from 'fs';
-import chalk from 'chalk';
 
 import * as validator from './validator';
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Reads configurations from a file
@@ -16,9 +17,9 @@ export function parseConfigsFromFile(path) {
       contents = JSON.parse(fs.readFileSync(path, 'utf-8'));
       const errors = validator.validateProjectConfigurations(contents);
       if (errors.length > 0) {
-        console.log(chalk.red('!! Invalid configuration file format'));
+        log.error('Invalid configuration file format!');
         errors.forEach((value) => {
-          console.log(chalk.red(`\t${value}`));
+          log.error(`\t${value}`);
         });
 
         return;
@@ -26,9 +27,9 @@ export function parseConfigsFromFile(path) {
 
       return contents;
     } catch (err) {
-      console.log(chalk.red('Invalid JSON format'));
+      log.error('Invalid JSON format!');
     }
   } catch (err) {
-    winston.log('error', 'failed to read from config file', err);
+    log.error('failed to read from config file', err);
   }
 }

@@ -1,6 +1,7 @@
-import winston from 'winston';
-
 import * as herokuClient from './../clients/heroku';
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Wrapper for the heroku login
@@ -20,7 +21,7 @@ import * as herokuClient from './../clients/heroku';
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function signInToHeroku(email, password) {
-  winston.log('verbose', 'signing into to heroku', email);
+  log.verbose('signing into to heroku', email);
   try {
     await herokuClient.requestHerokuToken(email, password);
     return { email, password };
@@ -29,6 +30,6 @@ export async function signInToHeroku(email, password) {
       return false;
     }
 
-    winston.log('error', 'failed to sign in to heroku', err);
+    log.error('failed to sign in to heroku', err);
   }
 }

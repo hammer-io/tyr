@@ -1,10 +1,11 @@
 import superagent from 'superagent';
-import winston from 'winston';
-import chalk from 'chalk';
 import * as authorizationUtil from './../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
+
+const log = getActiveLogger();
 
 /**
  * Filters out sensitive header information (such as authentication headers or post data)
@@ -45,7 +46,7 @@ function filterErrorResponse(err) {
  * @returns github token information if successful, error information otherwise
  */
 export function requestGitHubToken(username, password, otpCode, note = 'hammer-io token') {
-  winston.log('verbose', 'requestGitHubToken', username);
+  log.verbose('requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -90,7 +91,7 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
  * @returns {Promise}
  */
 export function deleteGitHubToken(githubUrl, username, password) {
-  winston.log('verbose', 'deleteGitHubToken');
+  log.verbose('deleteGitHubToken');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -115,8 +116,8 @@ export function deleteGitHubToken(githubUrl, username, password) {
  * @param token
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
-  winston.log('debug', 'createGitHubRepository', { projectName });
-  winston.log('verbose', 'creating github repository', { projectName });
+  log.debug('createGitHubRepository', { projectName });
+  log.verbose('creating github repository', { projectName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -145,7 +146,7 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  * @param token
  */
 export function listUserRepositories(token) {
-  winston.log('debug', 'listUserRepositories');
+  log.debug('listUserRepositories');
 
   return new Promise((resolve, reject) => {
     superagent
@@ -169,7 +170,7 @@ export function listUserRepositories(token) {
  * That's why we're using basic auth instead.
  */
 export function deleteRepository(repositoryName, username, password) {
-  winston.log('debug', 'deleteRepository', { repositoryName });
+  log.debug('deleteRepository', { repositoryName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -196,9 +197,9 @@ export function deleteRepository(repositoryName, username, password) {
  * @param isTwoFactorAuth
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('debug', 'initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
-  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
-  console.log(chalk.yellow('Pushing all files to the new git repository...'));
+  log.debug('initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
+  log.verbose('initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
+  log.info('Pushing all files to the new git repository...');
 
   return new Promise((resolve) => {
     if (!isTwoFactorAuth) {
@@ -210,7 +211,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
-          console.log(chalk.yellow('Please wait while files are pushed to GitHub...'));
+          log.info('Please wait while files are pushed to GitHub...');
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout
@@ -221,12 +222,12 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .add('.gitignore')
         .add('./*')
         .commit('Initial Commit w/ :heart: by @hammer-io.');
-      console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
+      log.warn('We cannot push hammer-io generated code to your repository because' +
       ' you have 2fa enabled. ' +
         'Please follow this link' +
         ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for' +
         ' support. Then manually add a new git remote and push your code using `git push origin' +
-        ' master`'));
+        ' master`');
       resolve();
     }
   });
