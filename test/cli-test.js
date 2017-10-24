@@ -21,7 +21,7 @@ const configs = {
   tooling: {
     sourceControl: 'GitHub',
     ci: 'TravisCI',
-    container: 'Docker'
+    containerization: 'Docker'
   }
 
 };
@@ -53,6 +53,26 @@ const configs3 = {
     deployment: 'Heroku'
   }
 };
+
+const noErrorConfig = {
+  projectConfigurations:
+    {
+      projectName: 'jack',
+      description: 'jack',
+      version: '0.0.0',
+      author: 'jack',
+      license: ''
+    },
+  tooling:
+    {
+      sourceControl: '<None>',
+      web: '<None>',
+      ci: '<None>',
+      containerization: '<None>',
+      deployment: '<None>'
+    }
+};
+
 
 describe('Initialize Project Files with GitHub, Travis, Docker', () => {
   before(async () => {
@@ -186,9 +206,27 @@ describe('Initialize Project Files with GitHub, Travis, Docker', () => {
       assert.equal(actualContents, expectedContents);
     });
   });
-
   after(() => {
     fs.removeSync(configs.projectConfigurations.projectName);
+  });
+});
+
+describe('Create .tyrfile', () => {
+  before(async () => {
+    await generateProjectFiles(noErrorConfig);
+  });
+
+  it('should create a .tyrfile', () => {
+    assert.equal(fs.existsSync(`${noErrorConfig.projectConfigurations.projectName}/.tyrfile`), true);
+  });
+
+  it('should create a .tyrfile with the proper contents', () => {
+    const actualContents = fs.readFileSync(`${noErrorConfig.projectConfigurations.projectName}/.tyrfile`);
+    assert.equal(JSON.stringify(JSON.parse(actualContents)), JSON.stringify(noErrorConfig));
+  });
+
+  after(() => {
+    fs.removeSync(noErrorConfig.projectConfigurations.projectName);
   });
 });
 
@@ -272,6 +310,8 @@ describe('Initialize Project Files With Heroku', () => {
         'notifications:\n' +
         '  email:\n' +
         '    on_success: never\n' +
+        'services:\n' +
+        '  - docker\n' +
         'before_install:\n' +
         '  - docker build -t jack .\n' +
         '  - docker ps -a\n' +

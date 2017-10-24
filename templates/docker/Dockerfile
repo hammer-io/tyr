@@ -3,14 +3,14 @@
 FROM node:alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
+COPY package.json /app
 
 # Install app dependencies
-COPY package.json package-lock.json ./
 RUN npm install
 
 # Bundle app source
-COPY . .
+COPY . /app
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
