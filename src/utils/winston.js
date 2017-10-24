@@ -6,7 +6,7 @@ import {
 
 const { printf } = format;
 
-const winstonUtil = exports;
+let activeLogger = 'standard';
 
 // Info level is only appended to the message if it's out of the ordinary (not 'info')
 function formatLog(info) {
@@ -38,8 +38,6 @@ loggers.add('standard', {
     })
   ]
 });
-winstonUtil.standardLogger = loggers.get('standard');
-
 
 /**
  * The verbose logger
@@ -55,8 +53,6 @@ loggers.add('verbose', {
     })
   ]
 });
-winstonUtil.verboseLogger = loggers.get('verbose');
-
 
 /**
  * The debug logger
@@ -72,16 +68,37 @@ loggers.add('debug', {
     })
   ]
 });
-winstonUtil.debugLogger = loggers.get('debug');
 
+function isLoggerType(str) {
+  return (str === 'standard' || str === 'verbose' || str === 'debug');
+}
+
+/**
+ * Returns the active logger instance.
+ */
+export function getActiveLogger() {
+  return loggers.get(activeLogger);
+}
+
+/**
+ * Changes the active logger instance.
+ *
+ * @param loggerType can be 'standard', 'verbose', or 'debug'
+ */
+export function setActiveLogger(loggerType) {
+  if (!isLoggerType(loggerType)) {
+    throw new Error('Active logger must be set to either \'standard\', \'verbose\', or \'debug\'');
+  }
+  activeLogger = loggerType;
+}
 
 /**
  * Write to all logs with level `debug` and below to `combined.log` with NO colors
  */
-winstonUtil.debugLogger.enableLogFile = () => {
-  winstonUtil.debugLogger.add(new transports.File({
+export function enableLogFile() {
+  getActiveLogger().add(new transports.File({
     level: 'debug',
     filename: 'tyr.log',
     format: normalFormatting
   }));
-};
+}

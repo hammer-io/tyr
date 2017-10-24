@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import { standardLogger, debugLogger, verboseLogger } from '../src/utils/winston';
-import { beforeEach, afterEach } from "mocha";
+import { setActiveLogger, getActiveLogger } from '../src/utils/winston';
+import { beforeEach, afterEach } from 'mocha';
 
 // Test strategy for capturing console output found here:
 // https://stackoverflow.com/questions/18543047/mocha-monitor-application-output
@@ -50,14 +50,16 @@ describe('Winston:', () => {
   });
 
   it('Standard logger should print \'info\' level and below in color', () => {
-    logAllLevels(standardLogger);
+    setActiveLogger('standard');
+    logAllLevels(getActiveLogger());
     const expected = '[WARN] \u001b[33mwarn\u001b[39m\n'
       + '\u001b[32minfo\u001b[39m\n';
     assert.equal(hook.captured(), expected);
   });
 
   it('Verbose logger should print \'verbose\' level and below in color', () => {
-    logAllLevels(verboseLogger);
+    setActiveLogger('verbose');
+    logAllLevels(getActiveLogger());
     const expected = '[WARN] \u001b[33mwarn\u001b[39m\n'
       + '\u001b[32minfo\u001b[39m\n'
       + '[VERBOSE] \u001b[36mverbose\u001b[39m\n';
@@ -65,7 +67,8 @@ describe('Winston:', () => {
   });
 
   it('Debug logger should print \'debug\' level and below (minus verbose) in color', () => {
-    logAllLevels(debugLogger);
+    setActiveLogger('debug');
+    logAllLevels(getActiveLogger());
     const expected = '[WARN] \u001b[33mwarn\u001b[39m\n'
       + '\u001b[32minfo\u001b[39m\n'
       + '\n'; // Verbose
