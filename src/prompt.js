@@ -1,8 +1,7 @@
 import inquirer from 'inquirer';
-import isValid from 'is-valid-path';
-import fs from 'fs';
 import winston from 'winston';
 
+import * as validator from './utils/validator';
 import sourceControlChoices from './constants/source-control-choices';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
@@ -27,21 +26,7 @@ async function promptForProjectConfigurations() {
     name: 'projectName',
     type: 'input',
     message: 'Project Name:',
-    validate: (value) => {
-      // a project name is a project name for which the folder does not exist,
-      // for which the name is no blank/undefined or contains spaces
-
-      if (typeof value === 'undefined' || value === ''
-        || value.indexOf(' ') !== -1 || !isValid(value)) {
-        return 'Invalid project name!';
-      }
-
-      if (fs.existsSync(value)) {
-        return 'Project with this name already exists in this directory!';
-      }
-
-      return true;
-    }
+    validate: value => validator.validateProjectName(value)
   }, {
     name: 'description',
     type: 'input',
@@ -51,15 +36,7 @@ async function promptForProjectConfigurations() {
     type: 'input',
     default: '0.0.0',
     message: 'Version:',
-    validate: (value) => {
-      // tests for valid version number.
-      // any combination of (number) (.number)* will work
-      if (/^(\d+\.)?(\d+\.)?(\*|\d+)/.test(value)) {
-        return true;
-      }
-
-      return 'Invalid version number!';
-    }
+    validate: value => validator.validateVersionNumber(value)
   }, {
     name: 'author',
     type: 'input',
@@ -67,7 +44,6 @@ async function promptForProjectConfigurations() {
   }, {
     name: 'license',
     type: 'input',
-    default: 'MIT',
     message: 'License:'
   }];
 

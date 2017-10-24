@@ -1,9 +1,14 @@
 #! /usr/bin/env node
 
+import program from 'commander';
 import run from './cli';
 
-function main() {
-  run();
+function main(tyrProgram) {
+  run(tyrProgram);
 }
 
-main();
+program.usage('[options]')
+  .option('--config <file>', 'configure project from configuration file')
+  .parse(process.argv);
+
+main(program);
