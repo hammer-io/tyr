@@ -1,10 +1,11 @@
-import winston from 'winston';
 import {
   loadTemplate,
   writeFile
 } from './file';
-
+import { getActiveLogger } from '../utils/winston';
 import constants from '../constants/constants';
+
+const log = getActiveLogger();
 
 /**
  * Creates a mocha test suite from the template file with one sample test that always returns true
@@ -12,7 +13,7 @@ import constants from '../constants/constants';
  */
 // eslint-disable-next-line
 export function createMochaTestSuite(filePath){
-  winston.log('verbose', 'creating mocha test suite', { filePath });
+  log.verbose('creating mocha test suite', { filePath });
 
   writeFile(
     `${filePath}/${constants.mocha.fileName}`,

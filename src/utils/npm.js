@@ -1,5 +1,8 @@
-import winston from 'winston';
 import shell from 'shelljs';
+
+import { getActiveLogger } from '../utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Uses the shell to create call npm install to install the dependencies of the project.
@@ -11,7 +14,7 @@ import shell from 'shelljs';
  */
 // eslint-disable-next-line
 export function npmInstall (path) {
-  winston.log('verbose', 'executing npm install', { directoryPath: path });
+  log.verbose('executing npm install', { directoryPath: path });
 
   const originalPath = process.cwd();
   shell.cd(path);

@@ -1,8 +1,9 @@
 import superagent from 'superagent';
-import winston from 'winston';
+import { getActiveLogger } from '../utils/winston';
 
 import * as authorizationUtil from './../utils/authorization';
 
+const log = getActiveLogger();
 const dockerAuthApiUrl = 'index.docker.io/v1/users';
 
 /**
@@ -15,8 +16,8 @@ const dockerAuthApiUrl = 'index.docker.io/v1/users';
  */
 // eslint-disable-next-line import/prefer-default-export
 export function login(username, password) {
-  winston.log('debug', 'login', username);
-  winston.log('verbose', 'logging in to docker', username);
+  log.debug('login', username);
+  log.verbose('Logging in to docker');
 
   const request = superagent
     .get(dockerAuthApiUrl)
