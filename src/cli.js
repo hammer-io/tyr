@@ -6,7 +6,7 @@ import * as configFileReader from './utils/config-file-reader';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
-import { getActiveLogger } from './utils/winston';
+import { enableLogFile, getActiveLogger } from './utils/winston';
 
 const log = getActiveLogger();
 
@@ -222,6 +222,11 @@ async function signInToThirdPartyTools(configs) {
  *                For more information about commander: https://github.com/tj/commander.js
  */
 export default async function run(tyr) {
+  // Enable logging to file upon user request
+  if (tyr.logfile) {
+    enableLogFile(tyr.logfile);
+  }
+
   try {
     let configs = {};
     log.verbose('run');
