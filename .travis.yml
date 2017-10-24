@@ -8,10 +8,15 @@ before_script:
   
 install:
   - npm install
+  - npm install -g instanbul
   - npm install -g codecov
+  
 script:
   - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
   - codecov
+  
+test:
+  npm test
 
 notifications:
   email:
