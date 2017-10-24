@@ -23,6 +23,12 @@ const customFormatting = format.printf((info) => {
   return `${level}${info.message}`;
 });
 
+// Formatting for writing to a log file includes the timestamp and level
+const logfileFormatting = format.printf((info) => {
+  const level = (`${info.level.toUpperCase()}       `).slice(0, 7);
+  return `${info.timestamp} [${level}] ${info.message}`;
+});
+
 /**
  * The info logger
  */
@@ -107,6 +113,9 @@ export function enableLogFile(logFilename) {
   getActiveLogger().add(new transports.File({
     level: 'debug',
     filename: logFilename,
-    format: customFormatting
+    format: format.combine(
+      format.timestamp(),
+      logfileFormatting
+    )
   }));
 }

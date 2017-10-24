@@ -2,17 +2,18 @@
 import figlet from 'figlet';
 import fs from 'fs';
 
-import * as configFileReader from './utils/config-file-reader';
+import * as configFile from './utils/config-file';
 import utils from './utils';
 import * as prompt from './prompt';
 import constants from './constants/constants';
 import { deleteGitHubToken } from './clients/github';
 import { getActiveLogger } from './utils/winston';
+import { enableLogFile, getActiveLogger } from './utils/winston';
 
 const log = getActiveLogger();
 
 /**
- * Generates all of the local files for th user
+ * Generates all of the local files for the user
  * @param config the project configurations
  * @returns
  */
@@ -21,6 +22,9 @@ export async function generateProjectFiles(config) {
   if (!fs.existsSync(config.projectConfigurations.projectName)) {
     fs.mkdirSync(config.projectConfigurations.projectName);
     fs.mkdirSync(`${config.projectConfigurations.projectName}/src`);
+
+    // write to config file
+    await configFile.writeToConfigFile(config);
 
     const dependencies = {};
 
@@ -34,6 +38,12 @@ export async function generateProjectFiles(config) {
 
     // create package.json
     await utils.file.createPackageJson(config.projectConfigurations, dependencies);
+
+    // create README.md
+    await utils.file.createReadMe(
+      config.projectConfigurations.projectName,
+      config.projectConfigurations.description
+    );
 
     // create mocha test suite
     await utils.mocha.createMochaTestSuite(`${config.projectConfigurations.projectName}`);
@@ -49,7 +59,7 @@ export async function generateProjectFiles(config) {
     }
 
     // create Dockerfile and .dockerignore
-    if (config.tooling.container === constants.docker.name) {
+    if (config.tooling.containerization === constants.docker.name) {
       await utils.docker.initDocker(config.projectConfigurations);
     }
   }
@@ -81,7 +91,7 @@ export async function initProject(config) {
 
   const environmentVariables = [];
   // create Dockerfile and .dockerignore
-  if (config.tooling.container === constants.docker.name) {
+  if (config.tooling.containerization === constants.docker.name) {
     environmentVariables.push({
       name: 'DOCKER_USERNAME',
       value: config.credentials.docker.username
@@ -237,6 +247,11 @@ async function signInToThirdPartyTools(configs) {
  *                For more information about commander: https://github.com/tj/commander.js
  */
 export default async function run(tyr) {
+  // Enable logging to file upon user request
+  if (tyr.logfile) {
+    enableLogFile(tyr.logfile);
+  }
+
   try {
     let configs = {};
     log.verbose('run');
@@ -244,7 +259,7 @@ export default async function run(tyr) {
 
     if (tyr.config) {
       if (fs.existsSync(tyr.config)) {
-        configs = configFileReader.parseConfigsFromFile(tyr.config);
+        configs = configFile.parseConfigsFromFile(tyr.config);
       } else {
         log.error('Configuration File does not exist!');
       }

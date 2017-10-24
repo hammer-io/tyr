@@ -50,6 +50,10 @@ export default {
     }
   },
 
+  tyrFile: {
+    fileName: '.tyrfile'
+  },
+
   tyr: {
     name: 'tyr',
     cliName: 'tyr',
@@ -66,5 +70,9 @@ export default {
   mocha: {
     name: 'Mocha',
     fileName: 'test.js'
+  },
+
+  readme: {
+    fileName: 'README.md'
   }
 };
