@@ -9,7 +9,8 @@
     "lint": "eslint src/. --ext .js",
     "build": "babel src --out-dir dist",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "integrationTests": "TYR_TEST_LEVEL=verbose npm test test/integration"
   },
   "repository": {
     "type": "git",
