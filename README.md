@@ -52,7 +52,7 @@ tyr [OPTIONS]
 |---------------|----------|--------------------------------------------------------------------------------|
 | `projectName` | Yes      | Must be a valid directory name and cannot be a directory that already exists.  |
 | `description` | Yes      |                                                                                |
-| `version`     | No       | Must match `/^(\d+\.)?(\d+\.)?(\*|\d+)/` or (number)(.number)*                 |
+| `version`     | No       | Must match ```\^(\d+\.)?(\d+\.)?(\*\\d+)\/``` or (number)(.number)*            |
 | `author`      | No       | For multiple authors, use comma separated values                               |
 | `license`     | No       |                                                                                |
 
@@ -66,23 +66,23 @@ tyr [OPTIONS]
 | `web`              | Yes      | The web framework you want to use              | `<None>`, `ExpressJS` |
 
 
-```json
+```javascript
 {
   projectConfigurations:
     {
-      projectName: '${project name}',
-      description: '${project description}',
-      version: '${version number}',
-      author: ['{author}'],
+      projectName: '{project name}',
+      description: '{project description}',
+      version: '{version number}',
+      author: ['author1', 'author2', ...],
       license: '{license}'
     },
   tooling:
     {
-      sourceControl: '${source control choice}',
-      web: '${web framework choice}>',
-      ci: '${ci choice}',
-      containerization: '${containerization choice}',
-      deployment: '${deployment choice}'
+      sourceControl: '{source control choice}',
+      web: '{web framework choice}',
+      ci: '{ci choice}',
+      containerization: '{containerization choice}',
+      deployment: '{deployment choice}'
     }
 }
 ```
