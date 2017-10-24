@@ -5,6 +5,12 @@ node_js:
 
 before_script:
   - npm run lint
+  
+install:
+  - npm install -g codecov
+script:
+  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - codecov
 
 notifications:
   email:
