@@ -66,6 +66,14 @@ tyr [OPTIONS]
 | `web`              | Yes      | The web framework you want to use              | `<None>`, `ExpressJS` |
 
 
+* If Source Control Choice is `<None>`, then CI Choice, Containerization Choice, and Deployment 
+Choice must also be `<None>`.
+
+* If CI Choice is `None>`, then Containerization Choice and Deployment Choice must also be `<None>`.
+
+* If Containerization Choice is `<None>`, then Deployment Choice must also be none. 
+
+### File Format
 ```javascript
 {
   projectConfigurations:
