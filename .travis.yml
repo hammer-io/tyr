@@ -22,8 +22,7 @@ jobs:
     - stage: integration tests
   include:
     - stage: integration tests
-      node_js:
-        - '6'
-        - '8'
+      node_js: '6'
+      node_js: '8'
       script: npm run integrationTests
       if: (branch = dev) AND (type IS cron)
