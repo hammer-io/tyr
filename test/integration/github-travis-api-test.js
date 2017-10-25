@@ -119,6 +119,11 @@ describe('GitHub API:', function() {
 
     // Create a token for use in testing
     await createTestToken();
+
+    console.log(`username: ${configs.username}\nprojectName: ${configs.projectName}`);
+    if (!configs.token) {
+      assert.fail('OAuth token not successfully created!');
+    }
   });
 
   after(async () => {

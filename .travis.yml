@@ -18,6 +18,9 @@ notifications:
     on_success: never
 
 jobs:
+  node_js:
+    - '6'
+    - '8'
   allow_failures:
     - stage: integration tests
   include:
