@@ -91,7 +91,8 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
  * @returns {Promise}
  */
 export function deleteGitHubToken(githubUrl, username, password) {
-  log.verbose('deleteGitHubToken');
+  log.verbose('deleting github token');
+  log.debug('deleteGitHubToken', { username });
 
   return new Promise((resolve, reject) => {
     superagent
