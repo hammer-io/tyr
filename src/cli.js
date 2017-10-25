@@ -90,16 +90,16 @@ export async function initProject(config) {
 
   const environmentVariables = [];
   // create Dockerfile and .dockerignore
-  if (config.tooling.containerization === constants.docker.name) {
-    environmentVariables.push({
-      name: 'DOCKER_USERNAME',
-      value: config.credentials.docker.username
-    });
-    environmentVariables.push({
-      name: 'DOCKER_PASSWORD',
-      value: config.credentials.docker.password
-    });
-  }
+  // if (config.tooling.containerization === constants.docker.name) {
+  //   environmentVariables.push({
+  //     name: 'DOCKER_USERNAME',
+  //     value: config.credentials.docker.username
+  //   });
+  //   environmentVariables.push({
+  //     name: 'DOCKER_PASSWORD',
+  //     value: config.credentials.docker.password
+  //   });
+  // }
 
   if (config.tooling.deployment === constants.heroku.name) {
     environmentVariables.push({
@@ -250,9 +250,8 @@ export default async function run(tyr) {
   if (tyr.logfile) {
     enableLogFile(tyr.logfile);
   }
-
+  let configs = {};
   try {
-    let configs = {};
     log.verbose('run');
     log.info(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' }));
 
@@ -275,6 +274,12 @@ export default async function run(tyr) {
     await initProject(configs);
     log.info('Successfully generated your project!');
   } catch (err) {
+    await deleteGitHubToken(
+      configs.credentials.github.url,
+      configs.credentials.github.username,
+      configs.credentials.github.password
+    );
+
     log.error('Failed to generate your project!');
   }
 }
