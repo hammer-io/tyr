@@ -18,9 +18,9 @@ notifications:
     on_success: never
 
 jobs:
+  allow_failures:
+    - stage: integration tests
   include:
-    - stage: unit tests
-      script: npm test
     - stage: integration tests
       script: npm run integrationTests
-      if: branch = dev AND type IS cron
+      if: (branch = dev) AND (type IS cron)
