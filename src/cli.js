@@ -101,7 +101,7 @@ export async function initProject(config) {
     });
     environmentVariables.push({
       name: 'HEROKU_PASSWORD',
-      value: config.credentials.heroku.password
+      value: config.credentials.heroku.apiKey
     });
   }
 
@@ -205,10 +205,10 @@ async function signInToThirdPartyTools(configs) {
     credentials.github = githubCredentials;
   }
 
-  if (configs.tooling.deployment === constants.heroku.name) {
-    const herokuCredentials = await signInToHeroku();
-    credentials.heroku = herokuCredentials;
-  }
+  // if (configs.tooling.deployment === constants.heroku.name) {
+  //   const herokuCredentials = await signInToHeroku();
+  //   credentials.heroku = herokuCredentials;
+  // }
 
   return credentials;
 }

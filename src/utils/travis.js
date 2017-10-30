@@ -20,14 +20,13 @@ export function initTravisCI(config) {
   log.verbose('initializing TravisCI');
 
   if (config.tooling.deployment === constants.heroku.name) {
-    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', 'Failed to' +
-      ' read from .travis.yml template file!'));
+    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
     const dockerBuild = `docker build -t ${config.projectConfigurations.projectName} .`;
     const dockerPs = 'docker ps -a';
     const afterSuccess =
       'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
       'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
-      `docker tag ${config.projectConfigurations.projectName} registry.heroku.com/${config.projectConfigurations.projectName}/web;\n` +
+      `docker build -t registry.heroku.com/${config.projectConfigurations.projectName}/web .;\n` +
       `docker push registry.heroku.com/${config.projectConfigurations.projectName}/web;\n` +
       'fi';
 
@@ -35,17 +34,12 @@ export function initTravisCI(config) {
     file.after_success = [afterSuccess];
     writeFile(
       `${config.projectConfigurations.projectName}/${constants.travisCI.fileName}`,
-      yaml.safeDump(file, { lineWidth: 100 }),
-      'Failed to write to .travis.yml'
+      yaml.safeDump(file, { lineWidth: 100 })
     );
   } else {
     writeFile(
       `${config.projectConfigurations.projectName}/${constants.travisCI.fileName}`,
-      loadTemplate(
-        './../../templates/travis/.travis.yml',
-        'Failed to read from .travis.yml template file',
-        'Failed to write to .travis.yml'
-      )
+      loadTemplate('./../../templates/travis/.travis.yml')
     );
   }
 }
