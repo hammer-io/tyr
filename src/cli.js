@@ -205,10 +205,10 @@ async function signInToThirdPartyTools(configs) {
     credentials.github = githubCredentials;
   }
 
-  // if (configs.tooling.deployment === constants.heroku.name) {
-  //   const herokuCredentials = await signInToHeroku();
-  //   credentials.heroku = herokuCredentials;
-  // }
+  if (configs.tooling.deployment === constants.heroku.name) {
+    const herokuCredentials = await signInToHeroku();
+    credentials.heroku = herokuCredentials;
+  }
 
   return credentials;
 }

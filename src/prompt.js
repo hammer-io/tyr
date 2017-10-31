@@ -199,8 +199,19 @@ export async function promptForHerokuCredentials() {
       return true;
     }
   }, {
+    name: 'password',
+    type: 'password',
+    message: 'Heroku Password:',
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return 'Heroku password cannot be blank!';
+      }
+
+      return true;
+    }
+  }, {
     name: 'apiKey',
-    type: 'apiKey',
+    type: 'password',
     message: 'Heroku API Key:',
     validate: (value) => {
       if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
