@@ -78,8 +78,7 @@ export async function initProject(config) {
   }
 
   const environmentVariables = [];
-  // create Dockerfile and .dockerignore
-  if (config.tooling.container === constants.docker.name) {
+  if (config.tooling.containerization === constants.docker.name) {
     environmentVariables.push({
       name: 'DOCKER_USERNAME',
       value: config.credentials.docker.username
