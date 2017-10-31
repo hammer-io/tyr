@@ -78,16 +78,16 @@ export async function initProject(config) {
   }
 
   const environmentVariables = [];
-  if (config.tooling.containerization === constants.docker.name) {
-    environmentVariables.push({
-      name: 'DOCKER_USERNAME',
-      value: config.credentials.docker.username
-    });
-    environmentVariables.push({
-      name: 'DOCKER_PASSWORD',
-      value: config.credentials.docker.password
-    });
-  }
+  // if (config.tooling.containerization === constants.docker.name) {
+  //   environmentVariables.push({
+  //     name: 'DOCKER_USERNAME',
+  //     value: config.credentials.docker.username
+  //   });
+  //   environmentVariables.push({
+  //     name: 'DOCKER_PASSWORD',
+  //     value: config.credentials.docker.password
+  //   });
+  // }
 
   if (config.tooling.deployment === constants.heroku.name) {
     environmentVariables.push({
