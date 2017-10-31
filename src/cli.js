@@ -48,7 +48,7 @@ export async function generateProjectFiles(config) {
     }
 
     // create Dockerfile and .dockerignore
-    if (config.tooling.container === constants.docker.name) {
+    if (config.tooling.containerization === constants.docker.name) {
       await utils.docker.initDocker(config.projectConfigurations);
     }
   }

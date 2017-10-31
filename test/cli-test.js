@@ -21,7 +21,7 @@ const configs = {
   tooling: {
     sourceControl: 'GitHub',
     ci: 'TravisCI',
-    container: 'Docker'
+    containerization: 'Docker'
   }
 
 };
