@@ -20,7 +20,9 @@ export function initTravisCI(config) {
   log.verbose('initializing TravisCI');
 
   if (config.tooling.deployment === constants.heroku.name) {
-    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
+    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml', 'Failed to' +
+      ' read from .travis.yml template file!'));
+    const docker = 'docker';
     const dockerBuild = `docker build -t ${config.projectConfigurations.projectName} .`;
     const dockerPs = 'docker ps -a';
     const afterSuccess =
@@ -30,6 +32,7 @@ export function initTravisCI(config) {
       `docker push registry.heroku.com/${config.projectConfigurations.projectName}/web;\n` +
       'fi';
 
+    file.services = [docker];
     file.before_install = [dockerBuild, dockerPs];
     file.after_success = [afterSuccess];
     writeFile(

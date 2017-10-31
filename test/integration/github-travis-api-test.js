@@ -8,18 +8,17 @@ import {
   createGitHubRepository,
   listUserRepositories,
   deleteRepository
-} from '../src/clients/github';
+} from '../../dist/clients/github';
 import {
   enableTravisOnProject
-} from '../src/utils/travis';
+} from '../../dist/utils/travis';
 import {
   fetchRepository,
   listEnvironmentVariables
-} from '../src/clients/travis';
-import { setActiveLogger } from '../src/utils/winston';
+} from '../../dist/clients/travis';
 
 // You need to fill in these credentials before running the tests
-const credentialsFilename = 'github-test-credentials.txt';
+const credentialsFilename = '../github-test-credentials.txt';
 
 // These get filled and used dynamically
 const configs = {
@@ -115,20 +114,19 @@ describe('GitHub API:', function() {
   this.timeout(10000);
 
   before(async () => {
-    // Enable 'verbose' level logging
-    setActiveLogger('verbose');
-
     // Load credentials
     await loadCredentials(credentialsFilename);
 
     // Create a token for use in testing
     await createTestToken();
+
+    console.log(`username: ${configs.username}\nprojectName: ${configs.projectName}`);
+    if (!configs.token) {
+      assert.fail('OAuth token not successfully created!');
+    }
   });
 
   after(async () => {
-    // Disable 'debug' level logging
-    setActiveLogger('info');
-
     // Delete the test token
     if (configs.authUrl) {
       await deleteGitHubToken(configs.authUrl, configs.username, configs.password);
@@ -140,70 +138,69 @@ describe('GitHub API:', function() {
     assert.ok(configs.authUrl, 'The response should include a url!');
   });
 
-  it('Should be able to create and delete a new GitHub repository', async () => {
+  it('Should be able to create and delete a new GitHub repository', (done) => {
     // Create the repo
-    await createGitHubRepository(configs.projectName, configs.description, configs.token);
+    createGitHubRepository(configs.projectName, configs.description, configs.token).then(() => {
+      // List all repos fro the user account, and assert that the new repo is in the list
+      listUserRepositories(configs.token).then((repos) => {
+        const expectedFullName = `${configs.username}/${configs.projectName}`;
+        let isCreated = false;
+        repos.body.forEach((repo) => {
+          if (repo.full_name === expectedFullName) {
+            isCreated = true;
+          }
+        });
+        assert.equal(isCreated, true, 'The repository was not successfully created and/or listed!');
 
-    // List all repos fro the user account, and assert that the new repo is in the list
-    const repos = await listUserRepositories(configs.token);
-    const expectedFullName = `${configs.username}/${configs.projectName}`;
-    let isCreated = false;
-    repos.body.forEach((repo) => {
-      if (repo.full_name === expectedFullName) {
-        isCreated = true;
-      }
+        deleteRepository(configs.projectName, configs.username, configs.password).then(() => {
+          // The test is now complete
+          done();
+        });
+      })
     });
-    assert.equal(isCreated, true, 'The repository was not successfully created and/or listed!');
-
-    // Delete the new repository
-    await deleteRepository(configs.projectName, configs.username, configs.password);
   });
 
-  it('Should be able to enable TravisCI on a GitHub repository with environment variables', async function() {
+  it('Should be able to enable TravisCI on a GitHub repository with environment variables', function(done) {
     // Lengthen the timeout, since it could take a while to sync Travis
     this.timeout(120 * 1000);
 
     // Create the repo
-    await createGitHubRepository(configs.projectName, configs.description, configs.token);
+    createGitHubRepository(configs.projectName, configs.description, configs.token).then(() => {
+      // Enable TravisCI on the new repository, and fetch info for assertion
+      const environmentVariables = [
+        {
+          name: 'MEANING_OF_LIFE',
+          value: '42'
+        },
+        {
+          name: 'HOLMGANG',
+          value: 'A Viking trial-by-combat',
+          public: true
+        }
+      ];
 
-    // Enable TravisCI on the new repository, and fetch info for assertion
-    const environmentVariables = [
-      {
-        name: 'MEANING_OF_LIFE',
-        value: '42'
-      },
-      {
-        name: 'HOLMGANG',
-        value: 'A Viking trial-by-combat',
-        public: true
-      }
-    ];
-    let travisToken, repo, envVarsRetrieved;
-    try {
-      travisToken = await enableTravisOnProject(
-        configs.token,
-        configs.username,
-        configs.projectName,
-        environmentVariables
-      );
-      repo = await fetchRepository(travisToken, configs.username, configs.projectName);
-      envVarsRetrieved = await listEnvironmentVariables(travisToken, repo.id);
-    } finally {
-      // Delete the repository
-      await deleteRepository(configs.projectName, configs.username, configs.password);
-    }
+      enableTravisOnProject(configs.token, configs.username, configs.projectName, environmentVariables).then((travisToken) => {
+        fetchRepository(travisToken, configs.username, configs.projectName).then((repo) => {
+          listEnvironmentVariables(travisToken, repo.id).then((envVarsRetrieved) => {
+            deleteRepository(configs.projectName, configs.username, configs.password).then(() => {
+              // Verify it was initialized
+              const expectedSlug = `${configs.username}/${configs.projectName}`;
+              assert.equal(repo.slug, expectedSlug);
 
-    // Verify it was initialized
-    const expectedSlug = `${configs.username}/${configs.projectName}`;
-    assert.equal(repo.slug, expectedSlug);
+              // Verify the environment variables were properly set
+              for (let i = 0; i < environmentVariables.length; i++) {
+                assert.equal(envVarsRetrieved[i].name, environmentVariables[i].name);
+                const expectedValue = (environmentVariables[i].public) ? environmentVariables[i].value : null;
+                assert.equal(envVarsRetrieved[i].value, expectedValue);
+                assert.equal(envVarsRetrieved[i].public, (environmentVariables[i].public || false));
+              }
 
-    // Verify the environment variables were properly set
-    for (let i = 0; i < environmentVariables.length; i++) {
-      assert.equal(envVarsRetrieved[i].name, environmentVariables[i].name);
-      const expectedValue = (environmentVariables[i].public) ? environmentVariables[i].value : null;
-      assert.equal(envVarsRetrieved[i].value, expectedValue);
-      assert.equal(envVarsRetrieved[i].public, (environmentVariables[i].public || false));
-    }
+              // The test is now complete
+              done();
+            });
+          });
+        });
+      });
+    });
   });
-
 });
