@@ -3,17 +3,11 @@ export default {
   docker: {
     name: 'Docker',
     dockerFile: {
-      fileName: 'Dockerfile',
-      error: {
-        fileWrite: 'Failed to write Dockerfile!'
-      }
+      fileName: 'Dockerfile'
     },
 
     dockerIgnore: {
-      fileName: '.dockerignore',
-      error: {
-        fileWrite: 'Failed to write .dockerignore!'
-      }
+      fileName: '.dockerignore'
     }
   },
 
@@ -37,16 +31,10 @@ export default {
     name: 'ExpressJS',
     version: '4.16.0',
     index: {
-      fileName: 'index.js',
-      error: {
-        fileWrite: 'Failed to write express index.js!'
-      }
+      fileName: 'index.js'
     },
     routes: {
-      fileName: 'routes.js',
-      error: {
-        fileWrite: 'Failed to write express route.js!'
-      }
+      fileName: 'routes.js'
     }
   },
 
