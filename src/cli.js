@@ -136,8 +136,6 @@ export async function initProject(config) {
       config.credentials.github.username,
       config.credentials.github.password
     );
-
-    log.info('Successfully deleted github token');
   } else {
     log.warn('Could not delete GitHub token since you are using two factor authentication.' +
       ' Please visit https://github.com/settings/tokens to manually delete your token.');
@@ -179,7 +177,6 @@ async function signInToGithub() {
       );
   }
 
-  log.info('Successfully logged into GitHub!');
   return finalCredentials;
 }
 
@@ -274,12 +271,12 @@ export default async function run(tyr) {
     await initProject(configs);
     log.info('Successfully generated your project!');
   } catch (err) {
+    log.error('Failed to generate your project!', err);
+  } finally {
     await deleteGitHubToken(
       configs.credentials.github.url,
       configs.credentials.github.username,
       configs.credentials.github.password
     );
-
-    log.error('Failed to generate your project!');
   }
 }

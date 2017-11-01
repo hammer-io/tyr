@@ -14,23 +14,52 @@ const log = getActiveLogger();
  * @returns {Error}
  */
 function filterErrorResponse(err) {
+  const filteredError = new Error();
   if (err && err.response) {
     // GitHub API response.text returns a stringified JSON that needs to be parsed
-    const filteredError = {
-      status: err.response.status,
-      text: JSON.parse(err.response.text),
-      req: {}
-    };
+    filteredError.status = err.response.status;
+    filteredError.text = err.response.text;
+    filteredError.req = {};
     if (err.response.req) {
-      filteredError.req = {
-        method: err.response.req.method,
-        url: err.response.req.url
-      };
+      filteredError.req.method = err.response.req.method;
+      filteredError.req.url = err.response.req.url;
     }
-    return new Error(JSON.stringify(filteredError));
+    return filteredError;
   }
-
   return err;
+}
+
+/**
+ * Delete GitHub OAuth token.
+ *
+ * @param githubUrl
+ * @param username
+ * @param password
+ * @returns {Promise}
+ */
+export async function deleteGitHubToken(githubUrl, username, password) {
+  log.verbose('deleting github token');
+  log.debug('deleteGitHubToken', { username });
+
+  if (githubUrl) {
+    return new Promise((resolve, reject) => {
+      superagent
+        .delete(githubUrl)
+        .set({Authorization: authorizationUtil.basicAuthorization(username, password)})
+        .end((err) => {
+          if (err) {
+            if (err.response.status !== 404) {
+              console.log('Already deleted');
+              reject(filterErrorResponse(err));
+            }
+          } else {
+            log.info('Successfully deleted github token');
+            resolve();
+          }
+        });
+    });
+  }
+  return undefined;
 }
 
 /**
@@ -43,7 +72,7 @@ function filterErrorResponse(err) {
  *                 will be null or their two factor authentication has not been
  *                 provided.
  * @param note the remark assigned to the given token in the user's GitHub account
- * @returns github token information if successful, error information otherwise
+ * @returns Promise github token information if successful, error information otherwise
  */
 export function requestGitHubToken(username, password, otpCode, note = 'hammer-io token') {
   log.verbose('requestGitHubToken', username);
@@ -76,37 +105,14 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
       if (err) {
         reject(filterErrorResponse(err));
       } else {
+        // do something when app is closing
+
         resolve({ token: res.body.token, url: res.body.url });
       }
     });
   });
 }
 
-/**
- * Delete GitHub OAuth token.
- *
- * @param githubUrl
- * @param username
- * @param password
- * @returns {Promise}
- */
-export function deleteGitHubToken(githubUrl, username, password) {
-  log.verbose('deleting github token');
-  log.debug('deleteGitHubToken', { username });
-
-  return new Promise((resolve, reject) => {
-    superagent
-      .delete(githubUrl)
-      .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
-      .end((err) => {
-        if (err) {
-          reject(filterErrorResponse(err));
-        } else {
-          resolve();
-        }
-      });
-  });
-}
 
 /**
  * Initialize an empty repository within a git repo, add the gitignore, and the rest of the files.
