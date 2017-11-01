@@ -45,7 +45,7 @@ export async function deleteGitHubToken(githubUrl, username, password) {
     return new Promise((resolve, reject) => {
       superagent
         .delete(githubUrl)
-        .set({Authorization: authorizationUtil.basicAuthorization(username, password)})
+        .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
         .end((err) => {
           if (err) {
             if (err.response.status !== 404) {
