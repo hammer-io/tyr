@@ -80,9 +80,9 @@ export async function initProject(config) {
     return;
   }
 
-  // create github repository and push files
+  // create github repository
   if (config.tooling.sourceControl === constants.github.name) {
-    await utils.git.setupGitHub(
+    await utils.git.createGithubRepo(
       config.projectConfigurations.projectName,
       config.projectConfigurations.description,
       config.credentials.github
@@ -90,6 +90,10 @@ export async function initProject(config) {
   }
 
   const environmentVariables = [];
+
+  // Docker Hub credentials
+  // May come in handy later
+
   // if (config.tooling.containerization === constants.docker.name) {
   //   environmentVariables.push({
   //     name: 'DOCKER_USERNAME',
@@ -128,6 +132,14 @@ export async function initProject(config) {
     } catch (err) {
       log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
+  }
+
+  // push files to github
+  if (config.tooling.sourceControl === constants.github.name) {
+    await utils.git.commitAndPush(
+      config.projectConfigurations.projectName,
+      config.credentials.github
+    );
   }
 
   if (!config.credentials.github.isTwoFactorAuth) {

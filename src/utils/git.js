@@ -108,21 +108,32 @@ export async function signIntoGithub(username, password) {
 }
 
 /**
- * Setups up a GitHub repo, by requesting a GitHub token, creating a .gitignore,
- * and initializing the local and remote repository
+ * Setups up a GitHub repo, by requesting a GitHub token
  *
  * @param projectName
  * @param projectDescription
- * @param username
- * @param password
+ * @param credentials
  */
-export async function setupGitHub(projectName, projectDescription, credentials) {
-  log.verbose('setting up github', credentials.username);
-
+export async function createGithubRepo(projectName, projectDescription, credentials) {
+  log.verbose('creating repo on Github', credentials.username);
   try {
     await createGitHubRepository(projectName, projectDescription, credentials.token);
+  } catch (err) {
+    log.error('failed to create github repo', err);
+  }
+}
+
+/**
+ * Initialize local and remote repositories
+ *
+ * @param projectName
+ * @param credentials
+ */
+export async function commitAndPush(projectName, credentials) {
+  log.verbose('creating repo on Github', credentials.username);
+  try {
     await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
   } catch (err) {
-    log.error('failed to set up github', err);
+    log.error('failed to set up local git and push files', err);
   }
 }
