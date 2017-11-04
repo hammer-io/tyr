@@ -8,7 +8,7 @@ import * as prompt from './prompt';
 import constants from './constants/constants';
 import { deleteGitHubToken } from './clients/github';
 import { getActiveLogger, enableLogFile } from './utils/winston';
-import deplomentChoices from './constants/deployment-choices'
+import deplomentChoices from './constants/deployment-choices';
 
 const log = getActiveLogger();
 
