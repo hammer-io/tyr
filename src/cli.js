@@ -8,6 +8,7 @@ import * as prompt from './prompt';
 import constants from './constants/constants';
 import { deleteGitHubToken } from './clients/github';
 import { getActiveLogger, enableLogFile } from './utils/winston';
+import deplomentChoices from './constants/deployment-choices'
 
 const log = getActiveLogger();
 
@@ -191,8 +192,9 @@ async function signInToGithub() {
  *  password: 'somethingsomething'
  * }
  */
-async function signInToHeroku() {
+async function setupHeroku(configs) {
   log.info('Please login to Heroku: ');
+  let disableHeroku = false;
   let herokuCredentials = await prompt.promptForHerokuCredentials();
   let credentials =
     await utils.heroku.signInToHeroku(
@@ -213,7 +215,30 @@ async function signInToHeroku() {
   }
 
   log.info('Successfully logged into Heroku!');
-  return herokuCredentials;
+  // Create the app on Heroku
+  let appName = await utils.heroku.createApp(
+    configs.projectConfigurations.projectName,
+    herokuCredentials.apiKey
+  );
+
+  if (appName && appName.includes('Delete some apps or add a credit card to verify your account.')) {
+    log.info('You\\\'ve reached the limit of 5 apps for unverified accounts. Delete some apps or add a credit card to verify your account.');
+    disableHeroku = true;
+    return {
+      herokuCredentials,
+      appName: configs.projectConfigurations.projectName,
+      disableHeroku
+    };
+  }
+
+  while (appName && appName.includes('Name is already taken')) {
+    log.error('Project name not available on Heroku!! Pick a different project name');
+    const response = await prompt.promptForNewProjectName();
+    appName = await utils.heroku.createApp(response.projectName, herokuCredentials.apiKey);
+  }
+  log.info('Successfully created app on Heroku!');
+
+  return { herokuCredentials, appName, disableHeroku };
 }
 
 /**
@@ -223,17 +248,22 @@ async function signInToHeroku() {
  */
 async function signInToThirdPartyTools(configs) {
   const credentials = {};
+  let herokuConfigs = {};
+  const toolOptions = {};
   if (configs.tooling.sourceControl === constants.github.name) {
     const githubCredentials = await signInToGithub();
     credentials.github = githubCredentials;
   }
 
   if (configs.tooling.deployment === constants.heroku.name) {
-    const herokuCredentials = await signInToHeroku();
-    credentials.heroku = herokuCredentials;
+    herokuConfigs = await setupHeroku(configs);
+    credentials.heroku = herokuConfigs.herokuCredentials;
+    toolOptions.appName = herokuConfigs.appName;
+    toolOptions.disableHeroku = herokuConfigs.disableHeroku;
   }
 
-  return credentials;
+  toolOptions.credentials = credentials;
+  return toolOptions;
 }
 
 /**
@@ -267,8 +297,14 @@ export default async function run(tyr) {
     }
 
     // sign in to third party tools
-    const credentials = await signInToThirdPartyTools(configs);
-    configs.credentials = credentials;
+    const toolConfigs = await signInToThirdPartyTools(configs);
+    configs.credentials = toolConfigs.credentials;
+    if (configs.tooling.deployment === constants.heroku.name) {
+      configs.projectConfigurations.projectName = toolConfigs.appName;
+      if (toolConfigs.disableHeroku) {
+        configs.tooling.deployment = deplomentChoices.none;
+      }
+    }
 
     // initialize the basic project files
     await initProject(configs);

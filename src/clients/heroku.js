@@ -15,7 +15,6 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
  *
  * @returns token information if successful, otherwise the error
  */
-// eslint-disable-next-line import/prefer-default-export
 export function requestHerokuToken(email, password) {
   log.debug('requestHerokuToken', email);
   log.verbose('requesting heroku token', password);
@@ -27,8 +26,32 @@ export function requestHerokuToken(email, password) {
         Authorization:
           authorizationUtil.basicAuthorization(email, password),
         'Content-Type': 'application/json',
-        scopes: ['identity', 'read']
+        scopes: ['identity', 'read', 'write']
       })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+export function createApp(name, apiKey) {
+  log.debug('createApp', name);
+  log.debug('createApp', apiKey);
+  return new Promise((resolve, reject) => {
+    superagent
+      .post(`${herokuApiUrl}/apps`)
+      .set({
+        Accept: herokuApiAccept,
+        Authorization:
+          authorizationUtil.bearerAuthorization(apiKey),
+        'Content-Type': 'application/json',
+        scopes: ['write']
+      })
+      .send({ name })
       .end((err, res) => {
         if (err) {
           reject(err);
