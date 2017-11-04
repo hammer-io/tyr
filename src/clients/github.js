@@ -105,8 +105,6 @@ export function requestGitHubToken(username, password, otpCode, note = 'hammer-i
       if (err) {
         reject(filterErrorResponse(err));
       } else {
-        // do something when app is closing
-
         resolve({ token: res.body.token, url: res.body.url });
       }
     });

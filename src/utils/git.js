@@ -101,8 +101,7 @@ export async function signIntoGithub(username, password) {
       // the user's request could not be authenticated, so return false.
       return false;
     } else if (err.status === 422) {
-      log.error('A github token has already been created.  Please go to GitHub and delete the hammer-to token' +
-        ' under Settings -> Developer Settings -> Personal Access Tokens -> Delete hammer-io token.');
+      log.error('A github token has already been created.  Please go to https://github.com/settings/tokens and delete hammer-io token.');
     } else {
       // something bad has happened if we get here.
       log.error('failed to sign in to github', err);
