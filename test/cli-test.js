@@ -319,7 +319,7 @@ describe('Initialize Project Files With Heroku', () => {
         '  - |-\n' +
         '    if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
         '    docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
-        '    docker tag jack registry.heroku.com/jack/web;\n' +
+        '    docker build -t registry.heroku.com/jack/web .;\n' +
         '    docker push registry.heroku.com/jack/web;\n' +
         '    fi\n';
       const actualContents = fs.readFileSync(`${configs3.projectConfigurations.projectName}/.travis.yml`, 'utf-8');
