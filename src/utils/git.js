@@ -72,6 +72,7 @@ export async function signIntoGithub(username, password) {
     credentials.token = token.token;
     credentials.url = token.url;
     credentials.isTwoFactorAuth = false;
+    log.info('Successfully logged into GitHub!');
     return credentials;
   } catch (err) {
     // if the above call was not successful, we will end up here...
@@ -91,6 +92,7 @@ export async function signIntoGithub(username, password) {
         credentials.token = token.token;
         credentials.url = token.url;
         credentials.isTwoFactorAuth = true;
+        log.info('Successfully logged into GitHub!');
         return credentials;
       } catch (error) {
         log.error('failed to sign into github', error);
@@ -98,23 +100,31 @@ export async function signIntoGithub(username, password) {
     } else if (err.status === 401) {
       // the user's request could not be authenticated, so return false.
       return false;
+    } else if (err.status === 422) {
+      log.error('A github token has already been created.  Please go to https://github.com/settings/tokens and delete hammer-io token.');
     } else {
       // something bad has happened if we get here.
       log.error('failed to sign in to github', err);
     }
   }
-
   return credentials;
 }
 
 /**
  * Setups up a GitHub repo, by requesting a GitHub token, creating a .gitignore,
- * and initializing the local and remote repository
+ * and initializing the local and remote repository. If github cannot be setup,
+ * a message will be printed to the user alerting them the github repo was not
+ * setup.
  *
  * @param projectName
  * @param projectDescription
- * @param username
- * @param password
+ * @param credentials
+ *  {
+ *      username: 'username',
+ *      password: 'password',
+ *      token: 'token',
+ *      isTwoFactorAuth: false
+ *  }
  */
 export async function setupGitHub(projectName, projectDescription, credentials) {
   log.verbose('setting up github', credentials.username);
@@ -122,6 +132,7 @@ export async function setupGitHub(projectName, projectDescription, credentials) 
   try {
     await createGitHubRepository(projectName, projectDescription, credentials.token);
     await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
+    log.info('Successfully setup GitHub');
   } catch (err) {
     log.error('failed to set up github', err);
   }

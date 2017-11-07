@@ -5,9 +5,10 @@ import {
 } from '../dist/utils/file';
 
 // Tests need to import transpiled files that will be located in dist/ rather than src/
-import { initProject, isUserFinishedWithPrereqs } from '../dist/cli'
+import { isUserFinishedWithPrereqs } from '../dist/cli'
 import constants from '../dist/constants/constants';
 import { generateProjectFiles } from '../dist/cli';
+import {deleteGitHubToken} from '../src/clients/github';
 
 const configs = {
   projectConfigurations: {

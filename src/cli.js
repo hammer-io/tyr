@@ -90,16 +90,16 @@ export async function initProject(config) {
 
   const environmentVariables = [];
   // create Dockerfile and .dockerignore
-  if (config.tooling.containerization === constants.docker.name) {
-    environmentVariables.push({
-      name: 'DOCKER_USERNAME',
-      value: config.credentials.docker.username
-    });
-    environmentVariables.push({
-      name: 'DOCKER_PASSWORD',
-      value: config.credentials.docker.password
-    });
-  }
+  // if (config.tooling.containerization === constants.docker.name) {
+  //   environmentVariables.push({
+  //     name: 'DOCKER_USERNAME',
+  //     value: config.credentials.docker.username
+  //   });
+  //   environmentVariables.push({
+  //     name: 'DOCKER_PASSWORD',
+  //     value: config.credentials.docker.password
+  //   });
+  // }
 
   if (config.tooling.deployment === constants.heroku.name) {
     environmentVariables.push({
@@ -128,19 +128,6 @@ export async function initProject(config) {
     } catch (err) {
       log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
-  }
-
-  if (!config.credentials.github.isTwoFactorAuth) {
-    await deleteGitHubToken(
-      config.credentials.github.url,
-      config.credentials.github.username,
-      config.credentials.github.password
-    );
-
-    log.info('Successfully deleted github token');
-  } else {
-    log.warn('Could not delete GitHub token since you are using two factor authentication.' +
-      ' Please visit https://github.com/settings/tokens to manually delete your token.');
   }
 
   // run npm install on project
@@ -179,7 +166,6 @@ async function signInToGithub() {
       );
   }
 
-  log.info('Successfully logged into GitHub!');
   return finalCredentials;
 }
 
@@ -250,9 +236,8 @@ export default async function run(tyr) {
   if (tyr.logfile) {
     enableLogFile(tyr.logfile);
   }
-
+  let configs = {};
   try {
-    let configs = {};
     log.verbose('run');
     log.info(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' }));
 
@@ -275,6 +260,12 @@ export default async function run(tyr) {
     await initProject(configs);
     log.info('Successfully generated your project!');
   } catch (err) {
-    log.error('Failed to generate your project!');
+    log.error('Failed to generate your project!', err);
+  } finally {
+    await deleteGitHubToken(
+      configs.credentials.github.url,
+      configs.credentials.github.username,
+      configs.credentials.github.password
+    );
   }
 }
