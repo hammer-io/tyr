@@ -130,17 +130,6 @@ export async function initProject(config) {
     }
   }
 
-  if (!config.credentials.github.isTwoFactorAuth) {
-    await deleteGitHubToken(
-      config.credentials.github.url,
-      config.credentials.github.username,
-      config.credentials.github.password
-    );
-  } else {
-    log.warn('Could not delete GitHub token since you are using two factor authentication.' +
-      ' Please visit https://github.com/settings/tokens to manually delete your token.');
-  }
-
   // run npm install on project
   utils.npm.npmInstall(`${config.projectConfigurations.projectName}`);
 }

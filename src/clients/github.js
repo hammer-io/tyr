@@ -49,8 +49,9 @@ export async function deleteGitHubToken(githubUrl, username, password) {
         .end((err) => {
           if (err) {
             if (err.response.status !== 404) {
-              console.log('Already deleted');
               reject(filterErrorResponse(err));
+            } else {
+              resolve();
             }
           } else {
             log.info('Successfully deleted github token');
