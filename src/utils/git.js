@@ -72,6 +72,7 @@ export async function signIntoGithub(username, password) {
     credentials.token = token.token;
     credentials.url = token.url;
     credentials.isTwoFactorAuth = false;
+    log.info('Successfully logged into GitHub!');
     return credentials;
   } catch (err) {
     // if the above call was not successful, we will end up here...
@@ -91,6 +92,7 @@ export async function signIntoGithub(username, password) {
         credentials.token = token.token;
         credentials.url = token.url;
         credentials.isTwoFactorAuth = true;
+        log.info('Successfully logged into GitHub!');
         return credentials;
       } catch (error) {
         log.error('failed to sign into github', error);
@@ -98,6 +100,8 @@ export async function signIntoGithub(username, password) {
     } else if (err.status === 401) {
       // the user's request could not be authenticated, so return false.
       return false;
+    } else if (err.status === 422) {
+      log.error('A github token has already been created.  Please go to https://github.com/settings/tokens and delete hammer-io token.');
     } else {
       // something bad has happened if we get here.
       log.error('failed to sign in to github', err);
@@ -133,6 +137,7 @@ export async function commitAndPush(projectName, credentials) {
   log.verbose('creating repo on Github', credentials.username);
   try {
     await initAddCommitAndPush(credentials.username, projectName, credentials.isTwoFactorAuth);
+    log.info('Successfully setup GitHub');
   } catch (err) {
     log.error('failed to set up local git and push files', err);
   }
