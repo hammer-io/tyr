@@ -27,9 +27,8 @@ Before you can use Tyr, you need to make sure you've done the following:
 
 1. Create a [GitHub](https://github.com/) account. At this current stage of development,
    GitHub is the default version control platform for storing and managing your code.
-2. Create a [Docker Hub](https://hub.docker.com/) account. Docker is used to create a
-   container for the application for deployment, and Docker Hub is used in the process
-   of deploying the app container.
+2. Create a [Heroku](https://signup.heroku.com/) account. At this current stage of development, Heroku is the default web hosting service. 
+3. After creating a Heroku account, find your API key [here](https://dashboard.heroku.com/account). Make sure to copy it as you'll need it to sign in to Heroku. 
 
 ### Installation
 
@@ -72,7 +71,7 @@ tyr [OPTIONS]
 * If Source Control Choice is `<None>`, then CI Choice, Containerization Choice, and Deployment 
 Choice must also be `<None>`.
 
-* If CI Choice is `None>`, then Containerization Choice and Deployment Choice must also be `<None>`.
+* If CI Choice is `<None>`, then Containerization Choice and Deployment Choice must also be `<None>`.
 
 * If Containerization Choice is `<None>`, then Deployment Choice must also be none. 
 
