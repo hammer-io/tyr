@@ -119,7 +119,7 @@ export async function signIntoGithub(username, password) {
  * @param credentials
  */
 export async function createGithubRepo(projectName, projectDescription, credentials) {
-  log.verbose('creating repo on Github', credentials.username);
+  log.verbose('creating repo on Github', credentials);
   try {
     await createGitHubRepository(projectName, projectDescription, credentials.token);
     return true;

@@ -17,7 +17,6 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
  */
 export function requestHerokuToken(email, password) {
   log.debug('requestHerokuToken', email);
-  log.verbose('requesting heroku token', password);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/oauth/authorizations`)
@@ -40,7 +39,6 @@ export function requestHerokuToken(email, password) {
 
 export function createApp(name, apiKey) {
   log.debug('createApp', name);
-  log.debug('createApp', apiKey);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/apps`)
