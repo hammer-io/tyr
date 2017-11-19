@@ -19,6 +19,11 @@ function filterErrorResponse(err) {
     // GitHub API response.text returns a stringified JSON that needs to be parsed
     filteredError.status = err.response.status;
     filteredError.text = err.response.text;
+    filteredError.response = {};
+    filteredError.response.headers = {};
+    if (err.response.headers['x-github-otp'] !== 'undefined') {
+      filteredError.response.headers = { 'x-github-otp': err.response.headers['x-github-otp'] };
+    }
     filteredError.req = {};
     if (err.response.req) {
       filteredError.req.method = err.response.req.method;
