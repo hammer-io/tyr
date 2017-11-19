@@ -1,10 +1,72 @@
 import superagent from 'superagent';
-import winston from 'winston';
-import chalk from 'chalk';
 import * as authorizationUtil from './../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
 const githubApiUrl = 'https://api.github.com';
 const git = require('simple-git');
+
+const log = getActiveLogger();
+
+/**
+ * Filters out sensitive header information (such as authentication headers or post data)
+ *
+ * @param err
+ * @returns {Error}
+ */
+function filterErrorResponse(err) {
+  const filteredError = new Error();
+  if (err && err.response) {
+    // GitHub API response.text returns a stringified JSON that needs to be parsed
+    filteredError.status = err.response.status;
+    filteredError.text = err.response.text;
+    filteredError.response = {};
+    filteredError.response.headers = {};
+    if (err.response.headers['x-github-otp'] !== 'undefined') {
+      filteredError.response.headers = { 'x-github-otp': err.response.headers['x-github-otp'] };
+    }
+    filteredError.req = {};
+    if (err.response.req) {
+      filteredError.req.method = err.response.req.method;
+      filteredError.req.url = err.response.req.url;
+    }
+    return filteredError;
+  }
+  return err;
+}
+
+/**
+ * Delete GitHub OAuth token.
+ *
+ * @param githubUrl
+ * @param username
+ * @param password
+ * @returns {Promise}
+ */
+export async function deleteGitHubToken(githubUrl, username, password) {
+  log.verbose('deleting github token');
+  log.debug('deleteGitHubToken', { username });
+
+  if (githubUrl) {
+    return new Promise((resolve, reject) => {
+      superagent
+        .delete(githubUrl)
+        .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
+        .end((err) => {
+          if (err) {
+            if (err.response.status !== 404) {
+              reject(filterErrorResponse(err));
+            } else {
+              resolve();
+            }
+          } else {
+            log.info('Successfully deleted github token');
+            resolve();
+          }
+        });
+    });
+  }
+  return undefined;
+}
 
 /**
  * Request GitHub OAuth token.
@@ -15,10 +77,11 @@ const git = require('simple-git');
  *                  If user does not use two factor authentication, otpCode
  *                 will be null or their two factor authentication has not been
  *                 provided.
- * @returns github token information if successful, error information otherwise
+ * @param note the remark assigned to the given token in the user's GitHub account
+ * @returns Promise github token information if successful, error information otherwise
  */
-export function requestGitHubToken(username, password, otpCode) {
-  winston.log('verbose', 'requestGitHubToken', username);
+export function requestGitHubToken(username, password, otpCode, note = 'hammer-io token') {
+  log.verbose('requestGitHubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -27,7 +90,7 @@ export function requestGitHubToken(username, password, otpCode) {
         'repo:status', 'public_repo', 'write:repo_hook',
         'user', 'repo'
       ],
-      note: 'hammer-io token'
+      note
     });
 
   // if the user is using
@@ -46,7 +109,7 @@ export function requestGitHubToken(username, password, otpCode) {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     request.end((err, res) => {
       if (err) {
-        reject(err);
+        reject(filterErrorResponse(err));
       } else {
         resolve({ token: res.body.token, url: res.body.url });
       }
@@ -54,30 +117,6 @@ export function requestGitHubToken(username, password, otpCode) {
   });
 }
 
-/**
- * Delete GitHub OAuth token.
- *
- * @param githubUrl
- * @param username
- * @param password
- * @returns {Promise}
- */
-export function deleteGitHubToken(githubUrl, token) {
-  winston.log('verbose', 'deleteGitHubToken');
-
-  return new Promise((resolve, reject) => {
-    superagent
-      .delete(githubUrl)
-      .set({ Authorization: authorizationUtil.tokenAuthorization(token) })
-      .end((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-  });
-}
 
 /**
  * Initialize an empty repository within a git repo, add the gitignore, and the rest of the files.
@@ -85,12 +124,11 @@ export function deleteGitHubToken(githubUrl, token) {
  *
  * @param projectName
  * @param projectDescription
- * @param username
- * @param password
+ * @param token
  */
 export function createGitHubRepository(projectName, projectDescription, token) {
-  winston.log('debug', 'createGitHubRepository', { projectName });
-  winston.log('verbose', 'creating github repository', { projectName });
+  log.debug('createGitHubRepository', { projectName });
+  log.verbose('creating github repository', { projectName });
 
   return new Promise((resolve, reject) => {
     superagent
@@ -105,7 +143,55 @@ export function createGitHubRepository(projectName, projectDescription, token) {
       })
       .end((err) => {
         if (err) {
-          reject(err);
+          reject(filterErrorResponse(err));
+        } else {
+          resolve();
+        }
+      });
+  });
+}
+
+/**
+ * List repositories that are accessible to the authenticated user
+ *
+ * @param token
+ */
+export function listUserRepositories(token) {
+  log.debug('listUserRepositories');
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${githubApiUrl}/user/repos`)
+      .set({
+        Authorization: authorizationUtil.tokenAuthorization(token)
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(filterErrorResponse(err));
+        } else {
+          resolve(res);
+        }
+      });
+  });
+}
+
+/**
+ * Deleting a repository requires admin access.
+ * If OAuth is used, the 'delete_repo' scope is required.
+ * That's why we're using basic auth instead.
+ */
+export function deleteRepository(repositoryName, username, password) {
+  log.debug('deleteRepository', { repositoryName });
+
+  return new Promise((resolve, reject) => {
+    superagent
+      .delete(`${githubApiUrl}/repos/${username}/${repositoryName}`)
+      .set({
+        Authorization: authorizationUtil.basicAuthorization(username, password)
+      })
+      .end((err) => {
+        if (err) {
+          reject(filterErrorResponse(err));
         } else {
           resolve();
         }
@@ -119,11 +205,12 @@ export function createGitHubRepository(projectName, projectDescription, token) {
  *
  * @param username
  * @param projectName
+ * @param isTwoFactorAuth
  */
 export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
-  winston.log('debug', 'initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
-  winston.log('verbose', 'initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
-  console.log(chalk.yellow('Pushing all files to the new git repository...'));
+  log.debug('initAddCommitAndPush', { username, projectName, isTwoFactorAuth });
+  log.verbose('initialize github repo, create repo and push to repo', { username, projectName, isTwoFactorAuth });
+  log.info('Pushing all files to the new git repository...');
 
   return new Promise((resolve) => {
     if (!isTwoFactorAuth) {
@@ -135,7 +222,7 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
         .push('origin', 'master')
         .exec(() => {
-          console.log(chalk.yellow('Please wait while files are pushed to GitHub...'));
+          log.info('Please wait while files are pushed to GitHub...');
           setTimeout(() => {
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout
@@ -146,12 +233,12 @@ export function initAddCommitAndPush(username, projectName, isTwoFactorAuth) {
         .add('.gitignore')
         .add('./*')
         .commit('Initial Commit w/ :heart: by @hammer-io.');
-      console.log(chalk.red('We cannot push hammer-io generated code to your repository because' +
+      log.warn('We cannot push hammer-io generated code to your repository because' +
       ' you have 2fa enabled. ' +
         'Please follow this link' +
         ' (https://help.github.com/articles/providing-your-2fa-authentication-code/) for' +
         ' support. Then manually add a new git remote and push your code using `git push origin' +
-        ' master`'));
+        ' master`');
       resolve();
     }
   });

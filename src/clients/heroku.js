@@ -1,8 +1,9 @@
 import superagent from 'superagent';
-import winston from 'winston';
+import { getActiveLogger } from '../utils/winston';
 
 import * as authorizationUtil from './../utils/authorization';
 
+const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';
 const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
@@ -14,10 +15,8 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
  *
  * @returns token information if successful, otherwise the error
  */
-// eslint-disable-next-line import/prefer-default-export
 export function requestHerokuToken(email, password) {
-  winston.log('debug', 'requestHerokuToken', email);
-  winston.log('verbose', 'requesting heroku token', password);
+  log.debug('requestHerokuToken', email);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/oauth/authorizations`)
@@ -26,8 +25,31 @@ export function requestHerokuToken(email, password) {
         Authorization:
           authorizationUtil.basicAuthorization(email, password),
         'Content-Type': 'application/json',
-        scopes: ['identity', 'read']
+        scopes: ['identity', 'read', 'write']
       })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+export function createApp(name, apiKey) {
+  log.debug('createApp', name);
+  return new Promise((resolve, reject) => {
+    superagent
+      .post(`${herokuApiUrl}/apps`)
+      .set({
+        Accept: herokuApiAccept,
+        Authorization:
+          authorizationUtil.bearerAuthorization(apiKey),
+        'Content-Type': 'application/json',
+        scopes: ['write']
+      })
+      .send({ name })
       .end((err, res) => {
         if (err) {
           reject(err);

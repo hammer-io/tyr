@@ -1,13 +1,14 @@
 import inquirer from 'inquirer';
-import isValid from 'is-valid-path';
-import fs from 'fs';
-import winston from 'winston';
 
+import * as validator from './utils/validator';
 import sourceControlChoices from './constants/source-control-choices';
 import ciChoices from './constants/ci-choices';
 import containerizationChoices from './constants/containerization-choices';
 import deploymentChoices from './constants/deployment-choices';
 import webChoices from './constants/web-choices';
+import { getActiveLogger } from './utils/winston';
+
+const log = getActiveLogger();
 
 /**
  * Prompts the user for basic project configurations
@@ -27,21 +28,7 @@ async function promptForProjectConfigurations() {
     name: 'projectName',
     type: 'input',
     message: 'Project Name:',
-    validate: (value) => {
-      // a project name is a project name for which the folder does not exist,
-      // for which the name is no blank/undefined or contains spaces
-
-      if (typeof value === 'undefined' || value === ''
-        || value.indexOf(' ') !== -1 || !isValid(value)) {
-        return 'Invalid project name!';
-      }
-
-      if (fs.existsSync(value)) {
-        return 'Project with this name already exists in this directory!';
-      }
-
-      return true;
-    }
+    validate: value => validator.validateProjectName(value)
   }, {
     name: 'description',
     type: 'input',
@@ -51,15 +38,7 @@ async function promptForProjectConfigurations() {
     type: 'input',
     default: '0.0.0',
     message: 'Version:',
-    validate: (value) => {
-      // tests for valid version number.
-      // any combination of (number) (.number)* will work
-      if (/^(\d+\.)?(\d+\.)?(\*|\d+)/.test(value)) {
-        return true;
-      }
-
-      return 'Invalid version number!';
-    }
+    validate: value => validator.validateVersionNumber(value)
   }, {
     name: 'author',
     type: 'input',
@@ -67,7 +46,6 @@ async function promptForProjectConfigurations() {
   }, {
     name: 'license',
     type: 'input',
-    default: 'MIT',
     message: 'License:'
   }];
 
@@ -75,7 +53,7 @@ async function promptForProjectConfigurations() {
     const projectConfigurations = await inquirer.prompt(projectConfigurationQuestions);
     return projectConfigurations;
   } catch (err) {
-    winston.log('error', 'failed to prompt project configurations', err);
+    log.error('failed to prompt project configurations', err);
   }
 }
 
@@ -150,7 +128,7 @@ async function promptForTooling() {
 
     return tooling;
   } catch (err) {
-    winston.log('error', 'failed to prompt tooling choices', err);
+    log.error('failed to prompt tooling choices', err);
   }
 }
 
@@ -165,7 +143,7 @@ async function promptForTooling() {
  * }
  */
 export async function promptForDockerCredentials() {
-  winston.log('verbose', 'prompting for Docker credentials');
+  log.verbose('prompting for Docker credentials');
   const questions = [{
     name: 'username',
     type: 'input',
@@ -194,7 +172,7 @@ export async function promptForDockerCredentials() {
     const dockerCredentials = await inquirer.prompt(questions);
     return dockerCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for Docker credentials', err);
+    log.error('failed to prompt for Docker credentials', err);
   }
 }
 
@@ -231,13 +209,24 @@ export async function promptForHerokuCredentials() {
 
       return true;
     }
+  }, {
+    name: 'apiKey',
+    type: 'password',
+    message: 'Heroku API Key:',
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return 'Heroku API key cannot be blank!';
+      }
+
+      return true;
+    }
   }];
 
   try {
     const herokuCredentials = await inquirer.prompt(questions);
     return herokuCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for Heroku credentials', err);
+    log.error('failed to prompt for Heroku credentials', err);
   }
 }
 
@@ -252,7 +241,7 @@ export async function promptForHerokuCredentials() {
  * }
  */
 export async function promptForGithubCredentials() {
-  winston.log('verbose', 'prompting for GitHub credentials');
+  log.verbose('prompting for GitHub credentials');
   const questions = [{
     name: 'username',
     type: 'input',
@@ -281,7 +270,39 @@ export async function promptForGithubCredentials() {
     const githubCredentials = await inquirer.prompt(questions);
     return githubCredentials;
   } catch (err) {
-    winston.log('error', 'failed to prompt for GitHub credentials', err);
+    log.error('failed to prompt for GitHub credentials', err);
+  }
+}
+
+export async function promptForNewProjectName() {
+  /**
+   * Prompts the user for a new project name.
+   *
+   * @returns project name
+   *
+   * {
+   *  projectName: 'Something'
+   * }
+   */
+  log.verbose('prompting for new project name');
+  const questions = [{
+    name: 'projectName',
+    type: 'input',
+    message: 'New Project Name:',
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return 'Project Name cannot be blank!';
+      }
+
+      return true;
+    }
+  }];
+
+  try {
+    const projectName = inquirer.prompt(questions);
+    return projectName;
+  } catch (err) {
+    log.error('Failed to prompt for project name', err);
   }
 }
 
@@ -291,7 +312,7 @@ export async function promptForGithubCredentials() {
  * @returns the project configurations and tooling configurations
  */
 export async function prompt() {
-  winston.log('verbose', 'prompting for configurations');
+  log.verbose('prompting for configurations');
   try {
     const configurations = {};
 
@@ -305,6 +326,6 @@ export async function prompt() {
 
     return configurations;
   } catch (err) {
-    winston.log('error', 'failed to prompt user for their configurations', err);
+    log.error('failed to prompt user for their configurations', err);
   }
 }

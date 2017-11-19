@@ -16,6 +16,28 @@ npm run lint  # runs the linter
 ```
 
 
+## Running the Tests
+
+There's a small amount of configuration needed to run the tests locally.
+Observe the bottom of the [.gitignore](https://github.com/hammer-io/tyr/blob/master/.gitignore)
+file, where it ignores the file `/test/github-test-credentials.txt`. You need to create this
+file on your local machine and populate it as follows:
+
+```bash
+####   WARNING: Do not commit!!!   ####
+
+username=
+password=
+```
+
+The username and password need to be filled in with actual GitHub
+account credentials. This is used for tests that involve the
+GitHub API. We've got a test user named Holmgang on GitHub for
+this purpose. Reach out to one of the developers if you need the
+password for that account. Otherwise, any valid account information
+you use will work for the tests.
+
+
 ## Commits
 
 Please ensure that commits are descriptive and are free of any obvious grammatical errors.
@@ -46,15 +68,22 @@ logging. There are several different log levels that we use:
 ```
 
 The `info` level is used by default. To increase the level for debugging, you can
-set the level by adding the following line.
+set the level by adding the following lines.
 
 ```javascript
-winston.level = 'debug';
+import { setActiveLogger } from '../utils/winston';
+
+setActiveLogger('debug');
 ```
 
-If you want to save off the output from the console to a file, the `tee` command is
-very useful:
+Additionally, you set the log level with environment variables. It can currently be
+set either to 'info', 'verbose', or 'debug'.
 
 ```bash
-npm start | tee output.log
+# Example of how to run the app with debug-level logging
+TYR_LOG_LEVEL=debug npm start
+
+# When running the tests, 'debug' will not display, because it gets written to stderr.
+# Instead, use 'verbose' to see more information
+TYR_LOG_LEVEL=verbose npm test
 ```
