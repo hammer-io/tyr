@@ -35,8 +35,7 @@ export async function signInToHeroku(email, password) {
 }
 
 export async function createApp(appName, apiKey) {
-  log.verbose('creating heroku app', appName);
-  log.debug('creating heroku app', apiKey);
+  log.info('creating heroku app', appName);
   try {
     const resp = await herokuClient.createApp(appName, apiKey);
     return resp.name;
@@ -45,7 +44,6 @@ export async function createApp(appName, apiKey) {
       return false;
     }
     if (err.status === 422) {
-      console.log(err.response.body.message);
       return err.response.body.message;
     }
     log.error('Failed to create app on Heroku', err);

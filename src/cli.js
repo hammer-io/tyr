@@ -75,18 +75,24 @@ export async function generateProjectFiles(config) {
 export async function initProject(config) {
   log.verbose('initializing project');
 
+  let createdRepo = false;
+
   const areFilesGenerated = await generateProjectFiles(config);
   if (!areFilesGenerated) {
     return;
   }
 
-  // create github repository
   if (config.tooling.sourceControl === constants.github.name) {
-    await utils.git.createGithubRepo(
-      config.projectConfigurations.projectName,
-      config.projectConfigurations.description,
-      config.credentials.github
-    );
+    try {
+      createdRepo = await utils.git.createGithubRepo(
+        config.projectConfigurations.projectName,
+        config.projectConfigurations.description,
+        config.credentials.github
+      );
+    } catch (err) {
+      log.error('failed to create github repo', err);
+      createdRepo = false;
+    }
   }
 
   const environmentVariables = [];
@@ -121,7 +127,7 @@ export async function initProject(config) {
   }
 
   // create .travis.yml file and enable travis on project
-  if (config.tooling.ci === constants.travisCI.name) {
+  if (createdRepo && config.tooling.ci === constants.travisCI.name) {
     try {
       await utils.travis.enableTravisOnProject(
         config.credentials.github.token,
@@ -135,7 +141,7 @@ export async function initProject(config) {
   }
 
   // push files to github
-  if (config.tooling.sourceControl === constants.github.name) {
+  if (createdRepo && config.tooling.sourceControl === constants.github.name) {
     await utils.git.commitAndPush(
       config.projectConfigurations.projectName,
       config.credentials.github
@@ -220,7 +226,7 @@ async function setupHeroku(configs) {
   );
 
   if (appName && appName.includes('Delete some apps or add a credit card to verify your account.')) {
-    log.info('You\\\'ve reached the limit of 5 apps for unverified accounts. Delete some apps or add a credit card to verify your account.');
+    log.error('You\'ve reached the limit of 5 apps for unverified accounts. Delete some apps or add a credit card to verify your account.');
     disableHeroku = true;
     return {
       herokuCredentials,

@@ -122,8 +122,10 @@ export async function createGithubRepo(projectName, projectDescription, credenti
   log.verbose('creating repo on Github', credentials.username);
   try {
     await createGitHubRepository(projectName, projectDescription, credentials.token);
+    return true;
   } catch (err) {
     log.error('failed to create github repo', err);
+    return false;
   }
 }
 
