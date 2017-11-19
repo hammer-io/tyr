@@ -19,7 +19,7 @@ const log = getActiveLogger();
  *  password: 'somethingsomething'
  * }
  */
-// eslint-disable-next-line import/prefer-default-export
+
 export async function signInToHeroku(email, password) {
   log.verbose('signing into to heroku', email);
   try {
@@ -30,6 +30,22 @@ export async function signInToHeroku(email, password) {
       return false;
     }
 
-    log.error('failed to sign in to heroku', err);
+    log.error('Failed to sign in to heroku', err);
+  }
+}
+
+export async function createApp(appName, apiKey) {
+  log.info('creating heroku app', appName);
+  try {
+    const resp = await herokuClient.createApp(appName, apiKey);
+    return resp.name;
+  } catch (err) {
+    if (err.status === 401) {
+      return false;
+    }
+    if (err.status === 422) {
+      return err.response.body.message;
+    }
+    log.error('Failed to create app on Heroku', err);
   }
 }

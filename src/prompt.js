@@ -209,6 +209,17 @@ export async function promptForHerokuCredentials() {
 
       return true;
     }
+  }, {
+    name: 'apiKey',
+    type: 'password',
+    message: 'Heroku API Key:',
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return 'Heroku API key cannot be blank!';
+      }
+
+      return true;
+    }
   }];
 
   try {
@@ -260,6 +271,38 @@ export async function promptForGithubCredentials() {
     return githubCredentials;
   } catch (err) {
     log.error('failed to prompt for GitHub credentials', err);
+  }
+}
+
+export async function promptForNewProjectName() {
+  /**
+   * Prompts the user for a new project name.
+   *
+   * @returns project name
+   *
+   * {
+   *  projectName: 'Something'
+   * }
+   */
+  log.verbose('prompting for new project name');
+  const questions = [{
+    name: 'projectName',
+    type: 'input',
+    message: 'New Project Name:',
+    validate: (value) => {
+      if (typeof value === 'undefined' || value === '' || value.indexOf(' ') !== -1) {
+        return 'Project Name cannot be blank!';
+      }
+
+      return true;
+    }
+  }];
+
+  try {
+    const projectName = inquirer.prompt(questions);
+    return projectName;
+  } catch (err) {
+    log.error('Failed to prompt for project name', err);
   }
 }
 

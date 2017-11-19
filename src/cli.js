@@ -8,6 +8,7 @@ import * as prompt from './prompt';
 import constants from './constants/constants';
 import { deleteGitHubToken } from './clients/github';
 import { getActiveLogger, enableLogFile } from './utils/winston';
+import deplomentChoices from './constants/deployment-choices';
 
 const log = getActiveLogger();
 
@@ -74,22 +75,31 @@ export async function generateProjectFiles(config) {
 export async function initProject(config) {
   log.verbose('initializing project');
 
+  let createdRepo = false;
+
   const areFilesGenerated = await generateProjectFiles(config);
   if (!areFilesGenerated) {
     return;
   }
 
-  // create github repository and push files
   if (config.tooling.sourceControl === constants.github.name) {
-    await utils.git.setupGitHub(
-      config.projectConfigurations.projectName,
-      config.projectConfigurations.description,
-      config.credentials.github
-    );
+    try {
+      createdRepo = await utils.git.createGithubRepo(
+        config.projectConfigurations.projectName,
+        config.projectConfigurations.description,
+        config.credentials.github
+      );
+    } catch (err) {
+      log.error('failed to create github repo', err);
+      createdRepo = false;
+    }
   }
 
   const environmentVariables = [];
-  // create Dockerfile and .dockerignore
+
+  // Docker Hub credentials
+  // May come in handy later
+
   // if (config.tooling.containerization === constants.docker.name) {
   //   environmentVariables.push({
   //     name: 'DOCKER_USERNAME',
@@ -112,12 +122,12 @@ export async function initProject(config) {
     });
     environmentVariables.push({
       name: 'HEROKU_PASSWORD',
-      value: config.credentials.heroku.password
+      value: config.credentials.heroku.apiKey
     });
   }
 
   // create .travis.yml file and enable travis on project
-  if (config.tooling.ci === constants.travisCI.name) {
+  if (createdRepo && config.tooling.ci === constants.travisCI.name) {
     try {
       await utils.travis.enableTravisOnProject(
         config.credentials.github.token,
@@ -128,6 +138,14 @@ export async function initProject(config) {
     } catch (err) {
       log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
     }
+  }
+
+  // push files to github
+  if (createdRepo && config.tooling.sourceControl === constants.github.name) {
+    await utils.git.commitAndPush(
+      config.projectConfigurations.projectName,
+      config.credentials.github
+    );
   }
 
   // run npm install on project
@@ -178,8 +196,9 @@ async function signInToGithub() {
  *  password: 'somethingsomething'
  * }
  */
-async function signInToHeroku() {
+async function setupHeroku(configs) {
   log.info('Please login to Heroku: ');
+  let disableHeroku = false;
   let herokuCredentials = await prompt.promptForHerokuCredentials();
   let credentials =
     await utils.heroku.signInToHeroku(
@@ -200,7 +219,30 @@ async function signInToHeroku() {
   }
 
   log.info('Successfully logged into Heroku!');
-  return herokuCredentials;
+  // Create the app on Heroku
+  let appName = await utils.heroku.createApp(
+    configs.projectConfigurations.projectName,
+    herokuCredentials.apiKey
+  );
+
+  if (appName && appName.includes('Delete some apps or add a credit card to verify your account.')) {
+    log.error('You\'ve reached the limit of 5 apps for unverified accounts. Delete some apps or add a credit card to verify your account.');
+    disableHeroku = true;
+    return {
+      herokuCredentials,
+      appName: configs.projectConfigurations.projectName,
+      disableHeroku
+    };
+  }
+
+  while (appName && appName.includes('Name is already taken')) {
+    log.error('Project name not available on Heroku!! Pick a different project name');
+    const response = await prompt.promptForNewProjectName();
+    appName = await utils.heroku.createApp(response.projectName, herokuCredentials.apiKey);
+  }
+  log.info('Successfully created app on Heroku!');
+
+  return { herokuCredentials, appName, disableHeroku };
 }
 
 /**
@@ -210,17 +252,22 @@ async function signInToHeroku() {
  */
 async function signInToThirdPartyTools(configs) {
   const credentials = {};
+  let herokuConfigs = {};
+  const toolOptions = {};
   if (configs.tooling.sourceControl === constants.github.name) {
     const githubCredentials = await signInToGithub();
     credentials.github = githubCredentials;
   }
 
   if (configs.tooling.deployment === constants.heroku.name) {
-    const herokuCredentials = await signInToHeroku();
-    credentials.heroku = herokuCredentials;
+    herokuConfigs = await setupHeroku(configs);
+    credentials.heroku = herokuConfigs.herokuCredentials;
+    toolOptions.appName = herokuConfigs.appName;
+    toolOptions.disableHeroku = herokuConfigs.disableHeroku;
   }
 
-  return credentials;
+  toolOptions.credentials = credentials;
+  return toolOptions;
 }
 
 /**
@@ -253,8 +300,14 @@ export default async function run(tyr) {
     }
 
     // sign in to third party tools
-    const credentials = await signInToThirdPartyTools(configs);
-    configs.credentials = credentials;
+    const toolConfigs = await signInToThirdPartyTools(configs);
+    configs.credentials = toolConfigs.credentials;
+    if (configs.tooling.deployment === constants.heroku.name) {
+      configs.projectConfigurations.projectName = toolConfigs.appName;
+      if (toolConfigs.disableHeroku) {
+        configs.tooling.deployment = deplomentChoices.none;
+      }
+    }
 
     // initialize the basic project files
     await initProject(configs);
