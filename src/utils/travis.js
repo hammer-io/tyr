@@ -20,7 +20,7 @@ export function initTravisCI(config) {
   log.verbose('initializing TravisCI');
 
   if (config.tooling.deployment === constants.heroku.name) {
-    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/.travis.yml'));
+    const file = yaml.safeLoad(loadTemplate('./../../templates/travis/travis.yml'));
     const docker = 'docker';
     const dockerBuild = `docker build -t ${config.projectConfigurations.projectName} .`;
     const dockerPs = 'docker ps -a';
@@ -41,7 +41,7 @@ export function initTravisCI(config) {
   } else {
     writeFile(
       `${config.projectConfigurations.projectName}/${constants.travisCI.fileName}`,
-      loadTemplate('./../../templates/travis/.travis.yml')
+      loadTemplate('./../../templates/travis/travis.yml')
     );
   }
 }

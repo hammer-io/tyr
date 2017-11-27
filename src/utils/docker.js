@@ -42,6 +42,6 @@ export function initDocker(config) {
 
   file.writeFile(
     `${config.projectName}/${constants.docker.dockerIgnore.fileName}`,
-    file.loadTemplate('./../../templates/docker/.dockerignore')
+    file.loadTemplate('./../../templates/docker/dockerignore')
   );
 }

@@ -102,7 +102,7 @@ describe('Initialize Project Files with GitHub, Travis, Docker', () => {
     });
 
     it('should create a .gitignore file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../../templates/git/.gitignore');
+      const expectedContents = loadTemplate('./../../templates/git/gitignore');
       const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.gitignore`);
       assert.equal(actualContents, expectedContents);
     });
@@ -114,7 +114,7 @@ describe('Initialize Project Files with GitHub, Travis, Docker', () => {
     });
 
     it('should create a .travis.yml file with the proper contents', () => {
-      const expectedContents = loadTemplate('./../../templates/travis/.travis.yml');
+      const expectedContents = loadTemplate('./../../templates/travis/travis.yml');
       const actualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.travis.yml`);
       assert.equal(actualContents, expectedContents);
     });
@@ -128,7 +128,7 @@ describe('Initialize Project Files with GitHub, Travis, Docker', () => {
 
     it('should create a Dockerfile and .dockerignore with the proper contents', () => {
       const dockerExpectedContents = loadTemplate('./../../templates/docker/Dockerfile');
-      const dockerignoreExpectedContents = loadTemplate('./../../templates/docker/.dockerignore');
+      const dockerignoreExpectedContents = loadTemplate('./../../templates/docker/dockerignore');
       const dockerActualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/Dockerfile`);
       const dockerignoreActualContents = fs.readFileSync(`${configs.projectConfigurations.projectName}/.dockerignore`);
 

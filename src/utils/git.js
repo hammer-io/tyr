@@ -24,7 +24,7 @@ export function createGitIgnore(projectName) {
 
   writeFile(
     `${projectName}/${constants.github.gitIgnore.fileName}`,
-    loadTemplate('./../../templates/git/.gitignore')
+    loadTemplate('./../../templates/git/gitignore')
   );
 }
 
