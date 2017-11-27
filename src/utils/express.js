@@ -23,4 +23,8 @@ export function createJsFiles(folderName) { // eslint-disable-line import/prefer
     `${folderName}/src/${constants.express.routes.fileName}`,
     loadTemplate('./../../templates/js/express/routes.js')
   );
+  writeFile(
+    `${folderName}/src/${constants.express.indexHTML.fileName}`,
+    loadTemplate('./../../templates/js/express/index.html')
+  );
 }

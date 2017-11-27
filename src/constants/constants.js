@@ -33,6 +33,9 @@ export default {
     index: {
       fileName: 'index.js'
     },
+    indexHTML: {
+      fileName: 'index.html'
+    },
     routes: {
       fileName: 'routes.js'
     }
