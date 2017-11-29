@@ -315,10 +315,18 @@ export default async function run(tyr) {
   } catch (err) {
     log.error('Failed to generate your project!', err);
   } finally {
-    await deleteGitHubToken(
-      configs.credentials.github.url,
-      configs.credentials.github.username,
-      configs.credentials.github.password
-    );
+    if (typeof configs.credentials.github !== 'undefined') {
+      try {
+        await
+        deleteGitHubToken(
+          configs.credentials.github.url,
+          configs.credentials.github.username,
+          configs.credentials.github.password
+        );
+      } catch (error) {
+        log.error('Failed to delete github token. Go to https://github.com/settings/tokens and' +
+          ' make sure the hammer-io token is deleted.', error);
+      }
+    }
   }
 }
