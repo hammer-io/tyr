@@ -44,9 +44,10 @@ tyr [OPTIONS]
 ```
 
 ### Options:
-* `-h, --help`       Output usage information
-* `--config <file>`  Configure project from configuration file
-* `--logfile <file>` The filepath that logs will be written to
+* `-V, --version`    output the version number
+* `--config <file>`  configure project from configuration file
+* `--logfile <file>` the filepath that logs will be written to
+* `-h, --help`       output usage information
 
 ## Configuration File
 ### Project Configurations
