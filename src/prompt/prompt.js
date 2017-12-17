@@ -4,8 +4,11 @@ import chalk from 'chalk';
 import * as projectConfigurationValidator from '../utils/validators/project-configuration-validator';
 import choices from './../constants/choices/choices';
 
-
-async function promptForProjectConfigurations() {
+/**
+ * Prompts the user for their project configurations
+ * @returns {Object} an object representing the user's project configurations
+ */
+export async function promptForProjectConfigurations() {
   console.log(chalk.blue('Enter your Project Configurations: '));
 
   const projectConfigurationQuestions = [{
@@ -37,6 +40,11 @@ async function promptForProjectConfigurations() {
   return projectConfigurations;
 }
 
+/**
+ * Cleans the tooling data by removing any key/value pairs that have a value of <None>
+ * @param toolingConfig the config object to clean
+ * @returns {Object} the cleaned config object
+ */
 function cleanToolingData(toolingConfig) {
   Object.keys(toolingConfig).forEach((key) => {
     if (toolingConfig[key]) {
@@ -50,7 +58,11 @@ function cleanToolingData(toolingConfig) {
   return toolingConfig;
 }
 
-async function promptForToolingConfigurations() {
+/**
+ * Prompts the user for their tooling configurations
+ * @returns {Object} an object representing their choices in tooling
+ */
+export async function promptForToolingConfigurations() {
   console.log(chalk.blue('Choose your Tooling: '));
 
   const toolingQuestions = [{
@@ -93,14 +105,65 @@ async function promptForToolingConfigurations() {
   }];
 
   const tooling = await inquirer.prompt(toolingQuestions);
-  return tooling;
+  return cleanToolingData(tooling);
 }
 
+/**
+ * Prompt for username and password combination
+ * @returns {Object} object containing an username and password key/value pair
+ */
+async function promptForUsernamePassword() {
+  const usernamePasswordQuestions = [{
+    name: 'username',
+    type: 'input',
+    message: 'Username:'
+  }, {
+    name: 'password',
+    type: 'password',
+    message: 'Password:'
+  }];
 
-export async function prompt() {
-  const configs = {};
-  configs.projectConfigs = await promptForProjectConfigurations();
-  const toolingConfigs = await promptForToolingConfigurations();
-  configs.toolingConfigs = cleanToolingData(toolingConfigs);
-  return configs;
+  const credentials = await inquirer.prompt(usernamePasswordQuestions);
+  return credentials;
+}
+
+/**
+ * Prompts the user for an email and password combination
+ * @returns {Object} object containing an email and password key/value pair
+ */
+async function promptForEmailAndPassword() {
+  const usernamePasswordQuestions = [{
+    name: 'email',
+    type: 'input',
+    message: 'Email:'
+  }, {
+    name: 'password',
+    type: 'password',
+    message: 'Password:'
+  }];
+
+  const credentials = await inquirer.prompt(usernamePasswordQuestions);
+  return credentials;
+}
+
+/**
+ * Prompts the user for their username and password on github
+ * @returns {Promise<*>}
+ */
+export async function promptForGithubCredentials() {
+  console.log(chalk.blue('Enter your GitHub username and Password:'));
+  const githubCredentials = await promptForUsernamePassword();
+
+  return githubCredentials;
+}
+
+/**
+ * Prompts the user for their email and password on Heroku
+ * @returns {Promise<void>}
+ */
+export async function promptForHerokuCredentials() {
+  console.log(chalk.blue('Enter your Heroku email and password:'));
+  const herokuCredentials = await promptForEmailAndPassword();
+
+  return herokuCredentials;
 }
