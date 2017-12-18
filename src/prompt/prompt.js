@@ -105,7 +105,7 @@ export async function promptForToolingConfigurations() {
   }];
 
   const tooling = await inquirer.prompt(toolingQuestions);
-  return cleanToolingData(tooling);
+  return tooling;
 }
 
 /**

@@ -1,6 +1,7 @@
-import isValidPath from 'is-valid-path'
+import isValidPath from 'is-valid-path';
 import fs from 'fs-extra';
 
+import choices from './../../constants/choices/choices';
 
 /**
 * Validate project name
@@ -34,4 +35,90 @@ export function validateVersionNumber(value) {
   }
 
   return 'Invalid version number!';
+}
+
+export function validateProjectConfigurations(input) {
+  const errors = [];
+  if (input.projectConfigurations === 'undefined' || input.tooling === 'undefined') {
+    errors.push('Invalid configuration file format.');
+  }
+
+  // validate project name
+  if (typeof input.projectConfigurations.projectName === 'undefined') {
+    errors.push('Project Name does not exist!');
+  } else {
+    const validateResult = validateProjectName(input.projectConfigurations.projectName);
+    if (validateResult !== true) {
+      errors.push(validateResult);
+    }
+  }
+
+  // validate description
+  if (typeof input.projectConfigurations.description === 'undefined') {
+    errors.push('Project Description does not exist!');
+  }
+
+  // validate version
+  if (typeof input.projectConfigurations.version !== 'undefined') {
+    const validateResult = validateProjectName(input.projectConfigurations.version);
+    if (validateResult !== true) {
+      errors.push(validateResult);
+    }
+  }
+
+  if (typeof input.tooling.sourceControl === 'undefined') {
+    errors.push('Source Control choice does not exist!');
+  } else if (!choices.source.includes(input.tooling.sourceControl)) {
+    errors.push(`Invalid source control choice. Valid choices are ${choices.sourceControlChoices}.`);
+  } else if (input.tooling.sourceControl === choices.none) {
+    if (input.tooling.ci !== choices.none) {
+      errors.push('If source control choice is <None>, CI choice must be <None>');
+    }
+
+    if (input.tooling.containerization !== choices.none) {
+      errors.push('If source control choice is <None>, container choice must be <None>');
+    }
+
+    if (input.tooling.deployment !== choices.none) {
+      errors.push('If source control choice is <None>, deployment choice must be <None>');
+    }
+  }
+
+  if (typeof input.tooling.ci === 'undefined') {
+    errors.push('CI choice does not exist!');
+  } else if (!choices.ciChoices.includes(input.tooling.ci)) {
+    errors.push(`Invalid CI choice. Valid choices are ${choices.ciChoices}.`);
+  } else if (input.tooling.ci === choices.none) {
+    if (input.tooling.containerization !== choices.none) {
+      errors.push('If ci choice is <None>, container choice must be <None>');
+    }
+
+    if (input.tooling.deployment !== choices.none) {
+      errors.push('If ci choice is <None>, deployment choice must be <None>');
+    }
+  }
+
+  if (typeof input.tooling.containerization === 'undefined') {
+    errors.push('Container choice does not exist!');
+  } else if (!choices.containerizationChoices.includes(input.tooling.containerization)) {
+    errors.push(`Invalid container choice. Valid choices are ${choices.containerizationChoices}`);
+  } else if (input.tooling.containerization === choices.none) {
+    if (input.tooling.deployment !== choices.none) {
+      errors.push('If container choice is <None>, deployment choice must be <None>');
+    }
+  }
+
+  if (typeof input.tooling.deployment === 'undefined') {
+    errors.push('Deployment choice does not exist!');
+  } else if (!choices.deploymentChoices.includes(input.tooling.deployment)) {
+    errors.push(`Invalid deployment choice. Valid choices are ${choices.deploymentChoices}`);
+  }
+
+  if (typeof input.tooling.web === 'undefined') {
+    errors.push('Web framework choice does not exist!');
+  } else if (!choices.webChoices.includes(input.tooling.web)) {
+    errors.push(`Invalid web framework choice. Valid choices are ${choices.webChoices}`);
+  }
+
+  return errors;
 }

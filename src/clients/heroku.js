@@ -7,15 +7,6 @@ const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';
 const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
-export async function isValidCredentials() {
-
-}
-
-export function requestAccountInformation(email, password) {
-  return new Promise((resolve, reject) => {
-    superagent.
-  })
-}
 
 /**
  * Exchanges a username/password pair for a token
