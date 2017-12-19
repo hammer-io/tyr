@@ -1,4 +1,3 @@
-
 export class Tyr {
   constructor(configs) {
     this.configs = configs;
