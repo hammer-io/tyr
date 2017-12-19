@@ -1,0 +1,16 @@
+{
+    "projectConfigurations": {
+        "projectName": "jack",
+        "description": "jack",
+        "version": "0.0.0",
+        "author": "jack",
+        "license": "MIT"
+    },
+    "toolingConfigurations": {
+        "sourceControl": "blah",
+        "ci": "blah",
+        "containerization": "blah",
+        "deployment": "blah",
+        "web": "blah"
+    }
+}
