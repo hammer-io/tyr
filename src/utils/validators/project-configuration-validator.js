@@ -4,16 +4,18 @@ import fs from 'fs-extra';
 import choices from './../../constants/choices/choices';
 
 /**
-* Validate project name
-* @param value the project name to test
-* @returns string if the project name is valid, the error message otherwise
-*/
+ * Validate project name
+ * @param value the project name to test
+ * @returns string if the project name is valid, the error message otherwise
+ */
 export function validateProjectName(value) {
   // a project name is a project name for which the folder does not exist,
   // for which the name is no blank/undefined or contains spaces
 
+  // TODO: this validation allows for project names with /, which would not create a valid directory
   if (typeof value === 'undefined' || value === ''
     || value.indexOf(' ') !== -1 || !isValidPath(value)) {
+
     return 'Invalid project name!';
   }
 
@@ -37,10 +39,17 @@ export function validateVersionNumber(value) {
   return 'Invalid version number!';
 }
 
+/**
+ * Validates the project configuration files
+ * @param input the configuraiton file in as a json object
+ * @returns {Array} the array of errors
+ */
 export function validateProjectConfigurations(input) {
+  console.log(input);
   const errors = [];
-  if (input.projectConfigurations === 'undefined' || input.tooling === 'undefined') {
-    errors.push('Invalid configuration file format.');
+  if ((typeof input.projectConfigurations === 'undefined') || (typeof input.toolingConfigurations === 'undefined')) {
+    errors.push('Invalid configuration file format!');
+    return errors; // can't go any farther with a bad format like this
   }
 
   // validate project name
@@ -60,63 +69,79 @@ export function validateProjectConfigurations(input) {
 
   // validate version
   if (typeof input.projectConfigurations.version !== 'undefined') {
-    const validateResult = validateProjectName(input.projectConfigurations.version);
+    const validateResult = validateVersionNumber(input.projectConfigurations.version);
     if (validateResult !== true) {
       errors.push(validateResult);
     }
   }
 
-  if (typeof input.tooling.sourceControl === 'undefined') {
-    errors.push('Source Control choice does not exist!');
-  } else if (!choices.source.includes(input.tooling.sourceControl)) {
+  // if there is an invalid source control choice
+  if (input.toolingConfigurations.sourceControl && (!choices.sourceControlChoices.includes(input.toolingConfigurations.sourceControl))) {
     errors.push(`Invalid source control choice. Valid choices are ${choices.sourceControlChoices}.`);
-  } else if (input.tooling.sourceControl === choices.none) {
-    if (input.tooling.ci !== choices.none) {
-      errors.push('If source control choice is <None>, CI choice must be <None>');
+
+    // otherwise, if the a source control was not chosen (either because of <None> or it's
+    // undefined, check if other CI, container, or deployment choices are being used. If they
+    // are, through an error because we cannot use these tools with out a source control
+  } else if ((input.toolingConfigurations.sourceControl === choices.none) || (typeof input.toolingConfigurations.sourceControl === 'undefined')) {
+    // check to make sure no CI is being used without source control
+    if ((typeof input.toolingConfigurations.ci !== 'undefined') || (input.toolingConfigurations.ci !== choices.none)) {
+      errors.push('If no source control tool was selected, there cannot be a CI tool selected.');
     }
 
-    if (input.tooling.containerization !== choices.none) {
-      errors.push('If source control choice is <None>, container choice must be <None>');
+    // check to make sure no containerization tool is being used without source control
+    if ((typeof input.toolingConfigurations.containerization !== 'undefined') || (input.toolingConfigurations.containerization !== choices.none)) {
+      errors.push('If no source control tool was selected, there cannot be a containerization' +
+        ' tool selected. ');
     }
 
-    if (input.tooling.deployment !== choices.none) {
-      errors.push('If source control choice is <None>, deployment choice must be <None>');
+    // check to make sure deployment tool is not being used without source control
+    if ((typeof input.toolingConfigurations.deployment === 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+      errors.push('If no source control tool was selected, there cannot be a deployment tool' +
+        ' selected');
     }
   }
 
-  if (typeof input.tooling.ci === 'undefined') {
-    errors.push('CI choice does not exist!');
-  } else if (!choices.ciChoices.includes(input.tooling.ci)) {
+  // if there is invalid CI choice
+  if (input.toolingConfigurations.ci && !choices.ciChoices.includes(input.toolingConfigurations.ci)) {
     errors.push(`Invalid CI choice. Valid choices are ${choices.ciChoices}.`);
-  } else if (input.tooling.ci === choices.none) {
-    if (input.tooling.containerization !== choices.none) {
-      errors.push('If ci choice is <None>, container choice must be <None>');
+    // otherwise, if no CI choice was selected, make sure a containerization choice or
+    // deployment choice is not selected.
+  } else if ((input.toolingConfigurations.ci === choices.none) || (typeof input.toolingConfigurations.ci === 'undefined')) {
+    // check to make sure containerization is not used without a CI tool
+    if ((typeof input.toolingConfigurations.containerization !== 'undefined') || (input.toolingConfigurations.containerization !== choices.none)) {
+      errors.push('If no continuous integration tool was selected, there cannot be a' +
+        ' containerization tool selected');
     }
 
-    if (input.tooling.deployment !== choices.none) {
-      errors.push('If ci choice is <None>, deployment choice must be <None>');
+    // check to make sure deployment choice is not used without a CI tool
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+      errors.push('If no continuous integration tool was selected, there cannot be a deployment' +
+        ' tool selected');
     }
   }
 
-  if (typeof input.tooling.containerization === 'undefined') {
-    errors.push('Container choice does not exist!');
-  } else if (!choices.containerizationChoices.includes(input.tooling.containerization)) {
+  // if there is an invalid containerization choice
+  if (input.toolingConfigurations.containerization &&
+    !choices.containerizationChoices.includes(input.toolingConfigurations.containerization)) {
     errors.push(`Invalid container choice. Valid choices are ${choices.containerizationChoices}`);
-  } else if (input.tooling.containerization === choices.none) {
-    if (input.tooling.deployment !== choices.none) {
-      errors.push('If container choice is <None>, deployment choice must be <None>');
+    // otherwise, if no containerization choice was chosen, make sure there is no deployment choice
+  } else if ((input.toolingConfigurations.containerization === choices.none) || (typeof input.toolingConfigurations.containerization === 'undefined')) {
+    // check to make sure no deployment choice was chosen
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+      errors.push('If no containerization tool was selected, there cannot be a deployment tool' +
+        ' selected');
     }
   }
 
-  if (typeof input.tooling.deployment === 'undefined') {
-    errors.push('Deployment choice does not exist!');
-  } else if (!choices.deploymentChoices.includes(input.tooling.deployment)) {
+  // check to make sure of valid deployment choices
+  if (input.toolingConfigurations.deployment &&
+    (!choices.deploymentChoices.includes(input.toolingConfigurations.deployment))) {
     errors.push(`Invalid deployment choice. Valid choices are ${choices.deploymentChoices}`);
   }
 
-  if (typeof input.tooling.web === 'undefined') {
-    errors.push('Web framework choice does not exist!');
-  } else if (!choices.webChoices.includes(input.tooling.web)) {
+  // check to make sure there are valid web choices
+  if (input.toolingConfigurations.web &&
+    !choices.webChoices.includes(input.toolingConfigurations.web)) {
     errors.push(`Invalid web framework choice. Valid choices are ${choices.webChoices}`);
   }
 
