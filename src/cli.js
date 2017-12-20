@@ -2,7 +2,7 @@ import * as prompt from './prompt/prompt';
 import { getActiveLogger } from './utils/log/winston';
 import { Tyr } from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
-
+import * as githubService from './services/github-service';
 const log = getActiveLogger();
 
 /**
@@ -42,8 +42,15 @@ async function signInToHeroku() {
  */
 async function signInToGithub() {
   const credentials = await prompt.promptForGithubCredentials();
+  try {
+    const isValid = await githubService.isValidCredentials(credentials.username, credentials.password);
+    if (!isValid) {
+      signInToGithub();
+    }
+  } catch (error) {
+    log.error('Something went wrong contacting the GitHub API!');
+  }
 
-  // TODO validate credentials
   return credentials;
 }
 
