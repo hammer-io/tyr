@@ -30,7 +30,7 @@ async function getToolingConfigurations() {
  * credentials, and if they are invalid, prompts for new credentials.
  * @returns {Object} the heroku credentials as a email and password key/value pair
  */
-async function signInToHeroku() {
+export async function signInToHeroku() {
   const credentials = await prompt.promptForHerokuCredentials();
   const isValid = await herokuService.isValidCredentials(credentials.email, credentials.password);
   if (!isValid) {
@@ -45,7 +45,7 @@ async function signInToHeroku() {
  * credentials, and if they are invalid, prompts for new credentials.
  * @returns {Object} the github credentials as a username and password key/value pair
  */
-async function signInToGithub() {
+export async function signInToGithub() {
   const credentials = await prompt.promptForGithubCredentials();
   const isValid = await githubService.isValidCredentials(credentials.username, credentials.password);
 
