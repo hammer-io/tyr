@@ -7,6 +7,25 @@ const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';
 const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
+export function getCurrentUser(email, password) {
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${herokuApiUrl}/account`)
+      .set({
+        Accept: herokuApiAccept,
+        Authorization:
+          authorizationUtil.basicAuthorization(email, password),
+      })
+      .end((err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res.body);
+        }
+      });
+  });
+}
+
 
 /**
  * Exchanges a username/password pair for a token

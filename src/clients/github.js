@@ -12,12 +12,9 @@ export async function getCurrentUser(username, password) {
         Accept: githubApiAccept,
         Authorization:
           authorizationUtil.basicAuthorization(username, password),
-        'Content-Type': 'application/json',
-        scopes: ['identity', 'read', 'write']
       })
       .end((error, res) => {
         if (error) {
-          console.log(error);
           reject(error);
         } else {
           resolve(res.body);
