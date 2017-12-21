@@ -38,6 +38,13 @@ describe('Test CLI Functionality', () => {
       assert.equal(credentials.username, 'blah');
       assert.equal(credentials.password, 'blah');
     });
+
+    after(() => {
+      githubStub.restore();
+      promptStub.restore();
+    });
+
+
   });
 
   describe('signInToHeroku()', () => {
@@ -68,6 +75,11 @@ describe('Test CLI Functionality', () => {
       const credentials = await cli.signInToHeroku();
       assert.equal(credentials.username, 'blah');
       assert.equal(credentials.password, 'blah');
+    });
+
+    after(() => {
+      herokuStub.restore();
+      promptStub.restore();
     });
   });
 });
