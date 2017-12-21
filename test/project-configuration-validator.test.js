@@ -3,20 +3,20 @@ import fs from 'fs';
 import {validateProjectConfigurations, validateProjectName, validateVersionNumber} from '../dist/utils/validators/project-configuration-validator';
 import choices from '../dist/constants/choices/choices';
 
-describe('Test Project Configuration Service', () => {
-  describe('Test Reading from Project Configuration File', () => {
-    it('should read from configuration file without errors', () => {
+describe('Project Configuration Validator', () => {
+  describe('validateProjectConfigurations()', () => {
+    it('should validate configuration file without errors', () => {
       const errors = validateProjectConfigurations(JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration', 'utf-8')));
       assert.equal(errors.length, 0);
     });
 
-    it('should read from configuration file with errors because of an invalid format', () => {
+    it('should validate configuration file with errors because of an invalid format', () => {
       const errors = validateProjectConfigurations(JSON.parse(fs.readFileSync('test/test-configurations/bad-format-configuration', 'utf-8')));
       assert.equal(errors.length, 1);
       assert.equal(errors[0], 'Invalid configuration file format!');
     });
 
-    it('should read from a configuration file with errors because of missing project' +
+    it('should validate configuration file with errors because of missing project' +
       ' configurations', () =>{
       const errors = validateProjectConfigurations(JSON.parse(fs.readFileSync('test/test-configurations/bad-project-configuration')));
       assert.equal(errors.length, 2);
@@ -24,7 +24,7 @@ describe('Test Project Configuration Service', () => {
       assert.equal(errors[1], 'Project Description does not exist!');
     });
 
-    it('should read form a configuration file with errors because of invalid project name', () => {
+    it('should validate configuration file with errors because of invalid project name', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/invalid-project-name', 'utf-8'));
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 1);
@@ -36,14 +36,14 @@ describe('Test Project Configuration Service', () => {
       // assert.equal(errors1.length, 1);
     });
 
-    it('should read from a configuration file with errors because of invalid version number', () => {
+    it('validate configuration file with errors because of invalid version number', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/invalid-version-number', 'utf-8'));
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 1);
       assert.equal(errors[0], 'Invalid version number!');
     });
 
-    it('should validate configurations with errors because of bad tool names', () => {
+    it('should validate configuration file with errors because of bad tool names', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/bad-tooling-names'));
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 5);
@@ -55,7 +55,7 @@ describe('Test Project Configuration Service', () => {
 
     });
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate configuration file with errors because of bad tooling configurations' +
       ' because of no source control', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/no-source-control-invalid', 'utf-8'));
       const errors = validateProjectConfigurations(input);
@@ -68,7 +68,7 @@ describe('Test Project Configuration Service', () => {
         ' selected');
     });
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate configuration file with errors because of bad tooling configurations' +
       ' because of no continuous integration (undefined)', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/no-ci-invalid', 'utf-8'));
       const errors = validateProjectConfigurations(input);
@@ -79,7 +79,7 @@ describe('Test Project Configuration Service', () => {
         ' deployment tool selected')
     });
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate configuration file with errors because of bad tooling configurations' +
       ' because of no containerization (undefined)', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/no-containerization-invalid', 'utf-8'));
       const errors = validateProjectConfigurations(input);
@@ -89,7 +89,7 @@ describe('Test Project Configuration Service', () => {
     });
 
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate configuration with errors because of bad tooling configurations' +
       ' because of no continuous integration (<None>)', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/no-ci-none-invalid', 'utf-8'));
       const errors = validateProjectConfigurations(input);
@@ -100,7 +100,7 @@ describe('Test Project Configuration Service', () => {
         ' deployment tool selected')
     });
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate configuration file with errors because of bad tooling configurations' +
       ' because of no containerization (<None>)', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/no-containerization-none-invalid', 'utf-8'));
       const errors = validateProjectConfigurations(input);
@@ -109,13 +109,13 @@ describe('Test Project Configuration Service', () => {
         ' selected')
     });
 
-    it('should read from a configuration file with errors because of bad tooling configurations' +
+    it('validate file with errors because of bad tooling configurations' +
       ' because of no deployment (<None>)', () => {
 
     });
   });
 
-  describe('Simple Validations', () => {
+  describe('validateProjectName()', () => {
     it('should properly validate project names', () => {
       assert.equal(validateProjectName('good-name'), true);
       assert.equal(validateProjectName('test'), 'Project with this name already exists in this' +
@@ -125,12 +125,13 @@ describe('Test Project Configuration Service', () => {
       //TODO add validation for / when it gets fixed
       //assert.equal(validateProjectName("jack/"), 'Invalid project name!')
     });
+  });
 
+  describe('validateVersionNumber()', () => {
     it('should properly validate project versions', () => {
       assert.equal(validateVersionNumber('0.0.0'), true);
       assert.equal(validateVersionNumber('1.1.fdafda'), true);
       assert.equal(validateVersionNumber('fdafda.1'), 'Invalid version number!');
     });
   });
-
-})
+});

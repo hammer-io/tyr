@@ -9,14 +9,14 @@ const DOWN = bddStdin.keys.down;
 const UP = bddStdin.keys.up;
 const ENTER = '\n';
 
-describe('Test Prompting Mechanisms', () => {
+describe('Prompting Mechanisms', () => {
   let stdin;
 
   beforeEach(() => {
     stdin = mockStdin.stdin();
   });
 
-  describe('Prompt for project configurations', () => {
+  describe('promptForProjectConfigurations()', () => {
     it('should return the project configurations in the proper format', async () => {
       bddStdin('jack', ENTER, 'jack', ENTER, '0.0.1', ENTER, 'jack', ENTER, 'MIT', ENTER);
       const configurations = await promptForProjectConfigurations();
@@ -28,7 +28,7 @@ describe('Test Prompting Mechanisms', () => {
     });
   });
 
-  describe('Prompt for tooling configurations', () => {
+  describe('promptForToolingConfigurations()', () => {
     it('should return the tooling configurations in the proper format with all selected', async () => {
       // TODO test tooling prompt.
       // tried doing this, but could never get the next question answered
@@ -40,10 +40,11 @@ describe('Test Prompting Mechanisms', () => {
       // bddStdin(DOWN, ENTER);
       //
       // const tooling = await promptForToolingConfigurations();
+
     });
   });
 
-  describe('Prompt user for GitHub Credentials', () => {
+  describe('promptForGithubCredentials()', () => {
     it('should return the credentials in the proper format with a username and password', async () => {
       bddStdin('jack', ENTER, 'jack', ENTER);
       const credentials = await promptForGithubCredentials();
@@ -52,7 +53,7 @@ describe('Test Prompting Mechanisms', () => {
     });
   });
 
-  describe('Prompt user for Heroku Credentials', () => {
+  describe('promptForHerokuCredentials()', () => {
     it('should return the credentials in the proper format with a email and password', async () => {
       bddStdin('jack@jack.com', ENTER, 'jack', ENTER);
       const credentials = await promptForHerokuCredentials();

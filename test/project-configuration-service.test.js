@@ -7,8 +7,8 @@ import { getActiveLogger } from '../dist/utils/log/winston';
 const log = getActiveLogger();
 
 describe('Project Configuration Service', () => {
-  describe('Read from Configuration File', () => {
-    it('should parse configurations without issues', () =>{
+  describe('parseConfigsFromFile()', () => {
+    it('should read configurations without issues', () =>{
       try {
         assert.equal(
           JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration')),
