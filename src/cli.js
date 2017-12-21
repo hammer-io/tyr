@@ -3,6 +3,8 @@ import { getActiveLogger } from './utils/log/winston';
 import { Tyr } from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
 import * as githubService from './services/github-service';
+import * as herokuService from './services/heroku-service';
+
 const log = getActiveLogger();
 
 /**
@@ -30,8 +32,11 @@ async function getToolingConfigurations() {
  */
 async function signInToHeroku() {
   const credentials = await prompt.promptForHerokuCredentials();
+  const isValid = await herokuService.isValidCredentials(credentials.email, credentials.password);
+  if (!isValid) {
+    await signInToHeroku();
+  }
 
-  // TODO validate credentials
   return credentials;
 }
 
@@ -42,13 +47,10 @@ async function signInToHeroku() {
  */
 async function signInToGithub() {
   const credentials = await prompt.promptForGithubCredentials();
-  try {
-    const isValid = await githubService.isValidCredentials(credentials.username, credentials.password);
-    if (!isValid) {
-      signInToGithub();
-    }
-  } catch (error) {
-    log.error('Something went wrong contacting the GitHub API!');
+  const isValid = await githubService.isValidCredentials(credentials.username, credentials.password);
+
+  if (!isValid) {
+    await signInToGithub();
   }
 
   return credentials;
@@ -119,22 +121,33 @@ export async function run(configFile, logFile) {
   let configurations = {};
 
   // parse from the config file that was passed in
-  if (configFile) {
-    configurations = getConfigurationsFromFile(configFile);
+  try {
+    if (configFile) {
+      configurations = getConfigurationsFromFile(configFile);
 
-    // if something goes wrong, get configs from the prompt
-    if (!configurations) {
+      // if something goes wrong, get configs from the prompt
+      if (!configurations) {
+        configurations = await getConfigurationsFromPrompt();
+      }
+
+      // no config file, that means we should get configs from the prompt
+    } else {
       configurations = await getConfigurationsFromPrompt();
     }
-
-    // no config file, that means we should get configs from the prompt
-  } else {
-    configurations = await getConfigurationsFromPrompt();
+  } catch (error) {
+    log.error('Unable to get configurations. Exiting tyr.');
   }
 
+
+
   // sign in to third party tools
-  const credentials = await signInToThirdPartyTools(configurations.toolingConfigurations);
-  configurations.credentials = credentials;
+  try {
+    const credentials = await signInToThirdPartyTools(configurations.toolingConfigurations);
+    configurations.credentials = credentials;
+  } catch (error) {
+    log.error(`${error.message}. Exiting tyr.`);
+    return;
+  }
 
   // TODO enable third party tools
   const tyr = new Tyr(configurations);
