@@ -7,6 +7,12 @@ const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';
 const herokuApiAccept = ' application/vnd.heroku+json; version=3';
 
+/**
+ * Makes request at https://api.heroku.com/account, and authenticates with basic auth
+ * @param email the email
+ * @param password the password
+ * @returns {Promise<any>} user account information
+ */
 export function getCurrentUser(email, password) {
   return new Promise((resolve, reject) => {
     superagent

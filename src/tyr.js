@@ -4,6 +4,9 @@ export class Tyr {
     this.configs = configs;
   }
 
+  /**
+   * Facilitates generating project files and connecting to third party services
+   */
   generateProject() {
     console.log(this.configs);
   }
