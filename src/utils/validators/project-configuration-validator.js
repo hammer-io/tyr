@@ -15,7 +15,6 @@ export function validateProjectName(value) {
   // TODO: this validation allows for project names with /, which would not create a valid directory
   if (typeof value === 'undefined' || value === ''
     || value.indexOf(' ') !== -1 || !isValidPath(value)) {
-
     return 'Invalid project name!';
   }
 
@@ -76,13 +75,15 @@ export function validateProjectConfigurations(input) {
   }
 
   // if there is an invalid source control choice
-  if (input.toolingConfigurations.sourceControl && (!choices.sourceControlChoices.includes(input.toolingConfigurations.sourceControl))) {
+  if (input.toolingConfigurations.sourceControl &&
+    (!choices.sourceControlChoices.includes(input.toolingConfigurations.sourceControl))) {
     errors.push(`Invalid source control choice. Valid choices are ${choices.sourceControlChoices}.`);
 
     // otherwise, if the a source control was not chosen (either because of <None> or it's
     // undefined, check if other CI, container, or deployment choices are being used. If they
     // are, through an error because we cannot use these tools with out a source control
-  } else if ((input.toolingConfigurations.sourceControl === choices.none) || (typeof input.toolingConfigurations.sourceControl === 'undefined')) {
+  } else if ((input.toolingConfigurations.sourceControl === choices.none) ||
+    (typeof input.toolingConfigurations.sourceControl === 'undefined')) {
     // check to make sure no CI is being used without source control
     if ((typeof input.toolingConfigurations.ci !== 'undefined') || (input.toolingConfigurations.ci !== choices.none)) {
       errors.push('If no source control tool was selected, there cannot be a CI tool selected.');
@@ -102,7 +103,8 @@ export function validateProjectConfigurations(input) {
   }
 
   // if there is invalid CI choice
-  if (input.toolingConfigurations.ci && !choices.ciChoices.includes(input.toolingConfigurations.ci)) {
+  if (input.toolingConfigurations.ci &&
+    !choices.ciChoices.includes(input.toolingConfigurations.ci)) {
     errors.push(`Invalid CI choice. Valid choices are ${choices.ciChoices}.`);
     // otherwise, if no CI choice was selected, make sure a containerization choice or
     // deployment choice is not selected.

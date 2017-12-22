@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import * as herokuClient from './../clients/heroku';
 
 export async function isValidCredentials(email, password) {

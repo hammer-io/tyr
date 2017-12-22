@@ -1,5 +1,6 @@
+/* eslint-disable no-await-in-loop,no-restricted-syntax */
 import * as prompt from './prompt/prompt';
-import { getActiveLogger } from './utils/log/winston';
+import { getActiveLogger, enableLogFile } from './utils/log/winston';
 import { Tyr } from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
 import * as githubService from './services/github-service';
@@ -47,7 +48,10 @@ export async function signInToHeroku() {
  */
 export async function signInToGithub() {
   const credentials = await prompt.promptForGithubCredentials();
-  const isValid = await githubService.isValidCredentials(credentials.username, credentials.password);
+  const isValid = await githubService.isValidCredentials(
+    credentials.username,
+    credentials.password
+  );
 
   if (!isValid) {
     await signInToGithub();
@@ -115,8 +119,9 @@ async function getConfigurationsFromPrompt() {
  * @param logFile path to the logfile
  */
 export async function run(configFile, logFile) {
-  // TODO enable logfile
-
+  if (logFile) {
+    enableLogFile(logFile);
+  }
 
   let configurations = {};
 
@@ -137,9 +142,6 @@ export async function run(configFile, logFile) {
   } catch (error) {
     log.error('Unable to get configurations. Exiting tyr.');
   }
-
-
-
   // sign in to third party tools
   try {
     const credentials = await signInToThirdPartyTools(configurations.toolingConfigurations);

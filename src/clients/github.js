@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import superagent from 'superagent';
 import * as authorizationUtil from './../utils/authorization/authorization';
 

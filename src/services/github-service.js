@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import * as githubClient from './../clients/github';
 
 export async function isValidCredentials(username, password) {

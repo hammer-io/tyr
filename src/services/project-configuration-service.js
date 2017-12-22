@@ -1,9 +1,7 @@
+/* eslint-disable import/prefer-default-export */
 import fs from 'fs';
 
 import * as validator from './../utils/validators/project-configuration-validator';
-import { getActiveLogger } from '../utils/log/winston';
-
-const log = getActiveLogger();
 
 /**
  * Reads configurations from a file
@@ -37,7 +35,8 @@ export function parseConfigsFromFile(path) {
 //   outputConfig.tooling = configs.tooling;
 //
 //   try {
-//     file.writeFile(`${configs.projectConfigurations.projectName}/${constants.tyrFile.fileName}`, JSON.stringify(outputConfig, null, 4));
+//     file.writeFile(`${configs.projectConfigurations.projectName}/${constants.tyrFile.fileName}`,
+// JSON.stringify(outputConfig, null, 4));
 //   } catch (err) {
 //     log.error('failed to write to config file', err);
 //   }
