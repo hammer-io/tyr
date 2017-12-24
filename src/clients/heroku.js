@@ -32,38 +32,14 @@ export function getCurrentUser(email, password) {
   });
 }
 
-
 /**
- * Exchanges a username/password pair for a token
- *
- * @param email heroku email
- * @param password heroku password
- *
- * @returns {Promise<Object>} information if successful, otherwise the error
+ * Makes a request at https://api.heroku.com/apps, and authenticates with basic auth
+ * @param name the name of the application to create
+ * @param email the email of the user
+ * @param password the password of the user
+ * @returns {Promise<any>}
  */
-export function requestHerokuToken(email, password) {
-  log.debug('requestHerokuToken', email);
-  return new Promise((resolve, reject) => {
-    superagent
-      .post(`${herokuApiUrl}/oauth/authorizations`)
-      .set({
-        Accept: herokuApiAccept,
-        Authorization:
-          authorizationUtil.basicAuthorization(email, password),
-        'Content-Type': 'application/json',
-        scopes: ['identity', 'read', 'write']
-      })
-      .end((err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res.body);
-        }
-      });
-  });
-}
-
-export function createApp(name, apiKey) {
+export function createApp(name, email, password) {
   log.debug('createApp', name);
   return new Promise((resolve, reject) => {
     superagent
@@ -71,7 +47,7 @@ export function createApp(name, apiKey) {
       .set({
         Accept: herokuApiAccept,
         Authorization:
-          authorizationUtil.bearerAuthorization(apiKey),
+          authorizationUtil.basicAuthorization(email, password),
         'Content-Type': 'application/json',
         scopes: ['write']
       })

@@ -20,3 +20,18 @@ export async function isValidCredentials(email, password) {
     }
   }
 }
+
+/**
+ * Creates a new Heroku application for a user
+ * @param appName the application name
+ * @param email the email of the user
+ * @param password the password of the user
+ * @returns {Promise<void>}
+ */
+export async function createApp(appName, email, password) {
+  try {
+    await herokuClient.createApp(appName, email, password);
+  } catch (error) {
+    throw new Error('Unable to create Heroku Application');
+  }
+}
