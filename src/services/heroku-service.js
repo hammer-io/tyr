@@ -10,8 +10,7 @@ import * as herokuClient from './../clients/heroku';
  */
 export async function isValidCredentials(email, password) {
   try {
-    const user = await herokuClient.getCurrentUser(email, password);
-    console.log(user);
+    await herokuClient.getCurrentUser(email, password);
     return true;
   } catch (error) {
     if (error.status !== 401) {
