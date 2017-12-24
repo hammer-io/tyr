@@ -20,3 +20,22 @@ export async function isValidCredentials(username, password) {
     }
   }
 }
+
+/**
+ * Creates a github repository
+ * @param repositoryName the name of the repository to create
+ * @param repositoryDescription the description of the repository
+ * @param username the username of the user
+ * @param password the password of the user
+ * @returns {Promise<void>}
+ */
+export async function createGitHubRepository(
+  repositoryName, repositoryDescription, username,
+  password
+) {
+  try {
+    await githubClient.createRepository(repositoryName, repositoryDescription, username, password);
+  } catch (error) {
+    throw new Error('Failed to create GitHub Repository');
+  }
+}
