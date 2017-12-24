@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop,no-restricted-syntax */
 import * as prompt from './prompt/prompt';
 import { getActiveLogger, enableLogFile } from './utils/log/winston';
-import { Tyr } from './tyr';
+import * as tyr from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
 import * as githubService from './services/github-service';
 import * as herokuService from './services/heroku-service';
@@ -35,6 +35,7 @@ export async function signInToHeroku() {
   const credentials = await prompt.promptForHerokuCredentials();
   const isValid = await herokuService.isValidCredentials(credentials.email, credentials.password);
   if (!isValid) {
+    log.error('Incorrect Email and/or Password!');
     await signInToHeroku();
   }
 
@@ -54,6 +55,7 @@ export async function signInToGithub() {
   );
 
   if (!isValid) {
+    log.error('Incorrect Username and/or Password!');
     await signInToGithub();
   }
 
@@ -78,7 +80,7 @@ async function signInToThirdPartyTools(toolingConfigs) {
   for (const key of Object.keys(toolingConfigs)) {
     const tool = toolingConfigs[key];
     if (thirdPartyTools[tool.toLowerCase()]) {
-      credentials[tool] = await thirdPartyTools[tool.toLowerCase()]();
+      credentials[tool.toLowerCase()] = await thirdPartyTools[tool.toLowerCase()]();
     }
   }
 
@@ -151,7 +153,5 @@ export async function run(configFile, logFile) {
     return;
   }
 
-  // TODO enable third party tools
-  const tyr = new Tyr(configurations);
-  tyr.generateProject();
+  await tyr.generateProject(configurations);
 }
