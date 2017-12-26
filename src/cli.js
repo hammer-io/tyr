@@ -144,6 +144,7 @@ export async function run(configFile, logFile) {
   } catch (error) {
     log.error('Unable to get configurations. Exiting tyr.');
   }
+
   // sign in to third party tools
   try {
     const credentials = await signInToThirdPartyTools(configurations.toolingConfigurations);

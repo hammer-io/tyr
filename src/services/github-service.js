@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import * as githubClient from './../clients/github';
+import * as file from './../utils/files/file';
 
 /**
  * Checks if the user's github credentials are valid by requesting account information.
@@ -38,4 +39,15 @@ export async function createGitHubRepository(
   } catch (error) {
     throw new Error('Failed to create GitHub Repository');
   }
+}
+
+/**
+ * Generates the necessary git files, including .gitignore
+ * @param configs the configuraiton object
+ * @returns {Promise<void>}
+ */
+export async function generateGithubFiles(projectName) {
+  const path = `${projectName}/.gitignore`;
+  const contents = file.loadTemplate('./../../../templates/git/gitignore');
+  file.writeFile(path, contents);
 }

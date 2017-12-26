@@ -4,6 +4,7 @@ import * as projectService from './services/project-service';
 import * as githubService from './services/github-service';
 import * as herokuService from './services/heroku-service';
 import * as travisService from './services/travis-service';
+import * as dockerService from './services/docker-service';
 
 import { getActiveLogger } from './utils/log/winston';
 
@@ -41,7 +42,7 @@ export async function generateBasicNodeProject(configs) {
  * @returns {Promise<void>}
  */
 export async function generateGithubFiles(configs) {
-  console.log('generate github');
+  await githubService.generateGithubFiles(configs.projectConfigurations.projectName);
 }
 
 /**
@@ -59,7 +60,7 @@ export async function generateTravisFiles(configs) {
  * @returns {Promise<void>}
  */
 export async function generateDockerFiles(configs) {
-  console.log('generate docker');
+  await dockerService.generateDockerFiles(configs.projectConfigurations.projectName);
 }
 
 /**
@@ -119,6 +120,7 @@ export async function generateProject(configs) {
     log.error(error.message);
   }
 
+  // generating static files
   try {
     for (const key of Object.keys(configs.toolingConfigurations)) {
       const tool = configs.toolingConfigurations[key];
@@ -130,10 +132,15 @@ export async function generateProject(configs) {
     log.error(error.message);
   }
 
-  for (const key of Object.keys(configs.toolingConfigurations)) {
-    const tool = configs.toolingConfigurations[key];
-    if (services[tool.toLowerCase()]) {
-      await services[tool.toLowerCase()](configs);
-    }
-  }
+  // enabling third party tools
+   try {
+    for (const key of Object.keys(configs.toolingConfigurations)) {
+       const tool = configs.toolingConfigurations[key];
+       if (services[tool.toLowerCase()]) {
+         await services[tool.toLowerCase()](configs);
+       }
+     }
+   } catch (error) {
+    log.error(err.message);
+   }
 }
