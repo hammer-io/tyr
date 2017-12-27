@@ -2,6 +2,20 @@ import fs from 'fs';
 import path from 'path';
 
 /**
+ * Reads the file at the path given.
+ * @param filePath
+ * @returns {*}
+ */
+export function readFile(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf-8');
+  } catch (e) {
+    throw new Error(`Failed to read file ${filePath}!`);
+  }
+}
+
+
+/**
  * Load template file.  IF an error is thrown, it will be caught, logged, then thrown again.
  * The given errMsg should be a constant.
  *

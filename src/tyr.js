@@ -5,7 +5,7 @@ import * as githubService from './services/github-service';
 import * as herokuService from './services/heroku-service';
 import * as travisService from './services/travis-service';
 import * as dockerService from './services/docker-service';
-
+import * as expressService from './services/express-service';
 import { getActiveLogger } from './utils/log/winston';
 
 const log = getActiveLogger();
@@ -69,7 +69,7 @@ export async function generateDockerFiles(configs) {
  * @returns {Promise<void>}
  */
 export async function generateExpressFiles(configs) {
-  console.log('generate express');
+  await expressService.generateExpressFiles(configs.projectConfigurations.projectName);
 }
 
 /**
