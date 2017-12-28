@@ -1,7 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import * as githubClient from './../clients/github';
 import * as file from './../utils/files/file';
+import { getActiveLogger } from '../utils/log/winston';
 
+const log = getActiveLogger();
 /**
  * Checks if the user's github credentials are valid by requesting account information.
  * @param username the username
@@ -36,6 +38,7 @@ export async function createGitHubRepository(
 ) {
   try {
     await githubClient.createRepository(repositoryName, repositoryDescription, username, password);
+    log.info(`Successfully created GitHub repository ${username}/${repositoryName}.`);
   } catch (error) {
     throw new Error('Failed to create GitHub Repository');
   }
@@ -50,4 +53,5 @@ export async function generateGithubFiles(projectName) {
   const path = `${projectName}/.gitignore`;
   const contents = file.loadTemplate('./../../../templates/git/gitignore');
   file.writeFile(path, contents);
+  log.info('Successfully generated .gitignore file.');
 }
