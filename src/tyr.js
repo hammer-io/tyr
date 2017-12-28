@@ -7,6 +7,8 @@ import * as herokuService from './services/heroku-service';
 import * as travisService from './services/travis-service';
 import * as dockerService from './services/docker-service';
 import * as expressService from './services/express-service';
+import * as mochaService from './services/mocha-service';
+
 import { getActiveLogger } from './utils/log/winston';
 
 const log = getActiveLogger();
@@ -77,6 +79,16 @@ export async function generateDockerFiles(configs) {
  */
 export async function generateExpressFiles(configs) {
   await expressService.generateExpressFiles(configs.projectConfigurations.projectName);
+  return configs;
+}
+
+/**
+ * Facilitates generating the necessary files for mocha
+ * @param configs the configuration object
+ * @returns {Promise<*>}
+ */
+export async function generateMochaFiles(configs) {
+  await mochaService.generateMochaFiles(configs);
   return configs;
 }
 
@@ -164,13 +176,17 @@ export async function generateProject(configs) {
         await staticFileGenerators[tool.toLowerCase()](configs);
       }
     }
+
+    await generateMochaFiles(configs);
   } catch (error) {
     log.error(error.message);
   }
 
   // init, add, commit, push to github
-  await githubService.initAddCommitAndPush(
-    configs.credentials.github.username,
-    configs.projectConfigurations.projectName
-  );
+  if (configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
+    await githubService.initAddCommitAndPush(
+      configs.credentials.github.username,
+      configs.projectConfigurations.projectName
+    );
+  }
 }
