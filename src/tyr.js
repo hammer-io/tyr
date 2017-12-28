@@ -28,7 +28,7 @@ export async function github(configs) {
 }
 
 /**
- * Faciliates generating the necessary files for a basic nodejs project
+ * Facilitates generating the necessary files for a basic nodejs project
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
@@ -78,7 +78,7 @@ export async function generateExpressFiles(configs) {
  * @returns {Promise<void>}
  */
 export async function travisci(configs) {
-  console.log('travisci');
+  await travisService.enableTravis(configs);
 }
 
 /**
@@ -118,6 +118,7 @@ export async function generateProject(configs) {
     await generateBasicNodeProject(configs);
   } catch (error) {
     log.error(error.message);
+    return;
   }
 
   // generating static files
@@ -130,17 +131,18 @@ export async function generateProject(configs) {
     }
   } catch (error) {
     log.error(error.message);
+    return;
   }
 
   // enabling third party tools
-   try {
+  try {
     for (const key of Object.keys(configs.toolingConfigurations)) {
-       const tool = configs.toolingConfigurations[key];
-       if (services[tool.toLowerCase()]) {
-         await services[tool.toLowerCase()](configs);
-       }
-     }
-   } catch (error) {
-    log.error(err.message);
-   }
+      const tool = configs.toolingConfigurations[key];
+      if (services[tool.toLowerCase()]) {
+        await services[tool.toLowerCase()](configs);
+      }
+    }
+  } catch (error) {
+    log.error(error.message);
+  }
 }
