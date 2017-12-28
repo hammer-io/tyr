@@ -1,5 +1,6 @@
-/* eslint-disable import/prefer-default-export,no-await-in-loop,
-prefer-destructuring,no-restricted-syntax */
+/* eslint-disable no-param-reassign,no-await-in-loop,no-restricted-syntax,prefer-destructuring */
+import shortid from 'shortid';
+
 import * as projectService from './services/project-service';
 import * as githubService from './services/github-service';
 import * as herokuService from './services/heroku-service';
@@ -25,6 +26,8 @@ export async function github(configs) {
     repositoryName, repositoryDescription, username,
     password
   );
+
+  return configs;
 }
 
 /**
@@ -34,6 +37,7 @@ export async function github(configs) {
  */
 export async function generateBasicNodeProject(configs) {
   await projectService.generateBasicNodeFiles(configs);
+  return configs;
 }
 
 /**
@@ -43,6 +47,7 @@ export async function generateBasicNodeProject(configs) {
  */
 export async function generateGithubFiles(configs) {
   await githubService.generateGithubFiles(configs.projectConfigurations.projectName);
+  return configs;
 }
 
 /**
@@ -52,6 +57,7 @@ export async function generateGithubFiles(configs) {
  */
 export async function generateTravisFiles(configs) {
   await travisService.generateTravisCIFile(configs);
+  return configs;
 }
 
 /**
@@ -61,6 +67,7 @@ export async function generateTravisFiles(configs) {
  */
 export async function generateDockerFiles(configs) {
   await dockerService.generateDockerFiles(configs.projectConfigurations.projectName);
+  return configs;
 }
 
 /**
@@ -70,6 +77,7 @@ export async function generateDockerFiles(configs) {
  */
 export async function generateExpressFiles(configs) {
   await expressService.generateExpressFiles(configs.projectConfigurations.projectName);
+  return configs;
 }
 
 /**
@@ -79,19 +87,33 @@ export async function generateExpressFiles(configs) {
  */
 export async function travisci(configs) {
   await travisService.enableTravis(configs);
+  return configs;
 }
 
 /**
  * Facilitates enabling heroku for the user. Creates Heroku App.
  * @param configs the configuration object
- * @returns {Promise<void>}
+ * @returns {Boolean} returns true if the app was successfully created, returns false if there
+ * was an error because the app name is unavailable.
  */
 export async function heroku(configs) {
-  const appName = configs.projectConfigurations.projectName;
+  const updatedConfig = configs;
+  let appName = configs.projectConfigurations.projectName;
   const email = configs.credentials.heroku.email;
   const password = configs.credentials.heroku.password;
 
-  await herokuService.createApp(appName, email, password);
+  let isCreated = await herokuService.createApp(appName, email, password);
+  while (!isCreated) {
+    log.warn('The name you chose was not available on Heroku. We\'ve appended a short id at the' +
+      ' end of your application name in order to make in unique.');
+    appName = `${appName}-${shortid.generate()}`;
+    appName = appName.toLowerCase(); // heroku apps need to be all lowercase
+    appName = appName.replace('_', '-'); // heroku apps cannot have underscores
+    isCreated = await herokuService.createApp(appName, email, password);
+  }
+
+  updatedConfig.projectConfigurations.herokuAppName = appName;
+  return updatedConfig;
 }
 
 // The services construct. This object acts as a selector. Add a method to this construct if there
@@ -121,6 +143,19 @@ export async function generateProject(configs) {
     return;
   }
 
+  // enabling third party tools
+  try {
+    for (const key of Object.keys(configs.toolingConfigurations)) {
+      const tool = configs.toolingConfigurations[key];
+      if (services[tool.toLowerCase()]) {
+        // eslint-disable-next-line no-param-reassign
+        configs = await services[tool.toLowerCase()](configs);
+      }
+    }
+  } catch (error) {
+    log.error(error.message);
+  }
+
   // generating static files
   try {
     for (const key of Object.keys(configs.toolingConfigurations)) {
@@ -131,18 +166,11 @@ export async function generateProject(configs) {
     }
   } catch (error) {
     log.error(error.message);
-    return;
   }
 
-  // enabling third party tools
-  try {
-    for (const key of Object.keys(configs.toolingConfigurations)) {
-      const tool = configs.toolingConfigurations[key];
-      if (services[tool.toLowerCase()]) {
-        await services[tool.toLowerCase()](configs);
-      }
-    }
-  } catch (error) {
-    log.error(error.message);
-  }
+  // init, add, commit, push to github
+  await githubService.initAddCommitAndPush(
+    configs.credentials.github.username,
+    configs.projectConfigurations.projectName
+  );
 }

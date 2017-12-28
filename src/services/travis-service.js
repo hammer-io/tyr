@@ -19,13 +19,13 @@ export async function generateTravisCIFile(configs) {
   // if the user has selected heroku for deployment, then generate the specific heroku instances
   if (configs.toolingConfigurations.deployment === 'Heroku') {
     const docker = 'docker';
-    const dockerBuild = `docker build -t ${configs.projectConfigurations.projectName} .`;
+    const dockerBuild = `docker build -t ${configs.projectConfigurations.herokuAppName} .`;
     const dockerPs = 'docker ps -a';
     const afterSuccess =
       'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
       'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
-      `docker build -t registry.heroku.com/${configs.projectConfigurations.projectName}/web .;\n` +
-      `docker push registry.heroku.com/${configs.projectConfigurations.projectName}/web;\n` +
+      `docker build -t registry.heroku.com/${configs.projectConfigurations.herokuAppName}/web .;\n` +
+      `docker push registry.heroku.com/${configs.projectConfigurations.herokuAppName}/web;\n` +
       'fi';
 
     travisCIFile.services = [docker];
@@ -63,6 +63,11 @@ export async function waitForSync(travisAccessToken, account) {
   });
 }
 
+/**
+ * Enables TravisCI for the project
+ * @param configs the configuration object
+ * @returns {Promise<{}>}
+ */
 export async function enableTravis(configs) {
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
@@ -91,7 +96,6 @@ export async function enableTravis(configs) {
   } catch (error) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to get a token from GitHub.`);
   }
-  console.log(githubToken);
 
   // Use the GitHub token to get a Travis token
   let travisAccessToken = {};

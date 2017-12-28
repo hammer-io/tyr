@@ -26,12 +26,19 @@ export async function isValidCredentials(email, password) {
  * @param appName the application name
  * @param email the email of the user
  * @param password the password of the user
- * @returns {Promise<void>}
+ * @returns {Boolean} returns true if the app was created successfully, returns false if there
+ * was a 422 error (meaning the app name was not available), throws an error for any other type
+ * of error.
  */
 export async function createApp(appName, email, password) {
   try {
     await herokuClient.createApp(appName, email, password);
+    return true;
   } catch (error) {
+    if (error.status === 422) {
+      return false;
+    }
+
     throw new Error('Unable to create Heroku Application');
   }
 }

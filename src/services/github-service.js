@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import git from 'simple-git';
+
 import * as githubClient from './../clients/github';
 import * as file from './../utils/files/file';
 import { getActiveLogger } from '../utils/log/winston';
@@ -54,4 +56,38 @@ export async function generateGithubFiles(projectName) {
   const contents = file.loadTemplate('./../../../templates/git/gitignore');
   file.writeFile(path, contents);
   log.info('Successfully generated .gitignore file.');
+}
+
+
+/**
+ * Init the git repository, add all the files, make the first commit,
+ * add the remote origin, and push origin to master.
+ *
+ * @param username
+ * @param projectName
+ * @param isTwoFactorAuth
+ */
+export function initAddCommitAndPush(username, projectName) {
+  log.debug('initAddCommitAndPush', { username, projectName });
+  log.verbose('initialize github repo, create repo and push to repo', {
+    username,
+    projectName
+  });
+  log.info('Pushing all files to the new git repository...');
+
+  return new Promise((resolve) => {
+    git(`${process.cwd()}/${projectName}`)
+      .init()
+      .add('.gitignore')
+      .add('./*')
+      .commit('Initial Commit w/ :heart: by @hammer-io.')
+      .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
+      .push('origin', 'master')
+      .exec(() => {
+        log.info('Please wait while files are pushed to GitHub...');
+        setTimeout(() => {
+          resolve();
+        }, 10000); // TODO: Find a better way to do this than a timeout
+      });
+  });
 }
