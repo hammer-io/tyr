@@ -131,7 +131,7 @@ async function promptForUsernamePassword() {
  * Prompts the user for an email and password combination
  * @returns {Object} object containing an email and password key/value pair
  */
-async function promptForEmailAndPassword() {
+async function promptForEmailAndPasswordApiKey() {
   const usernamePasswordQuestions = [{
     name: 'email',
     type: 'input',
@@ -140,6 +140,10 @@ async function promptForEmailAndPassword() {
     name: 'password',
     type: 'password',
     message: 'Password:'
+  }, {
+    name: 'apiKey',
+    type: 'password',
+    message: 'API Key:'
   }];
 
   const credentials = await inquirer.prompt(usernamePasswordQuestions);
@@ -163,7 +167,7 @@ export async function promptForGithubCredentials() {
  */
 export async function promptForHerokuCredentials() {
   console.log(chalk.blue('Enter your Heroku email and password:'));
-  const herokuCredentials = await promptForEmailAndPassword();
+  const herokuCredentials = await promptForEmailAndPasswordApiKey();
 
   return herokuCredentials;
 }

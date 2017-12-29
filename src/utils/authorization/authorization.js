@@ -19,3 +19,13 @@ export function basicAuthorization(username, password) {
 export function tokenAuthorization(token) {
   return `token ${token}`;
 }
+
+/**
+ * Returns the string used for the bearer authorization header\t
+ *
+ * @param token
+ * @returns {string}
+ */
+export function bearerAuthorization(token) {
+  return `Bearer ${token}`;
+}

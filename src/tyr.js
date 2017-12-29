@@ -113,15 +113,16 @@ export async function heroku(configs) {
   let appName = configs.projectConfigurations.projectName;
   const email = configs.credentials.heroku.email;
   const password = configs.credentials.heroku.password;
+  const apiKey = configs.credentials.heroku.apiKey;
 
-  let isCreated = await herokuService.createApp(appName, email, password);
+  let isCreated = await herokuService.createApp(appName, apiKey);
   while (!isCreated) {
     log.warn('The name you chose was not available on Heroku. We\'ve appended a short id at the' +
       ' end of your application name in order to make in unique.');
     appName = `${appName}-${shortid.generate()}`;
     appName = appName.toLowerCase(); // heroku apps need to be all lowercase
     appName = appName.replace('_', '-'); // heroku apps cannot have underscores
-    isCreated = await herokuService.createApp(appName, email, password);
+    isCreated = await herokuService.createApp(appName, apiKey);
   }
 
   updatedConfig.projectConfigurations.herokuAppName = appName;

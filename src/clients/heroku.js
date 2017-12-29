@@ -39,7 +39,7 @@ export function getCurrentUser(email, password) {
  * @param password the password of the user
  * @returns {Promise<any>}
  */
-export function createApp(name, email, password) {
+export function createApp(name, token) {
   log.debug('createApp', name);
   return new Promise((resolve, reject) => {
     superagent
@@ -47,7 +47,7 @@ export function createApp(name, email, password) {
       .set({
         Accept: herokuApiAccept,
         Authorization:
-          authorizationUtil.basicAuthorization(email, password),
+          authorizationUtil.bearerAuthorization(token),
         'Content-Type': 'application/json',
         scopes: ['write']
       })
