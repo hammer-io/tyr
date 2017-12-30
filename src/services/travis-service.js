@@ -13,11 +13,16 @@ const log = getActiveLogger();
  * @returns {Promise<void>}
  */
 export async function generateTravisCIFile(configs) {
+  log.verbose('Travis Service - generateTravisCIFile()');
+  const path = `${configs.projectConfigurations.projectName}/.travis.yml`;
+
   // load in the base travis CI file.
   const travisCIFile = yaml.safeLoad(file.loadTemplate('./../../../templates/travis/travis.yml'));
 
   // if the user has selected heroku for deployment, then generate the specific heroku instances
   if (configs.toolingConfigurations.deployment === 'Heroku') {
+    log.verbose('Travis Service - generateTravisCIFIle() - generating TravisCI file for use with' +
+      ' Docker/Heroku');
     const docker = 'docker';
     const dockerBuild = `docker build -t ${configs.projectConfigurations.herokuAppName} .`;
     const dockerPs = 'docker ps -a';
@@ -33,7 +38,8 @@ export async function generateTravisCIFile(configs) {
     travisCIFile.after_success = [afterSuccess];
   }
 
-  file.writeFile(`${configs.projectConfigurations.projectName}/.travis.yml`, yaml.safeDump(travisCIFile));
+  file.writeFile(path, yaml.safeDump(travisCIFile));
+  log.info(`Successfully generated file: ${path}`);
 }
 
 
@@ -49,7 +55,7 @@ export async function generateTravisCIFile(configs) {
  * @returns {Promise}
  */
 export async function waitForSync(travisAccessToken, account) {
-  log.verbose('waiting for sync');
+  log.verbose('Travis Service - waitForSync()');
   log.warn('Waiting for TravisCI to sync account...');
 
   return new Promise(async (resolve) => {
@@ -69,6 +75,8 @@ export async function waitForSync(travisAccessToken, account) {
  * @returns {Promise<{}>}
  */
 export async function enableTravis(configs) {
+  log.verbose('Travis Service - enableTravis()');
+
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
   const projectName = configs.projectConfigurations.projectName;
@@ -157,6 +165,6 @@ export async function enableTravis(configs) {
 
   await githubClient.deleteGitHubToken(githubToken.url, username, password);
 
-  log.info(`TravisCI successfully enabled on ${username}/${projectName}`);
+  log.info(`Successfully enabled TravisCI on ${username}/${projectName}`);
   return travisAccessToken;
 }

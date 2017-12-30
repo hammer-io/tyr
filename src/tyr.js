@@ -111,8 +111,6 @@ export async function travisci(configs) {
 export async function heroku(configs) {
   const updatedConfig = configs;
   let appName = configs.projectConfigurations.projectName;
-  const email = configs.credentials.heroku.email;
-  const password = configs.credentials.heroku.password;
   const apiKey = configs.credentials.heroku.apiKey;
 
   let isCreated = await herokuService.createApp(appName, apiKey);
@@ -149,6 +147,8 @@ const staticFileGenerators = {
 };
 
 export async function generateProject(configs) {
+  console.log();
+  log.info('>>> Generating Project!', configs);
   try {
     await generateBasicNodeProject(configs);
   } catch (error) {
@@ -184,10 +184,13 @@ export async function generateProject(configs) {
   }
 
   // init, add, commit, push to github
-  if (configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
+  if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
     await githubService.initAddCommitAndPush(
       configs.credentials.github.username,
       configs.projectConfigurations.projectName
     );
+    log.info('Successfully committed and pushed files to GitHub Repository');
   }
+
+  log.info('>>> Finished!');
 }

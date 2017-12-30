@@ -17,23 +17,25 @@ const log = getActiveLogger();
  * @returns {Promise}
  */
 export async function deleteGitHubToken(githubUrl, username, password) {
-  log.verbose('deleting github token');
-  log.debug('deleteGitHubToken', { username });
+  log.verbose('Github Client deleteGithubToken()');
 
   if (githubUrl) {
+    log.http(`DELETE ${githubUrl} - deleting github token for ${username}`);
     return new Promise((resolve, reject) => {
       superagent
         .delete(githubUrl)
         .set({ Authorization: authorizationUtil.basicAuthorization(username, password) })
         .end((err) => {
           if (err) {
+            log.debug(`ERROR: DELETE ${githubUrl} - error deleting github token for ${username} - 
+              ${JSON.stringify({ status: err.status, message: err.message })}`);
             if (err.response.status !== 404) {
               reject(err);
             } else {
               resolve();
             }
           } else {
-            log.info('Successfully deleted github token');
+            log.debug(`RESPONSE: DELETE DELETE ${githubUrl} - successfully deleted github token for ${username}`);
             resolve();
           }
         });
@@ -52,7 +54,7 @@ export async function deleteGitHubToken(githubUrl, username, password) {
  * @returns Promise github token information if successful, error information otherwise
  */
 export function requestGitHubToken(username, password, note = 'hammer-io token') {
-  log.verbose('requestGitHubToken', username);
+  log.verbose('Github Client requestGithubToken', username);
   let request = superagent
     .post(`${githubApiUrl}/authorizations`)
     .send({
@@ -69,12 +71,16 @@ export function requestGitHubToken(username, password, note = 'hammer-io token')
     Authorization: authorizationUtil.basicAuthorization(username, password)
   });
 
+  log.http(`POST ${githubApiUrl}/authorizations - getting token for ${username}`);
   return new Promise((resolve, reject) => {
     // Create a GitHub token via the GitHub API, store GitHub token and URL.
     request.end((err, res) => {
       if (err) {
+        log.debug(`ERROR: ${githubApiUrl}/authorizations - error getting token for ${username} - 
+        ${JSON.stringify({ status: err.status, message: err.message })}`);
         reject(err);
       } else {
+        log.debug(`RESPONSE: ${githubApiUrl}/authorizations - successfully retrieved token for ${username}`);
         resolve({ token: res.body.token, url: res.body.url });
       }
     });
@@ -88,8 +94,9 @@ export function requestGitHubToken(username, password, note = 'hammer-io token')
  * @returns {Promise<any>} returns the user information
  */
 export async function getCurrentUser(username, password) {
-  log.debug('getCurrentUser', { username });
+  log.debug(`Github Client getCurrentUser() - ${username}`);
 
+  log.http(`GET ${githubApiUrl}/user - getting current user information for ${username}`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${githubApiUrl}/user`)
@@ -100,8 +107,10 @@ export async function getCurrentUser(username, password) {
       })
       .end((error, res) => {
         if (error) {
+          log.debug(`ERROR: GET ${githubApiUrl}/user - error getting current user information - ${{ status: error.status, message: error.message }}`);
           reject(error);
         } else {
+          log.debug(`RESPONSE: GET ${githubApiUrl}/user - successfully retrieved current user information for ${username}`);
           resolve(res.body);
         }
       });
@@ -117,23 +126,28 @@ export async function getCurrentUser(username, password) {
  * @returns {Promise<any>}
  */
 export async function createRepository(repositoryName, repositoryDescription, username, password) {
-  log.debug('createGitHubRepository', { repositoryName });
+  log.verbose('Github Client createRepository()');
+  const payload = {
+    name: repositoryName,
+    description: repositoryDescription,
+    private: false
+  };
 
+  log.http(`POST ${githubApiUrl}/user/repos - creating github repository - ${JSON.stringify(payload)}`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${githubApiUrl}/user/repos`)
       .set({
         Authorization: authorizationUtil.basicAuthorization(username, password)
       })
-      .send({
-        name: repositoryName,
-        description: repositoryDescription,
-        private: false
-      })
-      .end((error) => {
-        if (error) {
-          reject(error);
+      .send(payload)
+      .end((err) => {
+        if (err) {
+          log.debug(`ERROR: POST ${githubApiUrl}/user/repos - error creating github repository - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
+          reject(err);
         } else {
+          log.debug(`RESPONSE: ${githubApiUrl}/user/repos - successfully created github repository`);
           resolve();
         }
       });

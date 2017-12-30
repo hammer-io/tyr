@@ -1,6 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import * as herokuClient from './../clients/heroku';
+import { getActiveLogger } from '../utils/log/winston';
 
+const log = getActiveLogger();
 /**
  * Checks if the user's heroku credentials are valid by requesting account information.
  * @param email the email
@@ -9,6 +11,7 @@ import * as herokuClient from './../clients/heroku';
  * connecting to the api
  */
 export async function isValidCredentials(email, password) {
+  log.verbose('Heroku Service - isValidCredentials()');
   try {
     await herokuClient.getCurrentUser(email, password);
     return true;
@@ -30,11 +33,13 @@ export async function isValidCredentials(email, password) {
  * of error.
  */
 export async function createApp(appName, token) {
+  log.verbose('Heroku Service - createApp()');
   try {
     await herokuClient.createApp(appName, token);
     return true;
   } catch (error) {
     if (error.status === 422) {
+      log.debug('ERROR: Application Name is already in use on Heroku');
       return false;
     }
 

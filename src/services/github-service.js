@@ -38,11 +38,15 @@ export async function createGitHubRepository(
   repositoryName, repositoryDescription, username,
   password
 ) {
+  log.verbose(`Creating GitHub repository ${username}/${repositoryName}.`);
+
   try {
     await githubClient.createRepository(repositoryName, repositoryDescription, username, password);
     log.info(`Successfully created GitHub repository ${username}/${repositoryName}.`);
   } catch (error) {
-    throw new Error('Failed to create GitHub Repository');
+    const errorMessage = 'Failed to create GitHub Repository!';
+    log.debug(errorMessage, { status: error.status, message: error.message });
+    throw new Error(errorMessage);
   }
 }
 
@@ -52,10 +56,13 @@ export async function createGitHubRepository(
  * @returns {Promise<void>}
  */
 export async function generateGithubFiles(projectName) {
+  log.verbose('Generating files for GitHub.');
+
   const path = `${projectName}/.gitignore`;
   const contents = file.loadTemplate('./../../../templates/git/gitignore');
   file.writeFile(path, contents);
-  log.info('Successfully generated .gitignore file.');
+
+  log.info(`Successfully generated file: ${path}`);
 }
 
 
@@ -68,13 +75,7 @@ export async function generateGithubFiles(projectName) {
  * @param isTwoFactorAuth
  */
 export function initAddCommitAndPush(username, projectName) {
-  log.debug('initAddCommitAndPush', { username, projectName });
-  log.verbose('initialize github repo, create repo and push to repo', {
-    username,
-    projectName
-  });
-  log.info('Pushing all files to the new git repository...');
-
+  log.verbose('Github Service - initAddCommitAndPush()');
   return new Promise((resolve) => {
     git(`${process.cwd()}/${projectName}`)
       .init()

@@ -2,12 +2,15 @@
 import fs from 'fs';
 
 import * as validator from './../utils/validators/project-configuration-validator';
+import { getActiveLogger } from '../utils/log/winston';
 
+const log = getActiveLogger();
 /**
  * Reads configurations from a file
  * @param path the path to read from
  */
 export function parseConfigsFromFile(path) {
+  log.verbose('Project Configuration Service - parseConfigsFromFile()');
   const contents = JSON.parse(fs.readFileSync(path, 'utf-8'));
   const errors = validator.validateProjectConfigurations(contents);
 

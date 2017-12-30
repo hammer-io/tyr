@@ -41,8 +41,9 @@ function filterErrorResponse(err) {
  * @returns {Promise}
  */
 export function getUserAccount(travisAccessToken) {
-  log.debug('getUserAccount');
-  log.verbose('getting user account from travis');
+  log.verbose('Travis Client - getUserAccount()');
+
+  log.http(`GET ${travisApiUrl}/accounts/ - getting user account`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/accounts/`)
@@ -53,8 +54,12 @@ export function getUserAccount(travisAccessToken) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/accounts/ - error getting user account - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
+
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/accounts/ - successfully got user account`);
           resolve(res.body);
         }
       });
@@ -71,9 +76,9 @@ export function getUserAccount(travisAccessToken) {
  * @returns {Promise}
  */
 export async function getUserInformation(travisAccessToken, account) {
-  log.debug('getUserInformation', account);
-  log.verbose('getting user information from travis', account.login);
+  log.verbose('Travis Client - getUserInformation');
 
+  log.http(`GET ${travisApiUrl}/users/${account.id} - getting user information`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/users/${account.id}`)
@@ -84,8 +89,12 @@ export async function getUserInformation(travisAccessToken, account) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/users/${account.id} - error getting user information - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
+
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/users/${account.id} - getting user information`);
           resolve(res.body);
         }
       });
@@ -101,9 +110,9 @@ export async function getUserInformation(travisAccessToken, account) {
  * @returns {Promise}
  */
 export function getRepositoryId(travisAccessToken, username, projectName) {
-  log.debug('getRepositoryId', { username, projectName });
-  log.verbose('getting repository id from travis', { username, projectName });
+  log.verbose('Travis Client - getRepositoryId()');
 
+  log.http(`GET ${travisApiUrl}/repos/${username}/${projectName} - getting repository id for repository`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/repos/${username}/${projectName}`)
@@ -114,8 +123,11 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/repos/${username}/${projectName} - failed to get repository id for repository - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/repos/${username}/${projectName} - successfully got repository id for repository`);
           resolve(res.body.repo.id);
         }
       });
@@ -130,9 +142,9 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
  * @returns {Promise}
  */
 export function activateTravisHook(repositoryId, travisAccessToken) {
-  log.verbose('activateTravisHook', { repositoryId });
-  log.verbose('activating travis', { repositoryId });
+  log.verbose('Travis Client - activateTravisHook()');
 
+  log.http(`PUT ${travisApiUrl}/hooks - activating travis hook on repository with id ${repositoryId}`);
   return new Promise((resolve, reject) => {
     superagent
       .put(`${travisApiUrl}/hooks`)
@@ -149,8 +161,11 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
       })
       .end((err) => {
         if (err) {
+          log.debug(`PUT ${travisApiUrl}/hooks - failed to activate travis hook on repository with id ${repositoryId} - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`PUT ${travisApiUrl}/hooks - successfully activated travis hook on repository with id ${repositoryId}`);
           resolve();
         }
       });
@@ -164,9 +179,9 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
  * @returns {Promise}
  */
 export function syncTravisWithGithub(travisAccessToken) {
-  log.debug('syncTravisWithGithub');
-  log.verbose('syncing travis with github');
+  log.verbose('Travis Client - syncTravisWithGithub()');
 
+  log.http(`POST ${travisApiUrl}/users/sync - syncing travis with github`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${travisApiUrl}/users/sync`)
@@ -177,9 +192,12 @@ export function syncTravisWithGithub(travisAccessToken) {
       })
       .end((err) => {
         if (err) {
+          log.debug(`ERROR: POST ${travisApiUrl}/users/sync - error syncing travis with github - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
           setTimeout(() => {
+            log.debug(`RESPONSE: POST ${travisApiUrl}/users/sync - successfully synced travis with github`);
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout.
         }
@@ -194,9 +212,9 @@ export function syncTravisWithGithub(travisAccessToken) {
  * @returns {Promise}
  */
 export function requestTravisToken(githubToken) {
-  log.debug('requestTravisToken');
-  log.verbose('requesting token from travis');
+  log.verbose('Travis Client - requestTravisToken()');
 
+  log.http(`POST ${travisApiUrl}/auth/github - getting travis token`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${travisApiUrl}/auth/github`)
@@ -207,9 +225,11 @@ export function requestTravisToken(githubToken) {
       })
       .end((err, res) => {
         if (err) {
-          console.log(err);
+          log.debug(`ERROR: POST ${travisApiUrl}/auth/github - getting travis token - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(err);
         } else {
+          log.debug(`RESPONSE: POST ${travisApiUrl}/auth/github - successfully got travis token`);
           resolve(res.body.access_token);
         }
       });
@@ -225,9 +245,9 @@ export function requestTravisToken(githubToken) {
  * @returns {Promise}
  */
 export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
-  log.debug('setEnvironmentVariable', { repoId });
-  log.verbose('setEnvironmentVariable');
+  log.verbose('Travis Client - setEnvironmentVariable()');
 
+  log.http(`POST ${travisApiUrl}/settings/env_vars - setting environment variables for repo with id ${repoId}`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${travisApiUrl}/settings/env_vars`)
@@ -240,8 +260,11 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: POST ${travisApiUrl}/settings/env_vars - setting environment variables for repo with id ${repoId} -
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`RESPONSE: POST ${travisApiUrl}/settings/env_vars - successfully set environment variables for repo with id ${repoId}`);
           resolve(res.body.env_var);
         }
       });
@@ -271,8 +294,9 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
  * ]
  */
 export function listEnvironmentVariables(travisAccessToken, repoId) {
-  log.debug('listEnvironmentVariables', { repoId });
+  log.verbose('Travis Client - listEnvironmentVariables()');
 
+  log.http(`GET ${travisApiUrl}/settings/env_vars - getting environment variables for repo with id ${repoId}`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/settings/env_vars`)
@@ -284,8 +308,11 @@ export function listEnvironmentVariables(travisAccessToken, repoId) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/settings/env_vars - error getting environment variables for repo with id ${repoId} - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/settings/env_vars - error getting environment variables for repo with id ${repoId}`);
           resolve(res.body.env_vars);
         }
       });
@@ -316,6 +343,7 @@ export function fetchRepository(travisAccessToken, username, repositoryName) {
   const repoSlug = `${username}/${repositoryName}`;
   log.debug('fetchRepository', repoSlug);
 
+  log.http(`GET ${travisApiUrl}/repos/${repoSlug} - getting repository information on TravisCI`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${travisApiUrl}/repos/${repoSlug}`)
@@ -326,10 +354,13 @@ export function fetchRepository(travisAccessToken, username, repositoryName) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/repos/${repoSlug} - error getting repository information on TravisCI - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else if (!res.body.repo) {
           reject(new Error(`Unable to find the repository '${repoSlug}'!`));
         } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/repos/${repoSlug} - success getting repository information on TravisCI`);
           resolve(res.body.repo);
         }
       });

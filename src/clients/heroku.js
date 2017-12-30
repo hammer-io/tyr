@@ -14,6 +14,9 @@ const herokuApiAccept = ' application/vnd.heroku+json; version=3';
  * @returns {Promise<any>} user account information
  */
 export function getCurrentUser(email, password) {
+  log.verbose('Heroku Client - getCurrentUser()');
+
+  log.http(`GET ${herokuApiUrl}/apps - getting account information for email: ${email}`);
   return new Promise((resolve, reject) => {
     superagent
       .get(`${herokuApiUrl}/account`)
@@ -24,8 +27,11 @@ export function getCurrentUser(email, password) {
       })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: POST ${herokuApiUrl}/apps - error getting account information for email: ${email}
+           - ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(err);
         } else {
+          log.debug(`RESPONSE: POST ${herokuApiUrl}/apps - error getting account information for email: ${email}`);
           resolve(res.body);
         }
       });
@@ -40,7 +46,9 @@ export function getCurrentUser(email, password) {
  * @returns {Promise<any>}
  */
 export function createApp(name, token) {
-  log.debug('createApp', name);
+  log.verbose('Heroku Client - createApp()');
+
+  log.http(`POST ${herokuApiUrl}/apps - creating heroku application with name ${name}`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${herokuApiUrl}/apps`)
@@ -54,8 +62,11 @@ export function createApp(name, token) {
       .send({ name })
       .end((err, res) => {
         if (err) {
+          log.debug(`ERROR: POST ${herokuApiUrl}/apps - error creating heroku application with name ${name}
+           - ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(err);
         } else {
+          log.debug(`RESPONSE POST ${herokuApiUrl}/apps - successfully created heroku application with name ${name}`);
           resolve(res.body);
         }
       });
