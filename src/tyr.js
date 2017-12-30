@@ -146,6 +146,11 @@ const staticFileGenerators = {
   expressjs: generateExpressFiles
 };
 
+/**
+ * Generates a project
+ * @param configs the configurations object
+ * @returns {Promise<void>}
+ */
 export async function generateProject(configs) {
   console.log();
   log.info('>>> Generating Project!', configs);
@@ -182,6 +187,10 @@ export async function generateProject(configs) {
   } catch (error) {
     log.error(error.message);
   }
+
+  // write configs to a file
+  projectService.generateTyrfile(configs);
+
 
   // init, add, commit, push to github
   if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {

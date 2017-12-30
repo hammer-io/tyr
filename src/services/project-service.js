@@ -3,7 +3,7 @@ import fs from 'fs';
 
 import * as file from './../utils/files/file';
 import { getActiveLogger } from '../utils/log/winston';
-
+import * as projectConfigurationService from './project-configuration-service';
 const log = getActiveLogger();
 
 /**
@@ -88,6 +88,15 @@ async function generateReadMe(configs) {
 
   file.writeFile(path, contents);
   log.info(`Successfully generated file: ${path}`);
+}
+
+/**
+ * Generates a tyr file
+ * @param configs the configurations object
+ * @returns {Promise<void>}
+ */
+export async function generateTyrfile(configs) {
+  await projectConfigurationService.writeToConfigFile(configs);
 }
 
 /**
