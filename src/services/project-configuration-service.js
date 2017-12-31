@@ -41,6 +41,6 @@ export function writeToConfigFile(configs) {
   try {
     file.writeFile(`${configs.projectConfigurations.projectName}/.tyrfile`, JSON.stringify(outputConfig, null, 4));
   } catch (err) {
-    log.error('failed to write to config file', err);
+    throw new Error('Failed to generate .tyrfile!');
   }
 }

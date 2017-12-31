@@ -12,7 +12,7 @@ const log = getActiveLogger();
  */
 export async function generateExpressFiles(projectName) {
   log.verbose('Express Service - generateExpressFiles()');
-  const path = `${projectName}/src/`;
+  const path = `${projectName}/src`;
 
   // generate the index.html file
   const indexHTMLContents = file.loadTemplate('./../../../templates/express/index.html');

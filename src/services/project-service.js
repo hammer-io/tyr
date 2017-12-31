@@ -4,6 +4,7 @@ import fs from 'fs';
 import * as file from './../utils/files/file';
 import { getActiveLogger } from '../utils/log/winston';
 import * as projectConfigurationService from './project-configuration-service';
+
 const log = getActiveLogger();
 
 /**
@@ -96,7 +97,11 @@ async function generateReadMe(configs) {
  * @returns {Promise<void>}
  */
 export async function generateTyrfile(configs) {
+  log.verbose('Project Service - generateTyrfile()');
+
   await projectConfigurationService.writeToConfigFile(configs);
+
+  log.info(`Successfully generated file: ${configs.projectConfigurations.projectName}/.tyrfile`);
 }
 
 /**
@@ -106,6 +111,7 @@ export async function generateTyrfile(configs) {
  */
 export async function generateBasicNodeFiles(configs) {
   log.verbose('Project File Service - generateBasicNodeFiles()');
+
   const projectName = configs.projectConfigurations.projectName;
   await generateProjectFolders(projectName);
   await generateIndexFile(projectName);
