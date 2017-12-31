@@ -8,6 +8,7 @@ import * as travisService from './services/travis-service';
 import * as dockerService from './services/docker-service';
 import * as expressService from './services/express-service';
 import * as mochaService from './services/mocha-service';
+import * as nodeService from './services/node-service';
 
 import { getActiveLogger } from './utils/log/winston';
 
@@ -191,6 +192,8 @@ export async function generateProject(configs) {
   // write configs to a file
   projectService.generateTyrfile(configs);
 
+  // npm install
+  nodeService.npmInstall(configs.projectConfigurations.projectName);
 
   // init, add, commit, push to github
   if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
