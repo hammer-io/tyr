@@ -29,7 +29,7 @@ export function readFile(filePath) {
  * @returns {*}
  */
 export function loadTemplate(filePath) {
-  log.verbose(`loading template: ${filePath}`);
+  log.verbose(`loading template: ${path.join(__dirname, '/', filePath)}`);
   try {
     return fs.readFileSync(path.join(__dirname, '/', filePath), 'utf-8');
   } catch (e) {
