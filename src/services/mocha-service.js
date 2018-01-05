@@ -8,9 +8,9 @@ const log = getActiveLogger();
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
-export async function generateMochaFiles(configs) {
+export async function generateMochaFiles(projectName) {
   log.verbose('Mocha Service - generateMochaFiles()');
-  const path = `${configs.projectConfigurations.projectName}/test.js`;
+  const path = `${projectName}/test.js`;
   const content = file.loadTemplate('./../../../templates/mocha/test.js');
 
   file.writeFile(path, content);

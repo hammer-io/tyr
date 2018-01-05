@@ -89,7 +89,7 @@ export async function generateExpressFiles(configs) {
  * @returns {Promise<*>}
  */
 export async function generateMochaFiles(configs) {
-  await mochaService.generateMochaFiles(configs);
+  await mochaService.generateMochaFiles(configs.projectConfigurations.projectName);
   return configs;
 }
 
