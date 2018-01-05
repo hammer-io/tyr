@@ -44,7 +44,6 @@ export function validateVersionNumber(value) {
  * @returns {Array} the array of errors
  */
 export function validateProjectConfigurations(input) {
-  console.log(input);
   const errors = [];
   if ((typeof input.projectConfigurations === 'undefined') || (typeof input.toolingConfigurations === 'undefined')) {
     errors.push('Invalid configuration file format!');
