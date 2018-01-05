@@ -190,10 +190,10 @@ export async function generateProject(configs) {
   }
 
   // write configs to a file
-  projectService.generateTyrfile(configs);
+  await projectService.generateTyrfile(configs);
 
   // npm install
-  nodeService.npmInstall(configs.projectConfigurations.projectName);
+  await nodeService.npmInstall(configs.projectConfigurations.projectName);
 
   // init, add, commit, push to github
   if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
