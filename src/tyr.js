@@ -19,7 +19,7 @@ const log = getActiveLogger();
  * @configs the configuration object
  * @returns {Promise<void>}
  */
-export async function github(configs) {
+async function github(configs) {
   const repositoryName = configs.projectConfigurations.projectName;
   const repositoryDescription = configs.projectConfigurations.description;
   const username = configs.credentials.github.username;
@@ -38,7 +38,7 @@ export async function github(configs) {
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
-export async function generateBasicNodeProject(configs) {
+async function generateBasicNodeProject(configs) {
   await projectService.generateBasicNodeFiles(configs);
   return configs;
 }
@@ -48,7 +48,7 @@ export async function generateBasicNodeProject(configs) {
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
-export async function generateGithubFiles(configs) {
+async function generateGithubFiles(configs) {
   await githubService.generateGithubFiles(configs.projectConfigurations.projectName);
   return configs;
 }
@@ -58,7 +58,7 @@ export async function generateGithubFiles(configs) {
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
-export async function generateTravisFiles(configs) {
+async function generateTravisFiles(configs) {
   await travisService.generateTravisCIFile(configs);
   return configs;
 }
@@ -68,7 +68,7 @@ export async function generateTravisFiles(configs) {
  * @param configs the configurations object
  * @returns {Promise<void>}
  */
-export async function generateDockerFiles(configs) {
+async function generateDockerFiles(configs) {
   await dockerService.generateDockerFiles(configs.projectConfigurations.projectName);
   return configs;
 }
@@ -78,7 +78,7 @@ export async function generateDockerFiles(configs) {
  * @param configs
  * @returns {Promise<void>}
  */
-export async function generateExpressFiles(configs) {
+async function generateExpressFiles(configs) {
   await expressService.generateExpressFiles(configs.projectConfigurations.projectName);
   return configs;
 }
@@ -98,7 +98,7 @@ export async function generateMochaFiles(configs) {
  * @configs the configuration object
  * @returns {Promise<void>}
  */
-export async function travisci(configs) {
+async function travisci(configs) {
   await travisService.enableTravis(configs);
   return configs;
 }
@@ -109,7 +109,7 @@ export async function travisci(configs) {
  * @returns {Boolean} returns true if the app was successfully created, returns false if there
  * was an error because the app name is unavailable.
  */
-export async function heroku(configs) {
+async function heroku(configs) {
   const updatedConfig = configs;
   let appName = configs.projectConfigurations.projectName;
   const apiKey = configs.credentials.heroku.apiKey;
