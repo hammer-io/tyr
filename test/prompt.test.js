@@ -55,10 +55,11 @@ describe('Prompting Mechanisms', () => {
 
   describe('promptForHerokuCredentials()', () => {
     it('should return the credentials in the proper format with a email and password', async () => {
-      bddStdin('jack@jack.com', ENTER, 'jack', ENTER);
+      bddStdin('jack@jack.com', ENTER, 'jack', ENTER, '1234', ENTER);
       const credentials = await promptForHerokuCredentials();
       assert.equal(credentials.email, 'jack@jack.com');
       assert.equal(credentials.password, 'jack');
+      assert.equal(credentials.apiKey, '1234');
     });
   });
 });

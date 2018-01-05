@@ -49,4 +49,14 @@ describe('Heroku Service', () => {
       }
     });
   });
+
+  describe('createApp()', () => {
+    it('should successfully create a heroku app', async () => {
+
+    });
+
+    it('should throw an error if it was unable to create a heroku app', async () => {
+
+    });
+  });
 });
