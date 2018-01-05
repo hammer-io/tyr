@@ -39,7 +39,7 @@ export function writeToConfigFile(configs) {
   outputConfig.toolingConfigurations = configs.toolingConfigurations;
 
   try {
-    file.writeFile(`${configs.projectConfigurations.projectName}/.tyrfile`, JSON.stringify(outputConfig, null, 4));
+    file.writeFile(`${configs.projectConfigurations.projectName}/.tyrfile`, JSON.stringify(outputConfig, null, ' '));
   } catch (err) {
     throw new Error('Failed to generate .tyrfile!');
   }
