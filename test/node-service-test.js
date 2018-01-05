@@ -28,10 +28,9 @@ describe('Node Service Test', () => {
         "}");
     });
 
-    it('should run npm install', () => {
-      npmInstall('test-npm-install')
+    it('should run npm install', async () => {
+      await npmInstall('test-npm-install')
       assert.equal(fs.existsSync('test-npm-install/node_modules'), true);
-      assert.equal(fs.existsSync('test-npm-install/package-lock.json'), true);
     }).timeout(10000);
 
     afterEach(() => {

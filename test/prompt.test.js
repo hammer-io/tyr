@@ -25,7 +25,7 @@ describe('Prompting Mechanisms', () => {
       assert.equal(configurations.version, '0.0.1');
       assert.equal(configurations.author, 'jack');
       assert.equal(configurations.license, 'MIT');
-    });
+    }).timeout(100000);
   });
 
   describe('promptForToolingConfigurations()', () => {
@@ -41,7 +41,7 @@ describe('Prompting Mechanisms', () => {
       //
       // const tooling = await promptForToolingConfigurations();
 
-    });
+    }).timeout(100000);
   });
 
   describe('promptForGithubCredentials()', () => {
@@ -50,7 +50,7 @@ describe('Prompting Mechanisms', () => {
       const credentials = await promptForGithubCredentials();
       assert.equal(credentials.username, 'jack');
       assert.equal(credentials.password, 'jack');
-    });
+    }).timeout(100000);
   });
 
   describe('promptForHerokuCredentials()', () => {
@@ -60,6 +60,6 @@ describe('Prompting Mechanisms', () => {
       assert.equal(credentials.email, 'jack@jack.com');
       assert.equal(credentials.password, 'jack');
       assert.equal(credentials.apiKey, '1234');
-    });
+    }).timeout(100000);
   });
 });

@@ -43,9 +43,6 @@ describe('Tyr Test', () => {
         assert.equal(fs.existsSync(projectName + '/node_modules'), true, 'should run NPM install,' +
           ' thus creating a node_modules folder');
 
-        assert.equal(fs.existsSync(projectName + '/package-lock.json'), true, 'should run NPM' +
-          ' install, thus creating a package-lock.json file');
-
         assert.equal(fs.existsSync(projectName + '/.tyrfile'), true, 'should create a .tyrfile');
       }).timeout(10000);
 
