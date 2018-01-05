@@ -57,6 +57,7 @@ async function generatePackageJson(configs) {
   contents = JSON.parse(contents);
   contents.name = projectConfigs.projectName;
   contents.description = projectConfigs.description;
+  contents.license = projectConfigs.license;
   contents.version = projectConfigs.version;
   contents.authors = projectConfigs.author.split(',');
 
