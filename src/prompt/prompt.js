@@ -45,7 +45,7 @@ export async function promptForProjectConfigurations() {
  * @param toolingConfig the config object to clean
  * @returns {Object} the cleaned config object
  */
-function cleanToolingData(toolingConfig) {
+export function cleanToolingData(toolingConfig) {
   Object.keys(toolingConfig).forEach((key) => {
     if (toolingConfig[key]) {
       if (toolingConfig[key] === choices.none) {
@@ -112,7 +112,7 @@ export async function promptForToolingConfigurations() {
  * Prompt for username and password combination
  * @returns {Object} object containing an username and password key/value pair
  */
-async function promptForUsernamePassword() {
+export async function promptForUsernamePassword() {
   const usernamePasswordQuestions = [{
     name: 'username',
     type: 'input',
@@ -131,7 +131,7 @@ async function promptForUsernamePassword() {
  * Prompts the user for an email and password combination
  * @returns {Object} object containing an email and password key/value pair
  */
-async function promptForEmailAndPasswordApiKey() {
+export async function promptForEmailAndPasswordApiKey() {
   const usernamePasswordQuestions = [{
     name: 'email',
     type: 'input',

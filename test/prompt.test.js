@@ -2,12 +2,32 @@ import assert from 'assert';
 import sinon from 'sinon'
 import inqurier from 'inquirer';
 ;
-import {promptForProjectConfigurations, promptForToolingConfigurations, promptForGithubCredentials, promptForHerokuCredentials } from '../dist/prompt/prompt';
+import {promptForProjectConfigurations, promptForToolingConfigurations, promptForGithubCredentials, promptForHerokuCredentials, cleanToolingData, promptForUsernamePassword, promptForEmailAndPasswordApiKey} from '../dist/prompt/prompt';
 
 describe('Prompting Test', () => {
   let inquirerMock = {};
   beforeEach(() => {
     inquirerMock = sinon.stub(inqurier, 'prompt');
+  });
+
+  describe('cleanToolingData()', () => {
+    it('should remove any key with <None> as a value', () => {
+      const toolingConfigBefore = {
+        sourceControl: '<None>',
+        ci: '<None>',
+        containerization: '<None>',
+        web: '<None>',
+        deployment: '<None>'
+      };
+
+      const after = {};
+      cleanToolingData(toolingConfigBefore);
+      assert.equal(typeof after.sourceControl, 'undefined');
+      assert.equal(typeof after.ci, 'undefined');
+      assert.equal(typeof after.containerization, 'undefined');
+      assert.equal(typeof after.web, 'undefined');
+      assert.equal(typeof after.deployment, 'undefined');
+    });
   });
 
   describe('promptForProjectConfigurations()', () => {
@@ -22,24 +42,26 @@ describe('Prompting Test', () => {
       assert.equal(configurations.author, 'test');
       assert.equal(configurations.license, 'MIT');
     });
-
-
-
   });
 
   describe('promptForToolingConfigurations()', () => {
-    it('should return the tooling configurations in the proper format with all selected', async () => {
-      // TODO test tooling prompt.
-      // tried doing this, but could never get the next question answered
+    it('should return the tooling configurations in the proper format with all selected', async (done) => {
+      inquirerMock.resolves({sourceControl: 'GitHub', ci: 'TravisCI', containerization: 'Docker', deployment: 'Heroku', web: 'ExpressJS', }, done());
+      const tooling = await promptForToolingConfigurations();
+      assert.equal(tooling.sourceControl, 'GitHub');
+      assert.equal(tooling.ci, 'TravisCI');
+      assert.equal(tooling.containerization, 'Docker');
+      assert.equal(tooling.deployment, 'Heroku');
+      assert.equal(tooling.web, 'ExpressJS');
+    });
+  });
 
-      // bddStdin(DOWN, ENTER);
-      // bddStdin(DOWN, ENTER);
-      // bddStdin(DOWN, ENTER);
-      // bddStdin(DOWN, ENTER);
-      // bddStdin(DOWN, ENTER);
-      //
-      // const tooling = await promptForToolingConfigurations();
-
+  describe('promptForUsernameAndPassword', () => {
+    it('should return the credentials in the proper format with a username and password', async function () {
+      inquirerMock.resolves({username: 'test', password: 'test'});
+      const credentials = await promptForUsernamePassword();
+      assert.equal(credentials.username, 'test');
+      assert.equal(credentials.password, 'test');
     });
   });
 
@@ -56,6 +78,16 @@ describe('Prompting Test', () => {
     it('should return the credentials in the proper format with a email and password', async function (done) {
       inquirerMock.resolves({email: 'test@test.com', password: 'test', apiKey: '1234'}, done());
       const credentials = await promptForHerokuCredentials();
+      assert.equal(credentials.email, 'test@test.com');
+      assert.equal(credentials.password, 'test');
+      assert.equal(credentials.apiKey, '1234');
+    });
+  });
+
+  describe('promptForEmailAndPasswordApiKey()', async function() {
+    it('should return the credentials in the proper format with a email and password', async function (done) {
+      inquirerMock.resolves({email: 'test@test.com', password: 'test', apiKey: '1234'}, done());
+      const credentials = await promptForEmailAndPasswordApiKey();
       assert.equal(credentials.email, 'test@test.com');
       assert.equal(credentials.password, 'test');
       assert.equal(credentials.apiKey, '1234');
