@@ -51,12 +51,36 @@ describe('Heroku Service', () => {
   });
 
   describe('createApp()', () => {
-    it('should successfully create a heroku app', async () => {
+    let createAppRequest = {};
 
+    beforeEach(() => {
+      createAppRequest = sinon.stub(herokuClient, 'createApp');
+    });
+
+    it('should successfully create a heroku app and return true', async () => {
+      createAppRequest.resolves();
+      const isCreated = await herokuService.createApp('blah', '1234');
+      assert.equal(isCreated, true);
+    });
+
+    it('should not create an app and return false if the name is already taken on heroku', async () => {
+      createAppRequest.rejects({status: 422});
+      const isCreated = await herokuService.createApp('blah', '1234');
+      assert.equal(isCreated, false);
     });
 
     it('should throw an error if it was unable to create a heroku app', async () => {
+      createAppRequest.rejects({status: 400});
+      try {
+        await herokuService.createApp('blah', '1234');
+        assert.equal(true, false, 'should be an error');
+      } catch (error) {
+        assert.equal(error.message, 'Unable to create Heroku Application');
+      }
+    });
 
+    afterEach(() => {
+      createAppRequest.restore();
     });
   });
 });
