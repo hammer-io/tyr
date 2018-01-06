@@ -136,7 +136,7 @@ export async function enableTravis(configs) {
   try {
     await travisClient.syncTravisWithGithub(travisAccessToken);
   } catch (error) {
-    throw new Error(`Failed to enable travis on ${username}/{$projectName} because we were unable to sync TravisCI with GitHub.`);
+    throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to sync TravisCI with GitHub.`);
   }
   // Get the project repository ID, and then use that ID to activate Travis for the project
   let repoId = '';
