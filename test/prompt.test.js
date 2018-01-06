@@ -1,31 +1,30 @@
 import assert from 'assert';
-import mockStdin from 'mock-stdin';
-import bddStdin from 'bdd-stdin';
-
+import sinon from 'sinon'
+import inqurier from 'inquirer';
+;
 import {promptForProjectConfigurations, promptForToolingConfigurations, promptForGithubCredentials, promptForHerokuCredentials } from '../dist/prompt/prompt';
 
-// prompt helpers
-const DOWN = bddStdin.keys.down;
-const UP = bddStdin.keys.up;
-const ENTER = '\n';
-
-describe('Prompting Mechanisms', () => {
-  let stdin;
-
+describe('Prompting Test', () => {
+  let inquirerMock = {};
   beforeEach(() => {
-    stdin = mockStdin.stdin();
+    inquirerMock = sinon.stub(inqurier, 'prompt');
   });
 
   describe('promptForProjectConfigurations()', () => {
-    it('should return the project configurations in the proper format', async () => {
-      bddStdin('jack', ENTER, 'jack', ENTER, '0.0.1', ENTER, 'jack', ENTER, 'MIT', ENTER);
+
+    it('should return the project configurations in the proper format', async function(done) {
+      inquirerMock.resolves({projectName: 'test', description: 'test', version: '0.0.1', author: 'test', license: 'MIT'}, done());
+
       const configurations = await promptForProjectConfigurations();
-      assert.equal(configurations.projectName, 'jack');
-      assert.equal(configurations.description, 'jack');
+      assert.equal(configurations.projectName, 'test');
+      assert.equal(configurations.description, 'test');
       assert.equal(configurations.version, '0.0.1');
-      assert.equal(configurations.author, 'jack');
+      assert.equal(configurations.author, 'test');
       assert.equal(configurations.license, 'MIT');
-    }).timeout(100000);
+    });
+
+
+
   });
 
   describe('promptForToolingConfigurations()', () => {
@@ -41,25 +40,29 @@ describe('Prompting Mechanisms', () => {
       //
       // const tooling = await promptForToolingConfigurations();
 
-    }).timeout(100000);
+    });
   });
 
   describe('promptForGithubCredentials()', () => {
-    it('should return the credentials in the proper format with a username and password', async () => {
-      bddStdin('jack', ENTER, 'jack', ENTER);
+    it('should return the credentials in the proper format with a username and password', async function () {
+      inquirerMock.resolves({username: 'test', password: 'test'});
       const credentials = await promptForGithubCredentials();
-      assert.equal(credentials.username, 'jack');
-      assert.equal(credentials.password, 'jack');
-    }).timeout(100000);
+      assert.equal(credentials.username, 'test');
+      assert.equal(credentials.password, 'test');
+    });
   });
 
-  describe('promptForHerokuCredentials()', () => {
-    it('should return the credentials in the proper format with a email and password', async () => {
-      bddStdin('jack@jack.com', ENTER, 'jack', ENTER, '1234', ENTER);
+  describe('promptForHerokuCredentials()', async function() {
+    it('should return the credentials in the proper format with a email and password', async function (done) {
+      inquirerMock.resolves({email: 'test@test.com', password: 'test', apiKey: '1234'}, done());
       const credentials = await promptForHerokuCredentials();
-      assert.equal(credentials.email, 'jack@jack.com');
-      assert.equal(credentials.password, 'jack');
+      assert.equal(credentials.email, 'test@test.com');
+      assert.equal(credentials.password, 'test');
       assert.equal(credentials.apiKey, '1234');
-    }).timeout(100000);
+    });
+  });
+
+  afterEach(() => {
+    inquirerMock.restore();
   });
 });

@@ -22,7 +22,7 @@ describe('Test Travis Service', () => {
   let waitForSync = {};
 
 
-  describe('enableTravis()', () => {
+  describe('enableTravis()', async function (){
     beforeEach(() => {
       configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
       githubTokenRequest = sinon.stub(githubClient, 'requestGitHubToken');
@@ -38,23 +38,28 @@ describe('Test Travis Service', () => {
     });
 
 
-    it('should enable Travis CI for a user', async () => {
+    it('should enable Travis CI for a user', async function(done) {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.resolves("1234");
       travisAccountRequest.resolves({accounts: [
           {id: 1, login: 'blah'},
           {id: 2, login: 'something else'}
         ]});
-      waitForSync.resolves();
-      travisGetUserInformationRequest.resolves({user: {user_is_syncing: false}});
+      travisGetUserInformationRequest.resolves({user: {is_syncing: false}});
+      waitForSync.resolves(done());
       syncTravisWithGithubRequest.resolves();
       getRepositoryIdRequest.resolves(1);
       activateTravisHookRequest.resolves();
       setEnvironmentVariableRequest.resolves();
+      deleteGithubTokenRequest.resolves();
 
-      const token = await enableTravis(configs);
-      assert.equal(token, '1234');
-    }).timeout(100000);
+      try {
+        const token = await enableTravis(configs);
+        assert.equal(token, '1234');
+      } catch (error) {
+        console.log(error.message);
+      }
+    });
 
     it('should throw an error if the GitHub token request fails', async () => {
       githubTokenRequest.rejects();
@@ -67,7 +72,7 @@ describe('Test Travis Service', () => {
       }
     });
 
-    it('should throw an error if the Travis token request fails', async () => {
+    it('should throw an error if the Travis token request fails', async function() {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.rejects();
 
@@ -80,7 +85,7 @@ describe('Test Travis Service', () => {
       }
     });
 
-    it('should thrown an error if the User Account request fails', async () => {
+    it('should thrown an error if the User Account request fails', async function() {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.resolves("1234");
       travisAccountRequest.rejects();
@@ -94,15 +99,15 @@ describe('Test Travis Service', () => {
       }
     });
 
-    it('should throw an error if Travis cannot sync with GitHub', async () => {
+    it('should throw an error if Travis cannot sync with GitHub', async function(done) {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.resolves("1234");
       travisAccountRequest.resolves({accounts: [
           {id: 1, login: 'blah'},
           {id: 2, login: 'something else'}
         ]});
-      waitForSync.resolves();
-      travisGetUserInformationRequest.resolves({user: {user_is_syncing: false}});
+      travisGetUserInformationRequest.resolves({user: {is_syncing: false}});
+      waitForSync.resolves(done());
       syncTravisWithGithubRequest.rejects();
 
       try {
@@ -114,17 +119,17 @@ describe('Test Travis Service', () => {
       }
 
 
-    }).timeout(100000);
+    });
 
-    it('should throw an error if Travis Hook cannot be activiated on the repository', async () => {
+    it('should throw an error if Travis Hook cannot be activiated on the repository', async function(done) {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.resolves("1234");
       travisAccountRequest.resolves({accounts: [
           {id: 1, login: 'blah'},
           {id: 2, login: 'something else'}
         ]});
-      waitForSync.resolves();
-      travisGetUserInformationRequest.resolves({user: {user_is_syncing: false}});
+      travisGetUserInformationRequest.resolves({user: {is_syncing: false}});
+      waitForSync.resolves(done());
       syncTravisWithGithubRequest.resolves();
       getRepositoryIdRequest.resolves(1);
       activateTravisHookRequest.rejects();
@@ -136,17 +141,17 @@ describe('Test Travis Service', () => {
         assert.equal(error.message, "Failed to enable travis on blah/test because we were unable" +
           " to activate TravisCI.")
       }
-    }).timeout(100000);
+    });
 
-    it('should throw an error if environment variables cannot be set', async () => {
+    it('should throw an error if environment variables cannot be set', async function(done) {
       githubTokenRequest.resolves("1234");
       travisTokenRequest.resolves("1234");
       travisAccountRequest.resolves({accounts: [
           {id: 1, login: 'blah'},
           {id: 2, login: 'something else'}
         ]});
-      waitForSync.resolves();
-      travisGetUserInformationRequest.resolves({user: {user_is_syncing: false}});
+      travisGetUserInformationRequest.resolves({user: {is_syncing: false}});
+      waitForSync.resolves(done());
       syncTravisWithGithubRequest.resolves();
       getRepositoryIdRequest.resolves(1);
       activateTravisHookRequest.resolves();
@@ -160,7 +165,7 @@ describe('Test Travis Service', () => {
           " to set environment variables.")
       }
 
-    }).timeout(100000);
+    });
 
     afterEach(() => {
       githubTokenRequest.restore();
