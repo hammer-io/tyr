@@ -81,7 +81,8 @@ export async function enableTravis(configs) {
   const password = configs.credentials.github.password;
   const projectName = configs.projectConfigurations.projectName;
   const envVariables = [];
-  if (configs.toolingConfigurations.deployment.toLowerCase() === 'heroku') {
+  if ((typeof configs.toolingConfigurations.deployment !== 'undefined')
+      && configs.toolingConfigurations.deployment.toLowerCase() === 'heroku') {
     envVariables.push({
       name: 'HEROKU_EMAIL',
       value: configs.credentials.heroku.email
