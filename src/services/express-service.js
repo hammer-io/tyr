@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import fs from 'fs';
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**
@@ -15,17 +15,17 @@ export async function generateExpressFiles(projectName) {
   const path = `${projectName}/src`;
 
   // generate the index.html file
-  const indexHTMLContents = file.loadTemplate('./../../../templates/express/index.html');
+  const indexHTMLContents = file.loadTemplate('./../../templates/express/index.html');
   file.writeFile(`${path}/index.html`, indexHTMLContents);
   log.info(`Successfully generated file: ${path}/index.html`);
 
   // generate the index.js file
-  const indexJSContents = file.loadTemplate('./../../../templates/express/index.js');
+  const indexJSContents = file.loadTemplate('./../../templates/express/index.js');
   file.writeFile(`${path}/index.js`, indexJSContents);
   log.info(`Successfully generated file: ${path}/index.js`);
 
   // generate the routes.js file
-  const routesJSContents = file.loadTemplate('./../../../templates/express/routes.js');
+  const routesJSContents = file.loadTemplate('./../../templates/express/routes.js');
   file.writeFile(`${path}/routes.js`, routesJSContents);
   log.info(`Successfully generated file: ${path}/routes.js`);
 

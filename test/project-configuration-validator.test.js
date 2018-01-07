@@ -1,6 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
-import {validateProjectConfigurations, validateProjectName, validateVersionNumber} from '../dist/utils/validators/project-configuration-validator';
+import {validateProjectConfigurations, validateProjectName, validateVersionNumber} from '../dist/utils/project-configuration-validator';
 import choices from '../dist/constants/choices/choices';
 
 describe('Project Configuration Validator', () => {

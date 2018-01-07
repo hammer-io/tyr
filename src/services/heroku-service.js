@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import * as herokuClient from './../clients/heroku';
-import { getActiveLogger } from '../utils/log/winston';
+import * as herokuClient from '../clients/heroku-client';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**

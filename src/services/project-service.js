@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
 import fs from 'fs';
 
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 import * as projectConfigurationService from './project-configuration-service';
 
 const log = getActiveLogger();
@@ -33,7 +33,7 @@ async function generateIndexFile(projectName) {
   log.verbose('Project File Service - generateIndexFile()');
 
   const path = `${projectName}/src/index.js`;
-  const contents = file.loadTemplate('./../../../templates/js/index.js');
+  const contents = file.loadTemplate('./../../templates/js/index.js');
   file.writeFile(path, contents);
   log.info(`Successfully generated file: ${path}`);
 }
@@ -51,7 +51,7 @@ async function generatePackageJson(configs) {
   const path = `${projectConfigs.projectName}/package.json`;
 
   // load the contents from the template file
-  let contents = file.loadTemplate('./../../../templates/js/package.json');
+  let contents = file.loadTemplate('./../../templates/js/package.json');
 
   // turn the template contents into json
   contents = JSON.parse(contents);

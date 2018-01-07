@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
 import yaml from 'js-yaml';
 
-import * as githubClient from './../clients/github';
-import * as travisClient from './../clients/travis';
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as githubClient from '../clients/github-client';
+import * as travisClient from '../clients/travis-client';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**
@@ -17,7 +17,7 @@ export async function generateTravisCIFile(configs) {
   const path = `${configs.projectConfigurations.projectName}/.travis.yml`;
 
   // load in the base travis CI file.
-  const travisCIFile = yaml.safeLoad(file.loadTemplate('./../../../templates/travis/travis.yml'));
+  const travisCIFile = yaml.safeLoad(file.loadTemplate('./../../templates/travis/travis.yml'));
 
   // if the user has selected heroku for deployment, then generate the specific heroku instances
   if (configs.toolingConfigurations.deployment === 'Heroku') {

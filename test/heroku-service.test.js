@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 
-import * as herokuClient from './../dist/clients/heroku';
+import * as herokuClient from './../dist/clients/heroku-client';
 import * as herokuService from '../dist/services/heroku-service';
 
 describe('Heroku Service', () => {

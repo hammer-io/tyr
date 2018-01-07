@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import superagent from 'superagent';
-import * as authorizationUtil from './../utils/authorization/authorization';
-import { getActiveLogger } from '../utils/log/winston';
+import * as authorizationUtil from '../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
 const githubApiUrl = 'https://api.github.com';
 const githubApiAccept = 'application/vnd.github.v3+json';

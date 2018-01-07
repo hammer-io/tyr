@@ -1,7 +1,7 @@
 import superagent from 'superagent';
-import { getActiveLogger } from '../utils/log/winston';
+import { getActiveLogger } from '../utils/winston';
 
-import * as authorizationUtil from './../utils/authorization/authorization';
+import * as authorizationUtil from '../utils/authorization';
 
 const log = getActiveLogger();
 const herokuApiUrl = 'https://api.heroku.com';

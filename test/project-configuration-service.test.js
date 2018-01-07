@@ -2,9 +2,6 @@ import assert from 'assert';
 import fs from 'fs';
 
 import { parseConfigsFromFile } from '../dist/services/project-configuration-service';
-import { getActiveLogger } from '../dist/utils/log/winston';
-
-const log = getActiveLogger();
 
 describe('Project Configuration Service', () => {
   describe('parseConfigsFromFile()', () => {

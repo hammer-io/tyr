@@ -10,7 +10,7 @@ import * as expressService from './services/express-service';
 import * as mochaService from './services/mocha-service';
 import * as nodeService from './services/node-service';
 
-import { getActiveLogger } from './utils/log/winston';
+import { getActiveLogger } from './utils/winston';
 
 const log = getActiveLogger();
 

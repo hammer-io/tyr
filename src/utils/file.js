@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getActiveLogger } from '../log/winston';
+import { getActiveLogger } from './winston';
 
 const log = getActiveLogger();
 

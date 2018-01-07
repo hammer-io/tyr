@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop,no-restricted-syntax */
 import * as prompt from './prompt/prompt';
-import { getActiveLogger, enableLogFile } from './utils/log/winston';
+import { getActiveLogger, enableLogFile } from './utils/winston';
 import * as tyr from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
 import * as githubService from './services/github-service';

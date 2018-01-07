@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import git from 'simple-git';
 
-import * as githubClient from './../clients/github';
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as githubClient from '../clients/github-client';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**
@@ -59,7 +59,7 @@ export async function generateGithubFiles(projectName) {
   log.verbose('Generating files for GitHub.');
 
   const path = `${projectName}/.gitignore`;
-  const contents = file.loadTemplate('./../../../templates/git/gitignore');
+  const contents = file.loadTemplate('./../../templates/git/gitignore');
   file.writeFile(path, contents);
 
   log.info(`Successfully generated file: ${path}`);

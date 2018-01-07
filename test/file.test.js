@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import eol from 'eol';
 
-import {readFile, loadTemplate, writeFile} from '../dist/utils/files/file';
+import {readFile, loadTemplate, writeFile} from '../dist/utils/file';
 
 describe('Test File Util', () => {
   before(() => {
@@ -36,7 +36,7 @@ describe('Test File Util', () => {
         "notifications:\n" +
         "  email:\n" +
         "    on_success: never";
-        const actualContents = loadTemplate('../../../templates/travis/travis.yml');
+        const actualContents = loadTemplate('../../templates/travis/travis.yml');
         assert.equal(eol.auto(actualContents), eol.auto(expectedContents));
 
     });

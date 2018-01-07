@@ -1,6 +1,6 @@
 import shell from 'shelljs';
 
-import { getActiveLogger } from './../utils/log/winston';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 

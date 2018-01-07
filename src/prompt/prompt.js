@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-import * as projectConfigurationValidator from '../utils/validators/project-configuration-validator';
-import choices from './../constants/choices/choices';
+import * as projectConfigurationValidator from '../utils/project-configuration-validator';
+import choices from '../constants/choices';
 
 /**
  * Prompts the user for their project configurations

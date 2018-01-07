@@ -3,8 +3,8 @@ import sinon from 'sinon';
 import fs from 'fs-extra';
 import eol from 'eol';
 
-import * as githubClient from '../dist/clients/github';
-import * as travisClient from '../dist/clients/travis';
+import * as githubClient from '../dist/clients/github-client';
+import * as travisClient from '../dist/clients/travis-client';
 
 import * as travisService from '../dist/services/travis-service';
 import {generateTravisCIFile, enableTravis} from '../dist/services/travis-service';

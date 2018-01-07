@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {basicAuthorization, tokenAuthorization, bearerAuthorization} from '../dist/utils/authorization/authorization';
+import {basicAuthorization, tokenAuthorization, bearerAuthorization} from '../dist/utils/authorization';
 
 describe('Authorization Util', () => {
   describe('basicAuthorization()', () => {

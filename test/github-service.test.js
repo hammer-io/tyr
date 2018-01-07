@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import fs from 'fs-extra';
 import eol from 'eol';
 
-import * as githubClient from '../dist/clients/github';
+import * as githubClient from '../dist/clients/github-client';
 import * as githubService from '../dist/services/github-service';
 import * as cli from '../dist/cli';
 

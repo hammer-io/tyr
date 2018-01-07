@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import fs from 'fs';
-import * as file from './../utils/files/file';
+import * as file from '../utils/file';
 
-import * as validator from './../utils/validators/project-configuration-validator';
-import { getActiveLogger } from '../utils/log/winston';
+import * as validator from '../utils/project-configuration-validator';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**

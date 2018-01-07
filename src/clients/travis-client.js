@@ -1,6 +1,6 @@
 import superagent from 'superagent';
-import * as authorizationUtil from './../utils/authorization/authorization';
-import { getActiveLogger } from '../utils/log/winston';
+import * as authorizationUtil from '../utils/authorization';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 const tyrAgent = 'Travis/1.0';

@@ -1,7 +1,7 @@
 import isValidPath from 'is-valid-path';
 import fs from 'fs-extra';
 
-import choices from './../../constants/choices/choices';
+import choices from '../constants/choices';
 
 /**
  * Validate project name

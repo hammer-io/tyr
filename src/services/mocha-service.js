@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**
@@ -11,7 +11,7 @@ const log = getActiveLogger();
 export async function generateMochaFiles(projectName) {
   log.verbose('Mocha Service - generateMochaFiles()');
   const path = `${projectName}/test.js`;
-  const content = file.loadTemplate('./../../../templates/mocha/test.js');
+  const content = file.loadTemplate('./../../templates/mocha/test.js');
 
   file.writeFile(path, content);
   log.info(`Successfully generated file: ${path}`);

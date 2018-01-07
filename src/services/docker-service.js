@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import * as file from './../utils/files/file';
-import { getActiveLogger } from '../utils/log/winston';
+import * as file from '../utils/file';
+import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 /**
@@ -13,8 +13,8 @@ export async function generateDockerFiles(projectName) {
   const dockerFilePath = `${projectName}/Dockerfile`;
   const dockerIgnorePath = `${projectName}/.dockerignore`;
 
-  const dockerFileContents = file.loadTemplate('./../../../templates/docker/Dockerfile');
-  const dockerIgnoreContents = file.loadTemplate('./../../../templates/docker/dockerignore');
+  const dockerFileContents = file.loadTemplate('./../../templates/docker/Dockerfile');
+  const dockerIgnoreContents = file.loadTemplate('./../../templates/docker/dockerignore');
 
   file.writeFile(dockerFilePath, dockerFileContents);
   log.info(`Successfully generated file: ${dockerFilePath}`);
