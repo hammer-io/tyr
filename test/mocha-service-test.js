@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import {generateMochaFiles} from '../dist/services/mocha-service';
 
@@ -23,7 +24,7 @@ describe('Mocha Service Test', () => {
       await generateMochaFiles('test-mocha');
 
       assert.equal(fs.existsSync('test-mocha/test.js'), true);
-      assert.equal(fs.readFileSync('test-mocha/test.js', 'utf-8'), expectedMochaContents);
+      assert.equal(eol.auto(fs.readFileSync('test-mocha/test.js', 'utf-8')), eol.auto(expectedMochaContents));
     });
 
     afterEach(() => {

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import * as githubClient from '../dist/clients/github';
 import * as travisClient from '../dist/clients/travis';
@@ -213,7 +214,7 @@ describe('Test Travis Service', () => {
       const actualContents = fs.readFileSync('test-project/.travis.yml', 'utf-8');
 
       assert.equal(fs.existsSync('test-project/.travis.yml'), true);
-      assert.equal(actualContents.trim(), expectedContents.trim());
+      assert.equal(eol.auto(actualContents.trim()), eol.auto(expectedContents.trim()));
     });
 
     it('should generate a .travis.yml file for use with heroku/docker', async () => {
@@ -264,9 +265,7 @@ describe('Test Travis Service', () => {
       const actualContents = fs.readFileSync('test-project/.travis.yml', 'utf-8');
 
       assert.equal(fs.existsSync('test-project/.travis.yml'), true);
-      assert.equal(actualContents.trim(), expectedContents.trim());
-
-
+      assert.equal(eol.auto(actualContents.trim()), eol.auto(expectedContents.trim()));
     });
 
     afterEach(() => {

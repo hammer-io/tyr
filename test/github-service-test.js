@@ -1,6 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import * as githubClient from '../dist/clients/github';
 import * as githubService from '../dist/services/github-service';
@@ -79,7 +80,7 @@ describe('GitHub Service', () => {
       await githubService.generateGithubFiles('test-github');
 
       assert.equal(fs.existsSync('test-github/.gitignore'), true);
-      assert.equal(fs.readFileSync('test-github/.gitignore'), expectedGitignoreContents);
+      assert.equal(eol.auto(fs.readFileSync('test-github/.gitignore', 'utf-8')), eol.auto(expectedGitignoreContents));
     });
 
     afterEach(() => {

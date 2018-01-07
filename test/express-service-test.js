@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import {generateExpressFiles} from '../dist/services/express-service';
 
@@ -72,7 +73,7 @@ describe('Express Service Test', () => {
         "</body>"
 
       assert.equal(fs.existsSync('test-express/src/index.html'), true);
-      assert.equal(fs.readFileSync('test-express/src/index.html'), expectedIndexContents);
+      assert.equal(eol.auto(fs.readFileSync('test-express/src/index.html', 'utf-8')), eol.auto(expectedIndexContents));
 
     });
 
@@ -97,7 +98,7 @@ describe('Express Service Test', () => {
         "module.exports = app;";
 
       assert.equal(fs.existsSync('test-express/src/index.js'), true);
-      assert.equal(fs.readFileSync('test-express/src/index.js'), expectedIndexContents)
+      assert.equal(eol.auto(fs.readFileSync('test-express/src/index.js', 'utf-8')), eol.auto(expectedIndexContents));
     });
 
     it('should generate a routes.js file', async () => {
@@ -117,7 +118,7 @@ describe('Express Service Test', () => {
         "});";
 
       assert.equal(fs.existsSync('test-express/src/routes.js'), true);
-      assert.equal(fs.readFileSync('test-express/src/routes.js'), expectedRoutesContent);
+      assert.equal(eol.auto(fs.readFileSync('test-express/src/routes.js', 'utf-8')), eol.auto(expectedRoutesContent));
     });
 
     it('should add express as a dependency to the package.json file', async () => {
@@ -147,7 +148,7 @@ describe('Express Service Test', () => {
       await generateExpressFiles('test-express');
 
       assert.equal(fs.existsSync('test-express/package.json'), true);
-      assert.equal(fs.readFileSync('test-express/package.json', 'utf-8'), expectedPackageJsonContents);
+      assert.equal(eol.auto(fs.readFileSync('test-express/package.json', 'utf-8')), eol.auto(expectedPackageJsonContents));
 
     });
 

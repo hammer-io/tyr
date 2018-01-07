@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import * as projectService from '../dist/services/project-service';
 
@@ -34,7 +35,7 @@ describe('Project Service Test', () => {
       await projectService.generateTyrfile(configs);
 
       assert.equal(fs.existsSync(projectName + "/.tyrfile"), true);
-      assert.equal(fs.readFileSync(projectName + "/.tyrfile", 'utf-8'), expectedTyrFileConfigs)
+      assert.equal(eol.auto(fs.readFileSync(projectName + "/.tyrfile", 'utf-8')), eol.auto(expectedTyrFileConfigs));
     });
   });
 
@@ -60,7 +61,7 @@ describe('Project Service Test', () => {
         "main();";
 
       assert.equal(fs.existsSync(projectName + '/src/' + 'index.js'), true);
-      assert.equal(fs.readFileSync(projectName + '/src/' + 'index.js'), expectedIndexContents);
+      assert.equal(eol.auto(fs.readFileSync(projectName + '/src/' + 'index.js', 'utf-8')), eol.auto(expectedIndexContents));
     });
 
     it('should generate a package.json file', () => {
@@ -86,7 +87,7 @@ describe('Project Service Test', () => {
         "}";
 
       assert.equal(fs.existsSync(projectName + '/' + 'package.json'), true);
-      assert.equal(fs.readFileSync(projectName + '/' + 'package.json', 'utf-8'), expectedPackageJsonContents);
+      assert.equal(eol.auto(fs.readFileSync(projectName + '/' + 'package.json', 'utf-8')), eol.auto(expectedPackageJsonContents));
     });
 
     it('should generate a README.md file', () => {
@@ -103,7 +104,7 @@ describe('Project Service Test', () => {
 
 
       assert.equal(fs.existsSync(projectName + '/' + 'README.md'), true);
-      assert.equal(fs.readFileSync(projectName + '/' + 'README.md', 'utf-8'), expectedReadmeContents);
+      assert.equal(eol.auto(fs.readFileSync(projectName + '/' + 'README.md', 'utf-8')), eol.auto(expectedReadmeContents));
     });
   });
 

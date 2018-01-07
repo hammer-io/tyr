@@ -1,5 +1,6 @@
 import assert from 'assert';
 import fs from 'fs-extra';
+import eol from 'eol';
 
 import {generateDockerFiles} from '../dist/services/docker-service';
 
@@ -16,7 +17,7 @@ describe('Docker Service Test', () => {
 
       await generateDockerFiles('test-docker');
 
-      assert.equal(fs.readFileSync('test-docker/.dockerignore', 'utf-8'), dockerignoreExpectedContents);
+      assert.equal(eol.auto(fs.readFileSync('test-docker/.dockerignore', 'utf-8')), eol.auto(dockerignoreExpectedContents));
       assert.equal(fs.existsSync('test-docker/.dockerignore'), true);
     });
 
@@ -46,7 +47,7 @@ describe('Docker Service Test', () => {
       await generateDockerFiles('test-docker');
 
       assert.equal(fs.existsSync('test-docker/Dockerfile'), true);
-      assert.equal(fs.readFileSync('test-docker/Dockerfile', 'utf-8'), dockerfileExpectedContents);
+      assert.equal(eol.auto(fs.readFileSync('test-docker/Dockerfile', 'utf-8')), eol.auto(dockerfileExpectedContents));
 
     });
   });
