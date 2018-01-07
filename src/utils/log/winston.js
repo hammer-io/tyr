@@ -48,8 +48,6 @@ const customDebugLevels = {
     info: 'green',
     http: 'grey',
     debug: 'grey',
-    verbose: 'black',
-    silly: 'black'
   }
 };
 
