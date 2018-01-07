@@ -85,7 +85,7 @@ export function initAddCommitAndPush(username, projectName) {
       .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
       .push('origin', 'master')
       .exec(() => {
-        log.info('Please wait while files are pushed to GitHub...');
+        log.warn('Please wait while files are pushed to GitHub...');
         setTimeout(() => {
           resolve();
         }, 10000); // TODO: Find a better way to do this than a timeout
