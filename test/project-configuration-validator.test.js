@@ -74,7 +74,7 @@ describe('Project Configuration Validator', () => {
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 2);
       assert.equal(errors[0], 'If no continuous integration tool was selected, there cannot be a' +
-        ' containerization tool selected')
+        ' containerization tool selected');
       assert.equal(errors[1], 'If no continuous integration tool was selected, there cannot be a' +
         ' deployment tool selected')
     });

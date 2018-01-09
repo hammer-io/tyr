@@ -15,6 +15,17 @@ describe('Project Configuration Service', () => {
       }
     });
 
+    it('should remove <None> from any tooling choice and remove the key it belongs to', () => {
+
+      const configs  = parseConfigsFromFile('test/test-configurations/.tyrfile');
+      assert.equal('test-project', configs.projectConfigurations.projectName);
+      assert.equal('test-project', configs.projectConfigurations.description);
+      assert.equal('0.0.0', configs.projectConfigurations.version);
+      assert.equal('test', configs.projectConfigurations.author);
+      assert.equal('MIT', configs.projectConfigurations.license);
+      assert.equal(0, Object.keys(configs.toolingConfigurations).length);
+      });
+
     it('should parse configurations and throw an error when an error occurs', () => {
       try {
         parseConfigsFromFile('test/test-configurations/bad-format-configuration');

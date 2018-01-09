@@ -4,6 +4,7 @@ import * as file from '../utils/file';
 
 import * as validator from '../utils/project-configuration-validator';
 import { getActiveLogger } from '../utils/winston';
+import { cleanToolingData } from '../prompt/prompt';
 
 const log = getActiveLogger();
 /**
@@ -24,6 +25,8 @@ export function parseConfigsFromFile(path) {
     throw new Error(message.trim());
   }
 
+  // clean contents
+  contents.toolingConfigurations = cleanToolingData(contents.toolingConfigurations);
   return contents;
 }
 

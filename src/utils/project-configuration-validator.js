@@ -80,22 +80,22 @@ export function validateProjectConfigurations(input) {
 
     // otherwise, if the a source control was not chosen (either because of <None> or it's
     // undefined, check if other CI, container, or deployment choices are being used. If they
-    // are, through an error because we cannot use these tools with out a source control
-  } else if ((input.toolingConfigurations.sourceControl === choices.none) ||
-    (typeof input.toolingConfigurations.sourceControl === 'undefined')) {
+    // are, throw an error because we cannot use these tools with out a source control
+  } else if ((typeof input.toolingConfigurations.sourceControl === 'undefined')
+    || (input.toolingConfigurations.sourceControl === choices.none)) {
     // check to make sure no CI is being used without source control
-    if ((typeof input.toolingConfigurations.ci !== 'undefined') || (input.toolingConfigurations.ci !== choices.none)) {
+    if ((typeof input.toolingConfigurations.ci !== 'undefined') && (input.toolingConfigurations.ci !== choices.none)) {
       errors.push('If no source control tool was selected, there cannot be a CI tool selected.');
     }
 
     // check to make sure no containerization tool is being used without source control
-    if ((typeof input.toolingConfigurations.containerization !== 'undefined') || (input.toolingConfigurations.containerization !== choices.none)) {
+    if ((typeof input.toolingConfigurations.containerization !== 'undefined') && (input.toolingConfigurations.containerization !== choices.none)) {
       errors.push('If no source control tool was selected, there cannot be a containerization' +
         ' tool selected. ');
     }
 
     // check to make sure deployment tool is not being used without source control
-    if ((typeof input.toolingConfigurations.deployment === 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') && (input.toolingConfigurations.deployment !== choices.none)) {
       errors.push('If no source control tool was selected, there cannot be a deployment tool' +
         ' selected');
     }
@@ -107,15 +107,15 @@ export function validateProjectConfigurations(input) {
     errors.push(`Invalid CI choice. Valid choices are ${choices.ciChoices}.`);
     // otherwise, if no CI choice was selected, make sure a containerization choice or
     // deployment choice is not selected.
-  } else if ((input.toolingConfigurations.ci === choices.none) || (typeof input.toolingConfigurations.ci === 'undefined')) {
+  } else if ((typeof input.toolingConfigurations.ci === 'undefined') || (input.toolingConfigurations.ci === choices.none)) {
     // check to make sure containerization is not used without a CI tool
-    if ((typeof input.toolingConfigurations.containerization !== 'undefined') || (input.toolingConfigurations.containerization !== choices.none)) {
+    if ((typeof input.toolingConfigurations.containerization !== 'undefined') && (input.toolingConfigurations.containerization !== choices.none)) {
       errors.push('If no continuous integration tool was selected, there cannot be a' +
         ' containerization tool selected');
     }
 
     // check to make sure deployment choice is not used without a CI tool
-    if ((typeof input.toolingConfigurations.deployment !== 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') && (input.toolingConfigurations.deployment !== choices.none)) {
       errors.push('If no continuous integration tool was selected, there cannot be a deployment' +
         ' tool selected');
     }
@@ -126,9 +126,10 @@ export function validateProjectConfigurations(input) {
     !choices.containerizationChoices.includes(input.toolingConfigurations.containerization)) {
     errors.push(`Invalid container choice. Valid choices are ${choices.containerizationChoices}`);
     // otherwise, if no containerization choice was chosen, make sure there is no deployment choice
-  } else if ((input.toolingConfigurations.containerization === choices.none) || (typeof input.toolingConfigurations.containerization === 'undefined')) {
+  } else if ((typeof input.toolingConfigurations.containerization === 'undefined')
+    || (input.toolingConfigurations.containerization === choices.none)) {
     // check to make sure no deployment choice was chosen
-    if ((typeof input.toolingConfigurations.deployment !== 'undefined') || (input.toolingConfigurations.deployment !== choices.none)) {
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') && (input.toolingConfigurations.deployment !== choices.none)) {
       errors.push('If no containerization tool was selected, there cannot be a deployment tool' +
         ' selected');
     }

@@ -87,7 +87,7 @@ Choice must also be `<None>`.
       author: ['author1', 'author2', ...],
       license: '{license}'
     },
-  tooling:
+  toolingConfigurations:
     {
       sourceControl: '{source control choice}',
       web: '{web framework choice}',
