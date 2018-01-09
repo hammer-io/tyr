@@ -1,332 +1,159 @@
-/* eslint-disable no-await-in-loop */
-import figlet from 'figlet';
-import fs from 'fs';
-
-import * as configFile from './utils/config-file';
-import utils from './utils';
-import * as prompt from './prompt';
-import constants from './constants/constants';
-import { deleteGitHubToken } from './clients/github';
+/* eslint-disable no-await-in-loop,no-restricted-syntax */
+import * as prompt from './prompt/prompt';
 import { getActiveLogger, enableLogFile } from './utils/winston';
-import deplomentChoices from './constants/deployment-choices';
+import * as tyr from './tyr';
+import { parseConfigsFromFile } from './services/project-configuration-service';
+import * as githubService from './services/github-service';
+import * as herokuService from './services/heroku-service';
 
 const log = getActiveLogger();
 
 /**
- * Generates all of the local files for the user
- * @param config the project configurations
- * @returns
+ * Gets the users project configurations by triggering the prompt
+ * @returns {Object} the user's project configurations
  */
-export async function generateProjectFiles(config) {
-  // if the project doesn't already exist, initialize the files and accounts
-  if (!fs.existsSync(config.projectConfigurations.projectName)) {
-    fs.mkdirSync(config.projectConfigurations.projectName);
-    fs.mkdirSync(`${config.projectConfigurations.projectName}/src`);
-
-    // write to config file
-    await configFile.writeToConfigFile(config);
-
-    const dependencies = {};
-
-    // enable an express project or a basic node project
-    if (config.tooling.web === constants.express.name) {
-      dependencies.express = constants.express.version;
-      await utils.express.createJsFiles(config.projectConfigurations.projectName);
-    } else {
-      await utils.file.createIndexFile(config.projectConfigurations.projectName);
-    }
-
-    // create package.json
-    await utils.file.createPackageJson(config.projectConfigurations, dependencies);
-
-    // create README.md
-    await utils.file.createReadMe(
-      config.projectConfigurations.projectName,
-      config.projectConfigurations.description
-    );
-
-    // create mocha test suite
-    await utils.mocha.createMochaTestSuite(`${config.projectConfigurations.projectName}`);
-
-    // create .gitignore
-    if (config.tooling.sourceControl === constants.github.name) {
-      await utils.git.createGitIgnore(config.projectConfigurations.projectName);
-    }
-
-    // create .travis.yml
-    if (config.tooling.ci === constants.travisCI.name) {
-      await utils.travis.initTravisCI(config);
-    }
-
-    // create Dockerfile and .dockerignore
-    if (config.tooling.containerization === constants.docker.name) {
-      await utils.docker.initDocker(config.projectConfigurations);
-    }
-  }
-
-  return 'Project already exists!';
+async function getProjectConfigurations() {
+  const configs = await prompt.promptForProjectConfigurations();
+  return configs;
 }
 
 /**
- * Initializes the files and accounts needed to use or application
- *
- * @param config the config object form the main inquirer prompt
+ * Gets the users tooling configurations by triggering the prompt
+ * @returns {Object} the user's tooling configurations
  */
-export async function initProject(config) {
-  log.verbose('initializing project');
+async function getToolingConfigurations() {
+  const configs = await prompt.promptForToolingConfigurations();
+  return configs;
+}
 
-  let createdRepo = false;
+/**
+ * Function which facilitates signing in to heroku. Gets the credentials, validates the
+ * credentials, and if they are invalid, prompts for new credentials.
+ * @returns {Object} the heroku credentials as a email and password key/value pair
+ */
+export async function signInToHeroku() {
+  const credentials = await prompt.promptForHerokuCredentials();
+  const isValid = await herokuService.isValidCredentials(credentials.email, credentials.password);
+  if (!isValid) {
+    log.error('Incorrect Email and/or Password!');
+    await signInToHeroku();
+  }
 
-  const areFilesGenerated = await generateProjectFiles(config);
-  if (!areFilesGenerated) {
+  return credentials;
+}
+
+/**
+ * Function which facilitates signing in to github. Gets the credentials, validates the
+ * credentials, and if they are invalid, prompts for new credentials.
+ * @returns {Object} the github credentials as a username and password key/value pair
+ */
+export async function signInToGithub() {
+  const credentials = await prompt.promptForGithubCredentials();
+  const isValid = await githubService.isValidCredentials(
+    credentials.username,
+    credentials.password
+  );
+
+  if (!isValid) {
+    log.error('Incorrect Username and/or Password!');
+    await signInToGithub();
+  }
+
+  return credentials;
+}
+
+// If the user needs to sign in to third party tools, then a key/value pair should go in this
+// constant. The key should be the tool's name (all lowercase) and the value should be a function
+// which should handle the sign in process.
+const thirdPartyTools = {
+  heroku: signInToHeroku,
+  github: signInToGithub
+};
+
+/**
+ * Function which facilitates signing in to third party tools
+ * @param toolingConfigs the tooling configurations
+ * @returns {Object} the credentials for the third party tools
+ */
+async function signInToThirdPartyTools(toolingConfigs) {
+  const credentials = {};
+  for (const key of Object.keys(toolingConfigs)) {
+    const tool = toolingConfigs[key];
+    if (thirdPartyTools[tool.toLowerCase()]) {
+      credentials[tool.toLowerCase()] = await thirdPartyTools[tool.toLowerCase()]();
+    }
+  }
+
+  return credentials;
+}
+
+/**
+ * Get the configurations from a file
+ * @param configFile the path to the configuration file
+ * @returns {Object} the configurations
+ */
+function getConfigurationsFromFile(configFile) {
+  let configurations = {};
+  try {
+    configurations = parseConfigsFromFile(configFile);
+    return configurations;
+  } catch (error) {
+    log.error('Failed to parse from configuration file', error);
+  }
+}
+
+/**
+ * Get the configuration from a prompt
+ * @returns {Object} the project configurations
+ */
+async function getConfigurationsFromPrompt() {
+  const configurations = {};
+  const projectConfigurations = await getProjectConfigurations();
+  const toolingConfigurations = await getToolingConfigurations();
+  configurations.projectConfigurations = projectConfigurations;
+  configurations.toolingConfigurations = toolingConfigurations;
+  return configurations;
+}
+
+/**
+ * The main run function
+ * @param configFile path to the configuration file
+ * @param logFile path to the logfile
+ */
+export async function run(configFile, logFile) {
+  if (logFile) {
+    enableLogFile(logFile);
+  }
+
+  let configurations = {};
+
+  // parse from the config file that was passed in
+  try {
+    if (configFile) {
+      configurations = getConfigurationsFromFile(configFile);
+
+      // if something goes wrong, get configs from the prompt
+      if (!configurations) {
+        configurations = await getConfigurationsFromPrompt();
+      }
+
+      // no config file, that means we should get configs from the prompt
+    } else {
+      configurations = await getConfigurationsFromPrompt();
+    }
+  } catch (error) {
+    log.error('Unable to get configurations. Exiting tyr.');
     return;
   }
 
-  if (config.tooling.sourceControl === constants.github.name) {
-    try {
-      createdRepo = await utils.git.createGithubRepo(
-        config.projectConfigurations.projectName,
-        config.projectConfigurations.description,
-        config.credentials.github
-      );
-    } catch (err) {
-      log.error('failed to create github repo', err);
-      createdRepo = false;
-    }
-  }
-
-  const environmentVariables = [];
-
-  // Docker Hub credentials
-  // May come in handy later
-
-  // if (config.tooling.containerization === constants.docker.name) {
-  //   environmentVariables.push({
-  //     name: 'DOCKER_USERNAME',
-  //     value: config.credentials.docker.username
-  //   });
-  //   environmentVariables.push({
-  //     name: 'DOCKER_PASSWORD',
-  //     value: config.credentials.docker.password
-  //   });
-  // }
-
-  if (config.tooling.deployment === constants.heroku.name) {
-    environmentVariables.push({
-      name: 'HEROKU_EMAIL',
-      value: config.credentials.heroku.email
-    });
-    environmentVariables.push({
-      name: 'HEROKU_USERNAME',
-      value: config.credentials.heroku.email
-    });
-    environmentVariables.push({
-      name: 'HEROKU_PASSWORD',
-      value: config.credentials.heroku.apiKey
-    });
-  }
-
-  // create .travis.yml file and enable travis on project
-  if (createdRepo && config.tooling.ci === constants.travisCI.name) {
-    try {
-      await utils.travis.enableTravisOnProject(
-        config.credentials.github.token,
-        config.credentials.github.username,
-        config.projectConfigurations.projectName,
-        environmentVariables
-      );
-    } catch (err) {
-      log.error(`failed to enable TravisCI on ${config.credentials.github.username}/${config.projectConfigurations.projectName}`, err);
-    }
-  }
-
-  // push files to github
-  if (createdRepo && config.tooling.sourceControl === constants.github.name) {
-    await utils.git.commitAndPush(
-      config.projectConfigurations.projectName,
-      config.credentials.github
-    );
-  }
-
-  // run npm install on project
-  utils.npm.npmInstall(`${config.projectConfigurations.projectName}`);
-}
-
-/**
- * Wrapper to get github credentials for the user
- * @returns the credentials structure
- *
- * {
- *  username: 'jack',
- *  password: 'somethingsomething',
- *  token: 'your private token',
- *  isTwoFactorAuth: 'false'
- * }
- */
-async function signInToGithub() {
-  log.info('Please login to GitHub: ');
-  let githubCredentials = await prompt.promptForGithubCredentials();
-  let finalCredentials =
-    await utils.git.signIntoGithub(
-      githubCredentials.username,
-      githubCredentials.password
-    );
-
-  // if the user could not be authenticated, loop again
-  while (!finalCredentials) {
-    log.error('Incorrect username/password!');
-    log.info('Please login to GitHub: ');
-    githubCredentials = await prompt.promptForGithubCredentials();
-    finalCredentials =
-      await utils.git.signIntoGithub(
-        githubCredentials.username,
-        githubCredentials.password
-      );
-  }
-
-  return finalCredentials;
-}
-
-/**
- * Wrapper to get heroku credentials for the user
- * @returns
- *
- * {
- *  email: 'someemail@email.com',
- *  password: 'somethingsomething'
- * }
- */
-async function setupHeroku(configs) {
-  log.info('Please login to Heroku: ');
-  let disableHeroku = false;
-  let herokuCredentials = await prompt.promptForHerokuCredentials();
-  let credentials =
-    await utils.heroku.signInToHeroku(
-      herokuCredentials.email,
-      herokuCredentials.password
-    );
-
-  // if the user could not be authenticated, loop again
-  while (!credentials) {
-    log.error('Incorrect email/password!');
-    log.info('Please login to Heroku: ');
-    herokuCredentials = await prompt.promptForHerokuCredentials();
-    credentials =
-      await utils.heroku.signInToHeroku(
-        herokuCredentials.email,
-        herokuCredentials.password
-      );
-  }
-
-  log.info('Successfully logged into Heroku!');
-  // Create the app on Heroku
-  let appName = await utils.heroku.createApp(
-    configs.projectConfigurations.projectName,
-    herokuCredentials.apiKey
-  );
-
-  if (appName && appName.includes('Delete some apps or add a credit card to verify your account.')) {
-    log.error('You\'ve reached the limit of 5 apps for unverified accounts. Delete some apps or add a credit card to verify your account.');
-    disableHeroku = true;
-    return {
-      herokuCredentials,
-      appName: configs.projectConfigurations.projectName,
-      disableHeroku
-    };
-  }
-
-  while (appName && appName.includes('Name is already taken')) {
-    log.error('Project name not available on Heroku!! Pick a different project name');
-    const response = await prompt.promptForNewProjectName();
-    appName = await utils.heroku.createApp(response.projectName, herokuCredentials.apiKey);
-  }
-  log.info('Successfully created app on Heroku!');
-
-  return { herokuCredentials, appName, disableHeroku };
-}
-
-/**
- * Signs into all of the third party tools
- * @param configs the project configurations
- * @returns the credentials
- */
-async function signInToThirdPartyTools(configs) {
-  const credentials = {};
-  let herokuConfigs = {};
-  const toolOptions = {};
-  if (configs.tooling.sourceControl === constants.github.name) {
-    const githubCredentials = await signInToGithub();
-    credentials.github = githubCredentials;
-  }
-
-  if (configs.tooling.deployment === constants.heroku.name) {
-    herokuConfigs = await setupHeroku(configs);
-    credentials.heroku = herokuConfigs.herokuCredentials;
-    toolOptions.appName = herokuConfigs.appName;
-    toolOptions.disableHeroku = herokuConfigs.disableHeroku;
-  }
-
-  toolOptions.credentials = credentials;
-  return toolOptions;
-}
-
-/**
- * The main execution function for tyr.
- *
- * @param tyr tyr holds values about command line parameters
- *                to access information about the config file, look at tyr.config
- *
- *                For more information about commander: https://github.com/tj/commander.js
- */
-export default async function run(tyr) {
-  // Enable logging to file upon user request
-  if (tyr.logfile) {
-    enableLogFile(tyr.logfile);
-  }
-  let configs = {};
+  // sign in to third party tools
   try {
-    log.verbose('run');
-    log.info(figlet.textSync(constants.tyr.name, { horizontalLayout: 'full' }));
-
-    if (tyr.config) {
-      if (fs.existsSync(tyr.config)) {
-        configs = configFile.parseConfigsFromFile(tyr.config);
-      } else {
-        log.error('Configuration File does not exist!');
-      }
-    } else {
-      // get the project configurations
-      configs = await prompt.prompt();
-    }
-
-    // sign in to third party tools
-    const toolConfigs = await signInToThirdPartyTools(configs);
-    configs.credentials = toolConfigs.credentials;
-    if (configs.tooling.deployment === constants.heroku.name) {
-      configs.projectConfigurations.projectName = toolConfigs.appName;
-      if (toolConfigs.disableHeroku) {
-        configs.tooling.deployment = deplomentChoices.none;
-      }
-    }
-
-    // initialize the basic project files
-    await initProject(configs);
-    log.info('Successfully generated your project!');
-  } catch (err) {
-    log.error('Failed to generate your project!', err);
-  } finally {
-    if (typeof configs.credentials.github !== 'undefined') {
-      try {
-        await
-        deleteGitHubToken(
-          configs.credentials.github.url,
-          configs.credentials.github.username,
-          configs.credentials.github.password
-        );
-      } catch (error) {
-        log.error('Failed to delete github token. Go to https://github.com/settings/tokens and' +
-          ' make sure the hammer-io token is deleted.', error);
-      }
-    }
+    const credentials = await signInToThirdPartyTools(configurations.toolingConfigurations);
+    configurations.credentials = credentials;
+  } catch (error) {
+    log.error(`${error.message}. Exiting tyr.`);
+    return;
   }
+
+  await tyr.generateProject(configurations);
 }
