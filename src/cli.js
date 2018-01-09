@@ -143,6 +143,7 @@ export async function run(configFile, logFile) {
     }
   } catch (error) {
     log.error('Unable to get configurations. Exiting tyr.');
+    return;
   }
 
   // sign in to third party tools
