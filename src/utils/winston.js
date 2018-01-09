@@ -1,7 +1,8 @@
 import {
   format,
   loggers,
-  transports
+  transports,
+  addColors
 } from 'winston';
 
 function isLoggerType(str) {
@@ -19,7 +20,7 @@ if (!isLoggerType(activeLogger)) {
 
 // Info level is only appended to the message if it's out of the ordinary (not 'info')
 const customFormatting = format.printf((info) => {
-  const level = (info.level === 'info') ? '' : `[${info.level.toUpperCase()}] `;
+  const level = `[${info.level.toUpperCase()}] `;
   return `${level}${info.message}`;
 });
 
@@ -29,10 +30,32 @@ const logfileFormatting = format.printf((info) => {
   return `${info.timestamp} [${level}] ${info.message}`;
 });
 
+// Switches the order of debug and verbose so that verbose
+// doesn't show during debug.
+const customDebugLevels = {
+  levels: {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    debug: 4,
+    verbose: 5,
+    silly: 6
+  },
+  colors: {
+    error: 'red',
+    warn: 'yellow',
+    info: 'green',
+    http: 'grey',
+    debug: 'grey',
+  }
+};
+
 /**
  * The info logger
  */
 loggers.add('info', {
+  levels: customDebugLevels.levels,
   transports: [
     new transports.Console({
       level: 'info',
@@ -48,6 +71,11 @@ loggers.add('info', {
  * The verbose logger
  */
 loggers.add('verbose', {
+  levels: customDebugLevels.levels,
+  format: format.combine(
+    format.colorize({ message: true }),
+    customFormatting
+  ),
   transports: [
     new transports.Console({
       level: 'verbose',
@@ -59,23 +87,15 @@ loggers.add('verbose', {
   ]
 });
 
-// Switches the order of debug and verbose so that verbose
-// doesn't show during debug.
-const customDebugLevels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-  verbose: 5,
-  silly: 6
-};
-
 /**
  * The debug logger
  */
 loggers.add('debug', {
-  levels: customDebugLevels,
+  levels: customDebugLevels.levels,
+  format: format.combine(
+    format.colorize({ message: true }),
+    customFormatting
+  ),
   transports: [
     new transports.Console({
       level: 'debug',
@@ -86,6 +106,8 @@ loggers.add('debug', {
     })
   ]
 });
+
+addColors(customDebugLevels);
 
 /**
  * Returns the active logger instance.

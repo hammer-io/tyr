@@ -1,0 +1,12 @@
+{
+    "projectConfigurations": {
+
+    },
+    "toolingConfigurations": {
+        "sourceControl": "GitHub",
+        "ci": "TravisCI",
+        "containerization": "Docker",
+        "deployment": "Heroku",
+        "web": "ExpressJS"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "projectConfigurations": {
+        "projectName": "test-project",
+        "description": "test-project",
+        "version": "0.0.0",
+        "author": "test",
+        "license": "MIT"
+    },
+    "toolingConfigurations": {
+
+    }
+}

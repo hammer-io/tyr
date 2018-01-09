@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 /**
  * Returns the string used for the basic authorization.
  *
