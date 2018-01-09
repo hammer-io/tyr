@@ -14,6 +14,6 @@ program.usage('[options]')
   .option('--logfile <file>', 'The filepath that logs will be written to.')
   .parse(process.argv);
 
-console.log(chalk.yellow(figlet.textSync('Tyr', { horizontalLayout: 'full' })));
+console.log(chalk.yellow(figlet.textSync('tyr', { horizontalLayout: 'full' })));
 
 cli.run(program.config, program.logfile);
