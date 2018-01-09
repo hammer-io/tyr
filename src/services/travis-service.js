@@ -70,6 +70,31 @@ export async function waitForSync(travisAccessToken, account) {
 }
 
 /**
+ * Waits for the project that is being created to exist on TravisCI
+ * @param projectName the project name
+ * @param username the username
+ * @param travisAccessToken the travis access token
+ * @param account the account
+ * @returns {Promise<void>}
+ */
+export async function waitForProjectToExist(projectName, username, travisAccessToken, account) {
+  const repos = await travisClient.getRepos(username, travisAccessToken);
+  let isFound = false;
+
+  repos.repositories.forEach((repo) => {
+    if (repo.name === projectName) {
+      isFound = true;
+    }
+  });
+
+  if (!isFound) {
+    await waitForSync(travisAccessToken, account);
+    await travisClient.syncTravisWithGithub(travisAccessToken);
+    await waitForProjectToExist(projectName, username, travisAccessToken, account);
+  }
+}
+
+/**
  * Enables TravisCI for the project
  * @param configs the configuration object
  * @returns {Promise<{}>}
@@ -139,12 +164,21 @@ export async function enableTravis(configs) {
   } catch (error) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to sync TravisCI with GitHub.`);
   }
+
+  await waitForProjectToExist(
+    configs.projectConfigurations.projectName,
+    username,
+    travisAccessToken,
+    account
+  );
+
   // Get the project repository ID, and then use that ID to activate Travis for the project
   let repoId = '';
   try {
     repoId = await travisClient.getRepositoryId(travisAccessToken, username, projectName);
     await travisClient.activateTravisHook(repoId, travisAccessToken);
   } catch (error) {
+    console.log(JSON.stringify(error));
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to activate TravisCI.`);
   }
 

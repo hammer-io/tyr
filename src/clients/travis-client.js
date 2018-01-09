@@ -67,6 +67,36 @@ export function getUserAccount(travisAccessToken) {
 }
 
 /**
+ * Gets the repositories for a user
+ * @param username the username to get the repostories for
+ * @param travisAccessToken the user's access token
+ * @returns {Promise<any>}
+ */
+export function getRepos(username, travisAccessToken) {
+  log.http(`GET ${travisApiUrl}/${username}/repos/ - getting user repositories`);
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${travisApiUrl}/owner/${username}/repos`)
+      .set({
+        'User-Agent': tyrAgent,
+        Accept: travisApiAccept,
+        'Travis-Api-Version': 3,
+        Authorization: `token ${travisAccessToken}`
+      })
+      .end((err, res) => {
+        if (err) {
+          log.debug(`ERROR: GET ${travisApiUrl}/repos/ - error getting user repos - 
+            ${JSON.stringify({ status: err.status, message: err.message })}`);
+          reject(filterErrorResponse(err));
+        } else {
+          log.debug(`RESPONSE: GET ${travisApiUrl}/accounts/ - successfully got user account`);
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+/**
  * Get user information based on the account provided.
  *
  * See https://docs.travis-ci.com/api/#users for information about returns.
