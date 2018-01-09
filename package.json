@@ -1,6 +1,6 @@
 {
   "name": "tyr-cli",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A command line interface for hammer-io.",
   "main": "src/index.js",
   "scripts": {
