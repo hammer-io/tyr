@@ -15,22 +15,24 @@ describe('Node Service Test', () => {
         "  \"main\": \"src/index.js\",\n" +
         "  \"scripts\": {\n" +
         "    \"start\": \"node src/index.js\",\n" +
-        "    \"test\": \"mocha\"\n" +
+        "    \"test\": \"\"\n" +
         "  },\n" +
         "  \"repository\": {},\n" +
         "  \"authors\": [],\n" +
         "  \"license\": \"\",\n" +
         "  \"bin\": {},\n" +
         "  \"dependencies\": {},\n" +
-        "  \"devDependencies\": {\n" +
-        "    \"mocha\": \"3.5.3\"\n" +
-        "  }\n" +
+        "  \"devDependencies\": {}\n" +
         "}");
     });
 
     it('should run npm install', async () => {
-      await npmInstall('test-npm-install')
-      assert.equal(fs.existsSync('test-npm-install/node_modules'), true);
+      await npmInstall('test-npm-install');
+      if(process.version.startsWith("v8")) { // node 8 doesn't create node modules folder for no dependencies
+        assert.equal(fs.existsSync('test-npm-install/node_modules'), false); // a basic node project has no dependencies
+      } else  { // node 6 creates node modules for no dependencies
+        assert.equal(fs.existsSync('test-npm-install/node_modules'), true); // a basic node project has no dependencies
+      }
     }).timeout(10000);
 
     afterEach(() => {

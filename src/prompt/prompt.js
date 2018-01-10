@@ -102,6 +102,11 @@ export async function promptForToolingConfigurations() {
     type: 'list',
     choices: choices.webChoices,
     message: 'Web Application Framework:'
+  }, {
+    name: 'test',
+    type: 'list',
+    choices: choices.testChoices,
+    message: 'Testing Framework:'
   }];
 
   const tooling = await inquirer.prompt(toolingQuestions);

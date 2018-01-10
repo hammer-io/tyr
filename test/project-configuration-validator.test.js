@@ -108,11 +108,6 @@ describe('Project Configuration Validator', () => {
       assert.equal(errors[0], 'If no containerization tool was selected, there cannot be a deployment tool' +
         ' selected')
     });
-
-    it('validate file with errors because of bad tooling configurations' +
-      ' because of no deployment (<None>)', () => {
-
-    });
   });
 
   describe('validateProjectName()', () => {
