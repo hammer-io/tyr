@@ -25,6 +25,12 @@
     "Nischay Venkatram <nischay.v@gmail.com> (www.nischayv.com)",
     "Nathan Karasch <nathankarasch@gmail.com> (krashdev.com)"
   ],
+  "keywords": [
+    "dev ops", "auto dev ops", "deployment", "project generator",
+    "project-generator", "deployment pipeline", "automation",
+    "command line interface", "cli", "hammer", "hammer.io",
+    "tyr", "tyr-cli", "tyr cli"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hammer-io/tyr/issues"
