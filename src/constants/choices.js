@@ -7,5 +7,6 @@ export default {
   containerizationChoices: ['<None>', 'Docker'],
   deploymentChoices: ['<None>', 'Heroku'],
   sourceControlChoices: ['<None>', 'GitHub'],
-  webChoices: ['<None>', 'ExpressJS']
+  webChoices: ['<None>', 'ExpressJS'],
+  testChoices: ['<None>', 'Mocha']
 };

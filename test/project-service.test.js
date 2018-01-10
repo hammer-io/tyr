@@ -72,7 +72,7 @@ describe('Project Service Test', () => {
         " \"main\": \"src/index.js\",\n" +
         " \"scripts\": {\n" +
         "  \"start\": \"node src/index.js\",\n" +
-        "  \"test\": \"mocha\"\n" +
+        "  \"test\": \"\"\n" +
         " },\n" +
         " \"repository\": {},\n" +
         " \"authors\": [\n" +
@@ -81,9 +81,7 @@ describe('Project Service Test', () => {
         " \"license\": \"MIT\",\n" +
         " \"bin\": {},\n" +
         " \"dependencies\": {},\n" +
-        " \"devDependencies\": {\n" +
-        "  \"mocha\": \"3.5.3\"\n" +
-        " }\n" +
+        " \"devDependencies\": {}\n" +
         "}";
 
       assert.equal(fs.existsSync(projectName + '/' + 'package.json'), true);
