@@ -39,8 +39,8 @@ describe('Mocha Service Test', () => {
 
       await generateMochaFiles('test-mocha');
 
-      assert.equal(fs.existsSync('test-mocha/test.js'), true);
-      assert.equal(eol.auto(fs.readFileSync('test-mocha/test.js', 'utf-8')), eol.auto(expectedMochaContents));
+      assert.equal(fs.existsSync('test-mocha/test/test.js'), true);
+      assert.equal(eol.auto(fs.readFileSync('test-mocha/test/test.js', 'utf-8')), eol.auto(expectedMochaContents));
     });
 
     it('should add mocha as a dev dependency and update the test script', async () => {
