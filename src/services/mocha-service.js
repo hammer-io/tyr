@@ -12,7 +12,8 @@ const log = getActiveLogger();
  */
 export async function generateMochaFiles(projectName) {
   log.verbose('Mocha Service - generateMochaFiles()');
-  const path = `${projectName}/test.js`;
+  fs.mkdirSync(`${projectName}/test`);
+  const path = `${projectName}/test/test.js`;
   const content = file.loadTemplate('./../../templates/mocha/test.js');
 
   // add mocha as a dev dependency to the package.json
