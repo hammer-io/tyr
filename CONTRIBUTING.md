@@ -48,6 +48,8 @@ Please ensure that commits are descriptive and are free of any obvious grammatic
 * Please follow the syntax of `closes #issuenumber: description` when submitting pull requests.
 * Please write a brief description of the pull request in the comments section
 * Please request a reviewer upon submitting pull request.
+* Please ensure that lint errors and tests pass before opening a pull request. 
+* Please create pull requests against the Dev branch. 
 * When in doubt, follow [GitHub's Guidelines](https://github.com/blog/1943-how-to-write-the-perfect-pull-request)
 
 

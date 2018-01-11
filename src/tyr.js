@@ -144,7 +144,8 @@ const staticFileGenerators = {
   github: generateGithubFiles,
   travisci: generateTravisFiles,
   docker: generateDockerFiles,
-  expressjs: generateExpressFiles
+  expressjs: generateExpressFiles,
+  mocha: generateMochaFiles,
 };
 
 /**
@@ -183,8 +184,6 @@ export async function generateProject(configs) {
         await staticFileGenerators[tool.toLowerCase()](configs);
       }
     }
-
-    await generateMochaFiles(configs);
   } catch (error) {
     log.error(error.message);
   }

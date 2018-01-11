@@ -29,7 +29,6 @@ export async function generateExpressFiles(projectName) {
   file.writeFile(`${path}/routes.js`, routesJSContents);
   log.info(`Successfully generated file: ${path}/routes.js`);
 
-
   // add express.js as a dependency to the package.json
   let projectPackageJson = file.readFile(`${projectName}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
