@@ -68,7 +68,7 @@ describe('GitHub Service', () => {
         "# Optional REPL history\n" +
         ".node_repl_history\n" +
         "\n" +
-        "# Output of pm pack\\\n" +
+        "# Output of 'npm pack'\n" +
         "*.tgz\n" +
         "\n" +
         "# Yarn Integrity file\n" +
