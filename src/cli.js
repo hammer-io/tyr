@@ -155,5 +155,23 @@ export async function run(configFile, logFile) {
     return;
   }
 
+  console.log(configurations.toolingConfigurations);
+
+  // validate github project name to make sure it doesn't exist
+  if (configurations.toolingConfigurations.sourceControl === 'GitHub') {
+    const isValidName = await githubService.isValidGithubRepositoryName(
+      configurations.projectConfigurations.projectName,
+      configurations.credentials.github.username,
+      configurations.credentials.github.password
+    );
+
+    console.log(isValidName);
+    // if the name
+    if (!isValidName) {
+      log.error('Not a valid name');
+      return;
+    }
+  }
+
   await tyr.generateProject(configurations);
 }

@@ -27,6 +27,40 @@ export async function isValidCredentials(username, password) {
 }
 
 /**
+ * Gets the repositories for the given user
+ * @param username the username of the user
+ * @param password the password for the user
+ * @returns {Promise<void>}
+ */
+export async function getUserRepositories(username, password) {
+  try {
+    return await githubClient.getRepositories(username, password);
+  } catch (error) {
+    throw new Error(`Failed to get repositories for user with username ${username}`);
+  }
+}
+
+/**
+ * Checks if the given repository name is a valid name. A repository name is valid if the name
+ * does not already exist as a repository for the user on github.
+ * @param repositoryName the repository name to check
+ * @param username the user's username
+ * @param password the user's password
+ * @returns {Boolean} true if the name does not exist as a repository, false if it does.
+ */
+export async function isValidGithubRepositoryName(repositoryName, username, password) {
+  const repos = await getUserRepositories(username, password);
+  repos.forEach((repo) => {
+    console.log(repo.name);
+    if (repo.name === repositoryName) {
+      return false;
+    }
+  });
+
+  return true;
+}
+
+/**
  * Creates a github repository
  * @param repositoryName the name of the repository to create
  * @param repositoryDescription the description of the repository
