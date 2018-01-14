@@ -115,7 +115,7 @@ async function getConfigurationsFromPrompt() {
   return configurations;
 }
 
-async function validateProjectNameAgainstGithubRepositories(configurations) {
+export async function validateProjectNameAgainstGithubRepositories(configurations) {
   // validate github project name to make sure it doesn't exist
   const repositories = await githubService.getUserRepositories(
     configurations.credentials.github.username,

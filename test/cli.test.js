@@ -1,10 +1,13 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import inquirer from 'inquirer';
+import fs from 'fs';
 
 import * as cli from './../dist/cli';
 import * as herokuService from './../dist/services/heroku-service';
 import * as githubService from './../dist/services/github-service';
 import * as prompt from './../dist/prompt/prompt';
+import * as githubClient from '../dist/clients/github-client';
 
 
 describe('Test CLI Functionality', () => {
@@ -80,6 +83,40 @@ describe('Test CLI Functionality', () => {
     after(() => {
       herokuStub.restore();
       promptStub.restore();
+    });
+  });
+
+  describe('validateProjectNameAgainstGithubRepositories()', () => {
+    it('should return the updated name since the original name was invalid', async () => {
+      const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
+
+      const getRepositoryStub = sinon.stub(githubClient, 'getRepositories');
+      getRepositoryStub.onFirstCall().resolves([{name: 'test'}, {name: 'project2'}]);
+      getRepositoryStub.onSecondCall().resolves([{name: 'project3'}, {name: 'project4'}]);
+      getRepositoryStub.onThirdCall().resolves([]);
+
+      const inquirerPrompt = sinon.stub(inquirer, 'prompt');
+      inquirerPrompt.returns({projectName: 'new-name'});
+
+      const newName = await cli.validateProjectNameAgainstGithubRepositories(configs);
+      assert.equal('new-name', newName);
+
+      inquirerPrompt.restore();
+      getRepositoryStub.restore();
+    });
+
+    it('should return the original name since the original name was valid', async () => {
+      const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
+
+      const getRepositoryStub = sinon.stub(githubClient, 'getRepositories');
+      getRepositoryStub.onFirstCall().resolves([{name: 'project1'}, {name: 'project2'}]);
+      getRepositoryStub.onSecondCall().resolves([{name: 'project3'}, {name: 'project4'}]);
+      getRepositoryStub.onThirdCall().resolves([]);
+
+      const newName = await cli.validateProjectNameAgainstGithubRepositories(configs);
+      assert.equal('test', newName);
+
+      getRepositoryStub.restore();
     });
   });
 });
