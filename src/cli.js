@@ -178,7 +178,7 @@ export async function run(configFile, logFile) {
 
   if (configurations.toolingConfigurations.sourceControl === 'GitHub') {
     configurations.projectConfigurations.projectName =
-      validateProjectNameAgainstGithubRepositories(configurations);
+      await validateProjectNameAgainstGithubRepositories(configurations);
   }
 
   await tyr.generateProject(configurations);

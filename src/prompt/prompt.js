@@ -3,7 +3,7 @@ import chalk from 'chalk';
 
 import * as projectConfigurationValidator from '../utils/project-configuration-validator';
 import choices from '../constants/choices';
-import * as githubServie from '../services/github-service';
+import * as githubService from '../services/github-service';
 
 /**
  * Prompts the user for their project configurations
@@ -186,7 +186,7 @@ export async function repromptForProjectName(repositories) {
     type: 'input',
     message: 'Project Name:',
     validate: (value) => {
-      const isValid = githubServie.isValidGithubRepositoryName(value, repositories);
+      const isValid = githubService.isValidGithubRepositoryName(value, repositories);
       if (!isValid) {
         return 'GitHub repository with this name already exists.';
       }

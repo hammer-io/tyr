@@ -30,7 +30,6 @@ export async function isValidCredentials(username, password) {
  * Gets the repositories for the given user
  * @param username the username of the user
  * @param password the password for the user
- * @param pageNumber the page number of the get user repositories response response
  * @returns {Promise<>}
  */
 export async function getUserRepositories(username, password) {
@@ -59,14 +58,7 @@ export async function getUserRepositories(username, password) {
  * @returns {Boolean} true if the name does not exist as a repository, false if it does.
  */
 export function isValidGithubRepositoryName(repositoryName, repositories) {
-  let isValid = true;
-  repositories.forEach((repo) => {
-    if (repo.name === repositoryName) {
-      isValid = false;
-    }
-  });
-
-  return isValid;
+  return repositories.filter(repo => repo.name === repositoryName).length === 0;
 }
 
 /**
