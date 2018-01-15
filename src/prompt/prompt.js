@@ -186,7 +186,8 @@ export async function repromptForProjectName(repositories) {
     type: 'input',
     message: 'Project Name:',
     validate: (value) => {
-      const isValid = githubService.isValidGithubRepositoryName(value, repositories);
+      const isValid = githubService.isValidGithubRepositoryName(value, repositories) &&
+          projectConfigurationValidator.validateProjectConfigurations(value);
       if (!isValid) {
         return 'GitHub repository with this name already exists.';
       }
