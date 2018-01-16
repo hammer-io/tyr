@@ -18,6 +18,10 @@ export function validateProjectName(value) {
     return 'Invalid project name!';
   }
 
+  if (value.length > 20) {
+    return 'Project Names must be less than 20 characters or less!';
+  }
+
   if (fs.existsSync(value)) {
     return 'Project with this name already exists in this directory!';
   }
