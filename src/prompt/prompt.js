@@ -3,6 +3,7 @@ import chalk from 'chalk';
 
 import * as projectConfigurationValidator from '../utils/project-configuration-validator';
 import choices from '../constants/choices';
+import * as githubService from '../services/github-service';
 
 /**
  * Prompts the user for their project configurations
@@ -175,4 +176,26 @@ export async function promptForHerokuCredentials() {
   const herokuCredentials = await promptForEmailAndPasswordApiKey();
 
   return herokuCredentials;
+}
+
+export async function repromptForProjectName(repositories) {
+  console.log(chalk.blue('ReEnter a Valid Project Name: '));
+
+  const question = [{
+    name: 'projectName',
+    type: 'input',
+    message: 'Project Name:',
+    validate: (value) => {
+      const isValid = githubService.isValidGithubRepositoryName(value, repositories) &&
+          projectConfigurationValidator.validateProjectConfigurations(value);
+      if (!isValid) {
+        return 'GitHub repository with this name already exists.';
+      }
+
+      return true;
+    }
+  }];
+
+  const answer = await inquirer.prompt(question);
+  return answer.projectName;
 }
