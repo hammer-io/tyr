@@ -2,8 +2,8 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import sinon from 'sinon';
 
-import {generateProject} from '../dist/tyr';
-import * as tyr from '../dist/tyr';
+import {generateProject, heroku} from '../dist/tyr';
+import * as herokuClient from "../dist/clients/heroku-client";
 
 describe('Tyr Test', () => {
 
@@ -104,4 +104,48 @@ describe('Tyr Test', () => {
         fs.removeSync('test-project');
       })
     });
+
+    describe('heroku()', () => {
+        it('should create a heroku app for the user', async function()  {
+            const herokuCreateRepoStub = sinon.stub(herokuClient, 'createApp');
+            herokuCreateRepoStub.resolves();
+
+            const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
+            const updatedConfigs = await heroku(configs);
+
+            assert.equal(updatedConfigs.projectConfigurations.herokuAppName, 'test');
+
+            herokuCreateRepoStub.restore();
+        });
+
+        it('should update the herokuAppName to remove any special characters', async function() {
+            const herokuCreateRepoStub = sinon.stub(herokuClient, 'createApp');
+            herokuCreateRepoStub.resolves();
+
+            const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
+            configs.projectConfigurations.projectName = '^^^TEST_PROJECT$$$';
+            const updatedConfigs = await heroku(configs);
+
+            assert.equal(updatedConfigs.projectConfigurations.herokuAppName, '---test-project---');
+
+            herokuCreateRepoStub.restore();
+        });
+
+        it('should append a random UUID to the end of the name if the project name already exists', async function() {
+            const herokuCreateRepoStub = sinon.stub(herokuClient, 'createApp');
+            herokuCreateRepoStub.onFirstCall().rejects({status: 422});
+            herokuCreateRepoStub.onSecondCall().resolves();
+
+            const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
+            const updatedConfigs = await heroku(configs);
+
+            const pattern = RegExp("(-([a-z0-9-]{7}))$");
+
+            const herokuAppName = updatedConfigs.projectConfigurations.herokuAppName;
+            console.log(herokuAppName);
+            assert.equal(pattern.test(herokuAppName), true);
+
+            herokuCreateRepoStub.restore();
+        });
+    })
 });
