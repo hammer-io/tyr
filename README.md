@@ -103,3 +103,6 @@ Choice must also be `<None>`.
 
 Please see our [Contributing Guide](https://github.com/hammer-io/tyr/blob/master/CONTRIBUTING.md)
 for contribution guidelines.
+
+## Security Information Management Policy
+We need your username and password for some third party applications, check out what we do with your credentials [here](https://github.com/hammer-io/tyr/blob/master/SECURITY_INFORMATION_MANAGEMENT_POLICY.md). 
