@@ -11,7 +11,7 @@ import * as mochaService from './services/mocha-service';
 import * as nodeService from './services/node-service';
 
 import { getActiveLogger } from './utils/winston';
-import { makeHerokuAppNameCompliant } from './utils/heroku-name-util';
+import { makeHerokuAppNameCompliant } from './utils/heroku-util';
 
 const log = getActiveLogger();
 
