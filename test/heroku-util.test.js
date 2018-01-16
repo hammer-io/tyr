@@ -1,7 +1,7 @@
 import assert from 'assert';
-import {makeHerokuAppNameCompliant} from "../dist/utils/heroku-name-util";
+import { makeHerokuAppNameCompliant } from "../dist/utils/heroku-util";
 
-describe('Heroku Name Util', () => {
+describe('Heroku Util Test', () => {
     it('should not modify the name since it is already compliant', () => {
         assert.equal('good-name', makeHerokuAppNameCompliant('good-name'));
         assert.equal('g00d-n4m3', makeHerokuAppNameCompliant('g00d-n4m3'));
