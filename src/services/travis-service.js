@@ -28,7 +28,7 @@ export async function generateTravisCIFile(configs) {
     const dockerPs = 'docker ps -a';
     const afterSuccess =
       'if [ "$TRAVIS_BRANCH" == "master" ]; then\n' +
-      'docker login -e="$HEROKU_EMAIL" -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
+      'docker login -u="$HEROKU_USERNAME" -p="$HEROKU_PASSWORD" registry.heroku.com;\n' +
       `docker build -t registry.heroku.com/${configs.projectConfigurations.herokuAppName}/web .;\n` +
       `docker push registry.heroku.com/${configs.projectConfigurations.herokuAppName}/web;\n` +
       'fi';
