@@ -105,4 +105,9 @@ Please see our [Contributing Guide](https://github.com/hammer-io/tyr/blob/master
 for contribution guidelines.
 
 ## Security Information Management Policy
-We need your username and password for some third party applications, check out what we do with your credentials [here](https://github.com/hammer-io/tyr/blob/master/SECURITY_INFORMATION_MANAGEMENT_POLICY.md). 
+
+In order to orchestrate the various third party applications for your
+project, we will periodically ask for your username and password to
+these applications. To find out more about how we use these credentials
+and what steps we are taking to keep your information safe, please read
+the [Security Information Management Policy](https://github.com/hammer-io/tyr/blob/master/SECURITY_INFORMATION_MANAGEMENT_POLICY.md).
