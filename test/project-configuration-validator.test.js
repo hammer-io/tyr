@@ -108,11 +108,6 @@ describe('Project Configuration Validator', () => {
       assert.equal(errors[0], 'If no containerization tool was selected, there cannot be a deployment tool' +
         ' selected')
     });
-
-    it('validate file with errors because of bad tooling configurations' +
-      ' because of no deployment (<None>)', () => {
-
-    });
   });
 
   describe('validateProjectName()', () => {
@@ -121,10 +116,12 @@ describe('Project Configuration Validator', () => {
       assert.equal(validateProjectName('test'), 'Project with this name already exists in this' +
         ' directory!');
       assert.equal(validateProjectName('**baddname'), 'Invalid project name!');
-      assert.equal(validateProjectName(), 'Invalid project name!')
+      assert.equal(validateProjectName(), 'Invalid project name!');
+      assert.equal(validateProjectName('thisisaverylongnamethatisovertwentycharacterslong'), 'Project Names must be less than 20 characters or less!');
       //TODO add validation for / when it gets fixed
       //assert.equal(validateProjectName("jack/"), 'Invalid project name!')
     });
+
   });
 
   describe('validateVersionNumber()', () => {

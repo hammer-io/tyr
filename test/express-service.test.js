@@ -74,7 +74,6 @@ describe('Express Service Test', () => {
 
       assert.equal(fs.existsSync('test-express/src/index.html'), true);
       assert.equal(eol.auto(fs.readFileSync('test-express/src/index.html', 'utf-8')), eol.auto(expectedIndexContents));
-
     });
 
     it('should generate an index.js file', async () => {

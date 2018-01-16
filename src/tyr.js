@@ -11,6 +11,7 @@ import * as mochaService from './services/mocha-service';
 import * as nodeService from './services/node-service';
 
 import { getActiveLogger } from './utils/winston';
+import { makeHerokuAppNameCompliant } from './utils/heroku-util';
 
 const log = getActiveLogger();
 
@@ -109,18 +110,23 @@ async function travisci(configs) {
  * @returns {Boolean} returns true if the app was successfully created, returns false if there
  * was an error because the app name is unavailable.
  */
-async function heroku(configs) {
+export async function heroku(configs) {
   const updatedConfig = configs;
   let appName = configs.projectConfigurations.projectName;
   const apiKey = configs.credentials.heroku.apiKey;
+
+  appName = makeHerokuAppNameCompliant(appName);
+  if (appName !== configs.projectConfigurations.projectName) {
+    log.warn('The name you chose was not compatible with Heroku naming conventions. We\'ve made your app name all ' +
+          'lowercase letters and removed any special characters and replaced them with a \'-\'.');
+  }
 
   let isCreated = await herokuService.createApp(appName, apiKey);
   while (!isCreated) {
     log.warn('The name you chose was not available on Heroku. We\'ve appended a short id at the' +
       ' end of your application name in order to make in unique.');
-    appName = `${appName}-${shortid.generate()}`;
-    appName = appName.toLowerCase(); // heroku apps need to be all lowercase
-    appName = appName.replace('_', '-'); // heroku apps cannot have underscores
+    appName = `${appName}-${shortid.generate().substring(0, 7)}`;
+    appName = makeHerokuAppNameCompliant(appName);
     isCreated = await herokuService.createApp(appName, apiKey);
   }
 
@@ -144,7 +150,8 @@ const staticFileGenerators = {
   github: generateGithubFiles,
   travisci: generateTravisFiles,
   docker: generateDockerFiles,
-  expressjs: generateExpressFiles
+  expressjs: generateExpressFiles,
+  mocha: generateMochaFiles,
 };
 
 /**
@@ -183,8 +190,6 @@ export async function generateProject(configs) {
         await staticFileGenerators[tool.toLowerCase()](configs);
       }
     }
-
-    await generateMochaFiles(configs);
   } catch (error) {
     log.error(error.message);
   }

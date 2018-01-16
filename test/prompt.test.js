@@ -1,8 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon'
 import inqurier from 'inquirer';
-;
+
 import {promptForProjectConfigurations, promptForToolingConfigurations, promptForGithubCredentials, promptForHerokuCredentials, cleanToolingData, promptForUsernamePassword, promptForEmailAndPasswordApiKey} from '../dist/prompt/prompt';
+import { repromptForProjectName } from '../dist/prompt/prompt';
 
 describe('Prompting Test', () => {
   let inquirerMock = {};
@@ -46,13 +47,14 @@ describe('Prompting Test', () => {
 
   describe('promptForToolingConfigurations()', () => {
     it('should return the tooling configurations in the proper format with all selected', async (done) => {
-      inquirerMock.resolves({sourceControl: 'GitHub', ci: 'TravisCI', containerization: 'Docker', deployment: 'Heroku', web: 'ExpressJS', }, done());
+      inquirerMock.resolves({sourceControl: 'GitHub', ci: 'TravisCI', containerization: 'Docker', deployment: 'Heroku', web: 'ExpressJS', test: 'Mocha'}, done());
       const tooling = await promptForToolingConfigurations();
       assert.equal(tooling.sourceControl, 'GitHub');
       assert.equal(tooling.ci, 'TravisCI');
       assert.equal(tooling.containerization, 'Docker');
       assert.equal(tooling.deployment, 'Heroku');
       assert.equal(tooling.web, 'ExpressJS');
+      assert.equal(tooling.test, 'Mocha');
     });
   });
 
@@ -91,6 +93,15 @@ describe('Prompting Test', () => {
       assert.equal(credentials.email, 'test@test.com');
       assert.equal(credentials.password, 'test');
       assert.equal(credentials.apiKey, '1234');
+    });
+  });
+
+  describe('repromptForProjectName()', function() {
+    it('should return the new project name', async function (done) {
+      inquirerMock.resolves({projectName: 'test'}, done());
+      const repos = [];
+      const projectName = await repromptForProjectName(repos);
+      assert.equal('test', projectName);
     });
   });
 

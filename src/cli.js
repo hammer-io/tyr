@@ -115,6 +115,27 @@ async function getConfigurationsFromPrompt() {
   return configurations;
 }
 
+export async function validateProjectNameAgainstGithubRepositories(configurations) {
+  // validate github project name to make sure it doesn't exist
+  const repositories = await githubService.getUserRepositories(
+    configurations.credentials.github.username,
+    configurations.credentials.github.password
+  );
+
+  const isValid = githubService.isValidGithubRepositoryName(
+    configurations.projectConfigurations.projectName,
+    repositories
+  );
+
+    // if the name is not valid, then reprompt for a new name.
+  if (!isValid) {
+    log.error('GitHub repository with this name already exists.');
+    const newName = await prompt.repromptForProjectName(repositories);
+    return newName;
+  }
+
+  return configurations.projectConfigurations.projectName;
+}
 /**
  * The main run function
  * @param configFile path to the configuration file
@@ -153,6 +174,11 @@ export async function run(configFile, logFile) {
   } catch (error) {
     log.error(`${error.message}. Exiting tyr.`);
     return;
+  }
+
+  if (configurations.toolingConfigurations.sourceControl === 'GitHub') {
+    configurations.projectConfigurations.projectName =
+      await validateProjectNameAgainstGithubRepositories(configurations);
   }
 
   await tyr.generateProject(configurations);

@@ -68,7 +68,7 @@ describe('GitHub Service', () => {
         "# Optional REPL history\n" +
         ".node_repl_history\n" +
         "\n" +
-        "# Output of pm pack\\\n" +
+        "# Output of 'npm pack'\n" +
         "*.tgz\n" +
         "\n" +
         "# Yarn Integrity file\n" +
@@ -162,5 +162,41 @@ describe('GitHub Service', () => {
       githubRepositoryCreateStub.restore();
     });
 
+  });
+
+  describe('isValidGithubRepositoryName()', () => {
+    it('should return true if the name is valid', () => {
+      const name = 'test';
+      const repos = [{name: 'notUsed'}, {name: 'something'}];
+
+      const isValid = githubService.isValidGithubRepositoryName(name, repos);
+      assert.equal(true, isValid);
+    });
+
+    it('should return false if the name is not valid', () => {
+      const name = 'test';
+      const repos = [{name: 'test'}, {name: 'something'}];
+
+      const isValid = githubService.isValidGithubRepositoryName(name, repos);
+      assert.equal(false, isValid);
+    });
+  });
+
+  describe('getUserRepositories()', () => {
+    it('should return all the repositories', async () => {
+      const getRepositoryStub = sinon.stub(githubClient, 'getRepositories');
+      getRepositoryStub.onFirstCall().resolves([{name: 'project1'}, {name: 'project2'}]);
+      getRepositoryStub.onSecondCall().resolves([{name: 'project3'}, {name: 'project4'}]);
+      getRepositoryStub.onThirdCall().resolves([]);
+
+      const repos = await githubService.getUserRepositories('blah', 'blah');
+      assert.equal(4, repos.length);
+      assert.equal('project1', repos[0].name);
+      assert.equal('project2', repos[1].name);
+      assert.equal('project3', repos[2].name);
+      assert.equal('project4', repos[3].name);
+
+      getRepositoryStub.restore();
+    });
   });
 });

@@ -1,4 +1,4 @@
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/prefer-default-export,no-await-in-loop */
 import git from 'simple-git';
 
 import * as githubClient from '../clients/github-client';
@@ -24,6 +24,41 @@ export async function isValidCredentials(username, password) {
       return false;
     }
   }
+}
+
+/**
+ * Gets the repositories for the given user
+ * @param username the username of the user
+ * @param password the password for the user
+ * @returns {Promise<>}
+ */
+export async function getUserRepositories(username, password) {
+  let repos = [];
+  let pageNumber = 1;
+
+  let done = false;
+  while (!done) {
+    const githubRepos = await githubClient.getRepositories(username, password, pageNumber);
+    if (githubRepos.length === 0) {
+      done = true;
+    } else {
+      repos = repos.concat(githubRepos);
+      pageNumber += 1;
+    }
+  }
+
+  return repos;
+}
+
+/**
+ * Checks if the given repository name is a valid name. A repository name is valid if the name
+ * does not already exist as a repository for the user on github.
+ * @param repositoryName the repository name to check
+ * @param repositories the github repositories for the user
+ * @returns {Boolean} true if the name does not exist as a repository, false if it does.
+ */
+export function isValidGithubRepositoryName(repositoryName, repositories) {
+  return repositories.filter(repo => repo.name === repositoryName).length === 0;
 }
 
 /**
