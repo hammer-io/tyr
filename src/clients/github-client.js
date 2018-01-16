@@ -118,6 +118,39 @@ export async function getCurrentUser(username, password) {
 }
 
 /**
+ * Makes a GET request to the /users/repos?page=#.
+ *
+ * This gets the repositories for the signed in user. GitHub takes advantage of paging.
+ * @param username the username to get repositories for
+ * @param password the password of the user
+ * @param pageNumber the page number, GitHub takes advantage of paging, so we will pass in a page
+ *                      number which will get the page.
+ * @returns {Promise<any>}
+ */
+export async function getRepositories(username, password, pageNumber) {
+  log.verbose('Github Client - getUserRepositories()');
+
+  log.http(`GET ${githubApiUrl}/users/repos?page=${pageNumber} - get user repositories`);
+  return new Promise((resolve, reject) => {
+    superagent
+      .get(`${githubApiUrl}/user/repos?page=${pageNumber}`)
+      .set({
+        Authorization: authorizationUtil.basicAuthorization(username, password)
+      })
+      .end((err, res) => {
+        if (err) {
+          log.debug(`ERROR: GET ${githubApiUrl}/user/repos - error getting user repositories -
+         ${JSON.stringify({ status: err.status, message: err.message })}`);
+          reject(err);
+        } else {
+          log.debug(`RESPONSE: ${githubApiUrl}/user/repos - successfully got user repositories`);
+          resolve(res.body);
+        }
+      });
+  });
+}
+
+/**
  * Make a request to https://api.github.com/user/repos, and authenticate with basic auth
  * @param repositoryName the repository name to create
  * @param repositoryDescription the description of the repository
