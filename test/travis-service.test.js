@@ -251,7 +251,7 @@ describe('Test Travis Service', () => {
         "  - >-\n" +
         "    if [ \"$TRAVIS_BRANCH\" == \"master\" ]; then\n" +
         "\n" +
-        "    docker login -e=\"$HEROKU_EMAIL\" -u=\"$HEROKU_USERNAME\" -p=\"$HEROKU_PASSWORD\"\n" +
+        "    docker login -u=\"$HEROKU_USERNAME\" -p=\"$HEROKU_PASSWORD\"\n" +
         "    registry.heroku.com;\n" +
         "\n" +
         "    docker build -t registry.heroku.com/test-project/web .;\n" +
