@@ -108,6 +108,11 @@ export async function promptForToolingConfigurations() {
     type: 'list',
     choices: choices.testChoices,
     message: 'Testing Framework:'
+  }, {
+    name: 'database',
+    type: 'list',
+    choices: choices.databaseChoices,
+    message: 'Database Framework:'
   }];
 
   const tooling = await inquirer.prompt(toolingQuestions);

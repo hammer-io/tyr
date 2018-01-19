@@ -8,5 +8,6 @@ export default {
   deploymentChoices: ['<None>', 'Heroku'],
   sourceControlChoices: ['<None>', 'GitHub'],
   webChoices: ['<None>', 'ExpressJS'],
-  testChoices: ['<None>', 'Mocha']
+  testChoices: ['<None>', 'Mocha'],
+  databaseChoices: ['<None>', 'Sequelize']
 };
