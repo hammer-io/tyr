@@ -12,9 +12,8 @@ export function validateProjectName(value) {
   // a project name is a project name for which the folder does not exist,
   // for which the name is no blank/undefined or contains spaces
 
-  // TODO: this validation allows for project names with /, which would not create a valid directory
   if (typeof value === 'undefined' || value === ''
-    || value.indexOf(' ') !== -1 || !isValidPath(value)) {
+    || value.indexOf(' ') !== -1 || !isValidPath(value) || value.indexOf('/') > -1) {
     return 'Invalid project name!';
   }
 
