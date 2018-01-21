@@ -118,8 +118,7 @@ describe('Project Configuration Validator', () => {
       assert.equal(validateProjectName('**baddname'), 'Invalid project name!');
       assert.equal(validateProjectName(), 'Invalid project name!');
       assert.equal(validateProjectName('thisisaverylongnamethatisovertwentycharacterslong'), 'Project Names must be less than 20 characters or less!');
-      //TODO add validation for / when it gets fixed
-      //assert.equal(validateProjectName("jack/"), 'Invalid project name!')
+      assert.equal(validateProjectName("test1/"), 'Invalid project name!')
     });
 
   });
