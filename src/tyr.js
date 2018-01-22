@@ -9,6 +9,7 @@ import * as dockerService from './services/docker-service';
 import * as expressService from './services/express-service';
 import * as mochaService from './services/mocha-service';
 import * as nodeService from './services/node-service';
+import * as sequelizeService from './services/sequelize-service';
 
 import { getActiveLogger } from './utils/winston';
 import { makeHerokuAppNameCompliant } from './utils/heroku-util';
@@ -95,6 +96,16 @@ export async function generateMochaFiles(configs) {
 }
 
 /**
+ * Facilitates generating the necessary files for sequelize
+ * @param configs the configuration object
+ * @returns {Promise<*>}
+ */
+export async function generateSequelizeFiles(configs) {
+  await sequelizeService.generateSequelizeFiles(configs);
+  return configs;
+}
+
+/**
  * Facilitates enabling travis ci for the user.
  * @configs the configuration object
  * @returns {Promise<void>}
@@ -152,6 +163,7 @@ const staticFileGenerators = {
   docker: generateDockerFiles,
   expressjs: generateExpressFiles,
   mocha: generateMochaFiles,
+  sequelize: generateSequelizeFiles,
 };
 
 /**
