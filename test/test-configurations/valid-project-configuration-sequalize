@@ -1,0 +1,18 @@
+{
+    "projectConfigurations": {
+        "projectName": "test-sequelize",
+        "description": "test",
+        "version": "0.0.0",
+        "author": "test",
+        "license": "MIT"
+    },
+    "toolingConfigurations": {
+        "database": "Sequelize"
+    },
+    "credentials": {
+        "sequelize": {
+            "username": "username",
+            "password": "password"
+        }
+    }
+}
