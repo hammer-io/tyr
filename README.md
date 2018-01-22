@@ -11,6 +11,7 @@ running the CLI, it will ask you a series of questions and use the answers to do
 following:
 
 - generate a new Node.js project,
+- add testing, web, and database frameworks,
 - initialize and push the code to a new GitHub repository,
 - establish a continuous integration environment,
 - build a container for the code, and
@@ -27,8 +28,9 @@ Before you can use Tyr, you need to make sure you've done the following:
 
 1. Create a [GitHub](https://github.com/) account. At this current stage of development,
    GitHub is the default version control platform for storing and managing your code.
-2. Create a [Heroku](https://signup.heroku.com/) account. At this current stage of development, Heroku is the default web hosting service. 
-3. After creating a Heroku account, find your API key [here](https://dashboard.heroku.com/account). Make sure to copy it as you'll need it to sign in to Heroku. 
+2. Ensure that you linked your TravisCI account to your GitHub account.   
+3. Create a [Heroku](https://signup.heroku.com/) account. At this current stage of development, Heroku is the default web hosting service. 
+4. After creating a Heroku account, find your API key [here](https://dashboard.heroku.com/account). Make sure to copy it as you'll need it to sign in to Heroku. 
 
 ### Installation
 
@@ -67,6 +69,8 @@ tyr [OPTIONS]
 | `deployment`       | Yes      | The deployment tool you want to use            | `<None>`, `Heroku`    |
 | `sourceControl`    | Yes      | The source control tool you want to use        | `<None>`, `GitHub`    |
 | `web`              | Yes      | The web framework you want to use              | `<None>`, `ExpressJS` |
+| `test`             | Yes      | The test framework you want to use             | `<None>`, `Mocha`      |
+| `database`         | Yes      | The database framework you want to use         | `<None>`, `Sequelize` |
 
 
 * If Source Control Choice is `<None>`, then CI Choice, Containerization Choice, and Deployment 
@@ -90,10 +94,12 @@ Choice must also be `<None>`.
   toolingConfigurations:
     {
       sourceControl: '{source control choice}',
-      web: '{web framework choice}',
       ci: '{ci choice}',
       containerization: '{containerization choice}',
-      deployment: '{deployment choice}'
+      deployment: '{deployment choice}',
+      web: '{web framework choice}',
+      test: '{test framework choice}',
+      database: '{database framework choice}'
     }
 }
 ```
