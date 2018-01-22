@@ -86,6 +86,17 @@ describe('Test CLI Functionality', () => {
     });
   });
 
+  describe('signInToSequelize()', () => {
+    it('should return the username and password for MySQL', async () => {
+      let promptStub = sinon.stub(prompt, 'promptForUsernamePassword');
+      promptStub.resolves({username: 'username', password: 'password'});
+      const credentials = await cli.signInToSequelize();
+      assert.equal(credentials.username, 'username');
+      assert.equal(credentials.password, 'password');
+      promptStub.restore();
+    });
+  });
+
   describe('validateProjectNameAgainstGithubRepositories()', () => {
     it('should return the updated name since the original name was invalid', async () => {
       const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));
