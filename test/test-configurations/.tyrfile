@@ -3,6 +3,7 @@
         "projectName": "test-project",
         "description": "test-project",
         "version": "0.0.0",
+        "isPrivateProject": false,
         "author": "test",
         "license": "MIT"
     },

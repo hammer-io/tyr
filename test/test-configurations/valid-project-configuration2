@@ -2,6 +2,7 @@
     "projectConfigurations": {
         "projectName": "test-project",
         "description": "test-proejct",
+        "isPrivateProject": false,
         "version": "0.0.0",
         "author": "test",
         "license": "MIT"

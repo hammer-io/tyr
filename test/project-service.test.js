@@ -19,6 +19,7 @@ describe('Project Service Test', () => {
         " \"projectConfigurations\": {\n" +
         "  \"projectName\": \"test-project\",\n" +
         "  \"description\": \"test-proejct\",\n" +
+        "  \"isPrivateProject\": false,\n" +
         "  \"version\": \"0.0.0\",\n" +
         "  \"author\": \"test\",\n" +
         "  \"license\": \"MIT\"\n" +
