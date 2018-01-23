@@ -19,21 +19,17 @@ describe('Project Configuration Validator', () => {
     it('should validate configuration file with errors because of missing project' +
       ' configurations', () =>{
       const errors = validateProjectConfigurations(JSON.parse(fs.readFileSync('test/test-configurations/bad-project-configuration')));
-      assert.equal(errors.length, 2);
+      assert.equal(errors.length, 3);
       assert.equal(errors[0], 'Project Name does not exist!');
       assert.equal(errors[1], 'Project Description does not exist!');
+      assert.equal(errors[2], 'Private Project Flag does not exist!');
     });
 
     it('should validate configuration file with errors because of invalid project name', () => {
       const input = JSON.parse(fs.readFileSync('test/test-configurations/invalid-project-name', 'utf-8'));
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 1);
-      assert.equal(errors[0], 'Invalid project name!')
-
-      // TODO: when a better project name validation is put into place
-      // const input1 = JSON.parse(fs.readFileSync('test/test-configurations/invalid-project-name1', 'utf-8'));
-      // const errors1 = validateProjectConfigurations(input1);
-      // assert.equal(errors1.length, 1);
+      assert.equal(errors[0], 'Invalid project name!');
     });
 
     it('validate configuration file with errors because of invalid version number', () => {

@@ -156,14 +156,21 @@ export async function getRepositories(username, password, pageNumber) {
  * @param repositoryDescription the description of the repository
  * @param username the username of the user
  * @param password the password of the user
+ * @param isPrivate flag to determine if a private project should be created or not
  * @returns {Promise<any>}
  */
-export async function createRepository(repositoryName, repositoryDescription, username, password) {
+export async function createRepository(
+  repositoryName,
+  repositoryDescription,
+  username,
+  password,
+  isPrivate
+) {
   log.verbose('Github Client createRepository()');
   const payload = {
     name: repositoryName,
     description: repositoryDescription,
-    private: false
+    private: isPrivate
   };
 
   log.http(`POST ${githubApiUrl}/user/repos - creating github repository - ${JSON.stringify(payload)}`);

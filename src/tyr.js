@@ -26,10 +26,14 @@ async function github(configs) {
   const repositoryDescription = configs.projectConfigurations.description;
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
+  const isPrivate = configs.projectConfigurations.isPrivateProject;
 
   await githubService.createGitHubRepository(
-    repositoryName, repositoryDescription, username,
-    password
+    repositoryName,
+    repositoryDescription,
+    username,
+    password,
+    isPrivate
   );
 
   return configs;
