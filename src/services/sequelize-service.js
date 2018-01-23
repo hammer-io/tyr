@@ -46,7 +46,10 @@ async function updatePackageJsonWithSequelizeDependency(projectName) {
   file.writeFile(`${projectName}/package.json`, projectPackageJson);
 }
 
-
+/**
+ * Updates the index.js file to add the sequelize require statement
+ * @param projectName the project name
+ */
 async function updateIndexJs(projectName) {
   let contents = file.readFile(`${projectName}/src/index.js`);
   const firstLine = 'const sequelize = require(\'./db/sequelize\');\n';
@@ -80,6 +83,7 @@ export async function generateSequelizeFiles(configs) {
   // update package.json
   await updatePackageJsonWithSequelizeDependency(projectName);
 
+  // update the index.js file
   await updateIndexJs(projectName);
 
   return configs;
