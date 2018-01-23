@@ -2,6 +2,7 @@
     "projectConfigurations": {
         "projectName": "jack",
         "description": "jack",
+        "isPrivateProject": false,
         "version": "0.0.0",
         "author": "jack",
         "license": "MIT"

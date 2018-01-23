@@ -52,17 +52,18 @@ export async function generateTravisCIFile(configs) {
  *
  * @param travisAccessToken the access token to retrieve user information
  * @param account the account trying to get user informatin for
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export async function waitForSync(travisAccessToken, account) {
+export async function waitForSync(travisAccessToken, account, isPrivate) {
   log.verbose('Travis Service - waitForSync()');
   log.warn('Waiting for TravisCI to sync account...');
 
   return new Promise(async (resolve) => {
     setTimeout(async () => {
-      let user = await travisClient.getUserInformation(travisAccessToken, account);
+      let user = await travisClient.getUserInformation(travisAccessToken, account, isPrivate);
       if (user.user.is_syncing) {
-        user = await waitForSync(travisAccessToken, account);
+        user = await waitForSync(travisAccessToken, account, isPrivate);
       }
       resolve(user);
     }, 2000);
@@ -75,10 +76,17 @@ export async function waitForSync(travisAccessToken, account) {
  * @param username the username
  * @param travisAccessToken the travis access token
  * @param account the account
+ * @param isPrivate is the project private or not
  * @returns {Promise<void>}
  */
-export async function waitForProjectToExist(projectName, username, travisAccessToken, account) {
-  const repos = await travisClient.getRepos(username, travisAccessToken);
+export async function waitForProjectToExist(
+  projectName,
+  username,
+  travisAccessToken,
+  account,
+  isPrivate
+) {
+  const repos = await travisClient.getRepos(username, travisAccessToken, isPrivate);
   let isFound = false;
 
   repos.repositories.forEach((repo) => {
@@ -88,9 +96,9 @@ export async function waitForProjectToExist(projectName, username, travisAccessT
   });
 
   if (!isFound) {
-    await waitForSync(travisAccessToken, account);
-    await travisClient.syncTravisWithGithub(travisAccessToken);
-    await waitForProjectToExist(projectName, username, travisAccessToken, account);
+    await waitForSync(travisAccessToken, account, isPrivate);
+    await travisClient.syncTravisWithGithub(travisAccessToken, isPrivate);
+    await waitForProjectToExist(projectName, username, travisAccessToken, account, isPrivate);
   }
 }
 
@@ -105,6 +113,8 @@ export async function enableTravis(configs) {
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
   const projectName = configs.projectConfigurations.projectName;
+  const isPrivate = configs.projectConfigurations.isPrivateProject;
+
   const envVariables = [];
   if ((typeof configs.toolingConfigurations.deployment !== 'undefined')
       && configs.toolingConfigurations.deployment.toLowerCase() === 'heroku') {
@@ -129,7 +139,7 @@ export async function enableTravis(configs) {
   // Use the GitHub token to get a Travis token
   let travisAccessToken = {};
   try {
-    travisAccessToken = await travisClient.requestTravisToken(githubToken.token);
+    travisAccessToken = await travisClient.requestTravisToken(githubToken.token, isPrivate);
   } catch (error) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to get a token from TravisCI.`);
   }
@@ -138,7 +148,7 @@ export async function enableTravis(configs) {
   let account = {};
   try {
     // get the accounts for the user
-    response = await travisClient.getUserAccount(travisAccessToken);
+    response = await travisClient.getUserAccount(travisAccessToken, isPrivate);
     // a user may have many accounts, we should find the account associated with the github username
     for (let i = 0; i < response.accounts.length; i += 1) {
       if (response.accounts[i].login === username) {
@@ -152,11 +162,11 @@ export async function enableTravis(configs) {
 
 
   // Wait for the user's account to be done syncing....
-  await waitForSync(travisAccessToken, account);
+  await waitForSync(travisAccessToken, account, isPrivate);
 
   // Sync Travis with GitHub, which must be done before activating the repository
   try {
-    await travisClient.syncTravisWithGithub(travisAccessToken);
+    await travisClient.syncTravisWithGithub(travisAccessToken, isPrivate);
   } catch (error) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to sync TravisCI with GitHub.`);
   }
@@ -165,14 +175,21 @@ export async function enableTravis(configs) {
     configs.projectConfigurations.projectName,
     username,
     travisAccessToken,
-    account
+    account,
+    isPrivate
   );
 
   // Get the project repository ID, and then use that ID to activate Travis for the project
   let repoId = '';
   try {
-    repoId = await travisClient.getRepositoryId(travisAccessToken, username, projectName);
-    await travisClient.activateTravisHook(repoId, travisAccessToken);
+    repoId = await travisClient.getRepositoryId(
+      travisAccessToken,
+      username,
+      projectName,
+      isPrivate
+    );
+
+    await travisClient.activateTravisHook(repoId, travisAccessToken, isPrivate);
   } catch (error) {
     console.log(JSON.stringify(error));
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to activate TravisCI.`);
@@ -185,7 +202,8 @@ export async function enableTravis(configs) {
         await travisClient.setEnvironmentVariable( // eslint-disable-line no-await-in-loop
           travisAccessToken,
           repoId,
-          env
+          env,
+          isPrivate
         );
       }
     }

@@ -68,6 +68,13 @@ export function validateProjectConfigurations(input) {
     errors.push('Project Description does not exist!');
   }
 
+  // validate isPrivateProject
+  if (typeof input.projectConfigurations.isPrivateProject === 'undefined') {
+    errors.push('Private Project Flag does not exist!');
+  } else if (typeof input.projectConfigurations.isPrivateProject !== 'boolean') {
+    errors.push('Private Project Flag must be a boolean value!');
+  }
+
   // validate version
   if (typeof input.projectConfigurations.version !== 'undefined') {
     const validateResult = validateVersionNumber(input.projectConfigurations.version);

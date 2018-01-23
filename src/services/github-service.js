@@ -67,16 +67,24 @@ export function isValidGithubRepositoryName(repositoryName, repositories) {
  * @param repositoryDescription the description of the repository
  * @param username the username of the user
  * @param password the password of the user
+ * @param isPrivate flag if the project should be private or not
  * @returns {Promise<void>}
  */
 export async function createGitHubRepository(
   repositoryName, repositoryDescription, username,
-  password
+  password, isPrivate
 ) {
   log.verbose(`Creating GitHub repository ${username}/${repositoryName}.`);
 
   try {
-    await githubClient.createRepository(repositoryName, repositoryDescription, username, password);
+    await githubClient.createRepository(
+      repositoryName,
+      repositoryDescription,
+      username,
+      password,
+      isPrivate
+    );
+
     log.info(`Successfully created GitHub repository ${username}/${repositoryName}.`);
   } catch (error) {
     const errorMessage = 'Failed to create GitHub Repository!';

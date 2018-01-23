@@ -22,6 +22,11 @@ export async function promptForProjectConfigurations() {
     type: 'input',
     message: 'Project Description:'
   }, {
+    name: 'isPrivateProject',
+    type: 'confirm',
+    message: 'Private Project?',
+    default: false
+  }, {
     name: 'version',
     type: 'input',
     default: '0.0.0',

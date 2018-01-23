@@ -4,8 +4,20 @@ import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
 const tyrAgent = 'Travis/1.0';
-const travisApiUrl = 'https://api.travis-ci.org';
 const travisApiAccept = 'application/vnd.travis-ci.2+json';
+
+/**
+ * Gets the proper travis api url depending on if the project should be private or not
+ * @param isPrivate is the project private or not
+ * @returns {string} the private or public url
+ */
+function getTravisApiUrl(isPrivate) {
+  if (isPrivate) {
+    return 'https://api.travis-ci.com'; // private repositories
+  }
+
+  return 'https://api.travis-ci.org'; // public repositories
+}
 
 /**
  * Filters out sensitive header information (such as authentication headers or post data)
@@ -38,15 +50,17 @@ function filterErrorResponse(err) {
  * See https://docs.travis-ci.com/api/#accounts for information about returns.
  *
  * @param travisAccessToken the access token to use to get account information
+ * @param isPrivate is the project private or not
+
  * @returns {Promise}
  */
-export function getUserAccount(travisAccessToken) {
+export function getUserAccount(travisAccessToken, isPrivate) {
   log.verbose('Travis Client - getUserAccount()');
 
-  log.http(`GET ${travisApiUrl}/accounts/ - getting user account`);
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/accounts/ - getting user account`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/accounts/`)
+      .get(`${getTravisApiUrl(isPrivate)}/accounts/`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -54,12 +68,12 @@ export function getUserAccount(travisAccessToken) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/accounts/ - error getting user account - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/accounts/ - error getting user account - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
 
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/accounts/ - successfully got user account`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/accounts/ - successfully got user account`);
           resolve(res.body);
         }
       });
@@ -70,13 +84,14 @@ export function getUserAccount(travisAccessToken) {
  * Gets the repositories for a user
  * @param username the username to get the repostories for
  * @param travisAccessToken the user's access token
+ * @param isPrivate is the project private or not
  * @returns {Promise<any>}
  */
-export function getRepos(username, travisAccessToken) {
-  log.http(`GET ${travisApiUrl}/${username}/repos/ - getting user repositories`);
+export function getRepos(username, travisAccessToken, isPrivate) {
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/${username}/repos/ - getting user repositories`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/owner/${username}/repos`)
+      .get(`${getTravisApiUrl(isPrivate)}/owner/${username}/repos`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -85,11 +100,11 @@ export function getRepos(username, travisAccessToken) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/repos/ - error getting user repos - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/repos/ - error getting user repos - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/accounts/ - successfully got user account`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/accounts/ - successfully got user account`);
           resolve(res.body);
         }
       });
@@ -101,17 +116,18 @@ export function getRepos(username, travisAccessToken) {
  *
  * See https://docs.travis-ci.com/api/#users for information about returns.
  *
- *  @param travisAccessToken the access token to get user information
+ * @param travisAccessToken the access token to get user information
  * @param account the account to get user information about
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export async function getUserInformation(travisAccessToken, account) {
+export async function getUserInformation(travisAccessToken, account, isPrivate) {
   log.verbose('Travis Client - getUserInformation');
 
-  log.http(`GET ${travisApiUrl}/users/${account.id} - getting user information`);
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/users/${account.id} - getting user information`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/users/${account.id}`)
+      .get(`${getTravisApiUrl(isPrivate)}/users/${account.id}`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -119,12 +135,12 @@ export async function getUserInformation(travisAccessToken, account) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/users/${account.id} - error getting user information - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/users/${account.id} - error getting user information - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
 
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/users/${account.id} - getting user information`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/users/${account.id} - getting user information`);
           resolve(res.body);
         }
       });
@@ -134,18 +150,19 @@ export async function getUserInformation(travisAccessToken, account) {
 /**
  * Get github repo id from Travis-CI
  *
- * @param travisAccessToken
- * @param username
- * @param projectName
+ * @param travisAccessToken the user's travis access token
+ * @param username the username
+ * @param projectName the project name
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export function getRepositoryId(travisAccessToken, username, projectName) {
+export function getRepositoryId(travisAccessToken, username, projectName, isPrivate) {
   log.verbose('Travis Client - getRepositoryId()');
 
-  log.http(`GET ${travisApiUrl}/repos/${username}/${projectName} - getting repository id for repository`);
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/repos/${username}/${projectName} - getting repository id for repository`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/repos/${username}/${projectName}`)
+      .get(`${getTravisApiUrl(isPrivate)}/repos/${username}/${projectName}`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -153,11 +170,11 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/repos/${username}/${projectName} - failed to get repository id for repository - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/repos/${username}/${projectName} - failed to get repository id for repository - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/repos/${username}/${projectName} - successfully got repository id for repository`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/repos/${username}/${projectName} - successfully got repository id for repository`);
           resolve(res.body.repo.id);
         }
       });
@@ -167,17 +184,18 @@ export function getRepositoryId(travisAccessToken, username, projectName) {
 /**
  * Activate Travis hook on a Github repository
  *
- * @param repositoryId
- * @param travisAccessToken
+ * @param repositoryId the repository id of the project
+ * @param travisAccessToken the user's travis access token
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export function activateTravisHook(repositoryId, travisAccessToken) {
+export function activateTravisHook(repositoryId, travisAccessToken, isPrivate) {
   log.verbose('Travis Client - activateTravisHook()');
 
-  log.http(`PUT ${travisApiUrl}/hooks - activating travis hook on repository with id ${repositoryId}`);
+  log.http(`PUT ${getTravisApiUrl(isPrivate)}/hooks - activating travis hook on repository with id ${repositoryId}`);
   return new Promise((resolve, reject) => {
     superagent
-      .put(`${travisApiUrl}/hooks`)
+      .put(`${getTravisApiUrl(isPrivate)}/hooks`)
       .send({
         hook: {
           id: repositoryId,
@@ -191,11 +209,11 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
       })
       .end((err) => {
         if (err) {
-          log.debug(`PUT ${travisApiUrl}/hooks - failed to activate travis hook on repository with id ${repositoryId} - 
+          log.debug(`PUT ${getTravisApiUrl(isPrivate)}/hooks - failed to activate travis hook on repository with id ${repositoryId} - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`PUT ${travisApiUrl}/hooks - successfully activated travis hook on repository with id ${repositoryId}`);
+          log.debug(`PUT ${getTravisApiUrl(isPrivate)}/hooks - successfully activated travis hook on repository with id ${repositoryId}`);
           resolve();
         }
       });
@@ -206,15 +224,16 @@ export function activateTravisHook(repositoryId, travisAccessToken) {
  * Triggers a new sync with GitHub. Needed to see the newly-created repository
  *
  * @param travisAccessToken
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export function syncTravisWithGithub(travisAccessToken) {
+export function syncTravisWithGithub(travisAccessToken, isPrivate) {
   log.verbose('Travis Client - syncTravisWithGithub()');
 
-  log.http(`POST ${travisApiUrl}/users/sync - syncing travis with github`);
+  log.http(`POST ${getTravisApiUrl(isPrivate)}/users/sync - syncing travis with github`);
   return new Promise((resolve, reject) => {
     superagent
-      .post(`${travisApiUrl}/users/sync`)
+      .post(`${getTravisApiUrl(isPrivate)}/users/sync`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -222,12 +241,12 @@ export function syncTravisWithGithub(travisAccessToken) {
       })
       .end((err) => {
         if (err) {
-          log.debug(`ERROR: POST ${travisApiUrl}/users/sync - error syncing travis with github - 
+          log.debug(`ERROR: POST ${getTravisApiUrl(isPrivate)}/users/sync - error syncing travis with github - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
           setTimeout(() => {
-            log.debug(`RESPONSE: POST ${travisApiUrl}/users/sync - successfully synced travis with github`);
+            log.debug(`RESPONSE: POST ${getTravisApiUrl(isPrivate)}/users/sync - successfully synced travis with github`);
             resolve();
           }, 10000); // TODO: Find a better way to do this than a timeout.
         }
@@ -238,16 +257,18 @@ export function syncTravisWithGithub(travisAccessToken) {
 /**
  * Request Travis-CI auth token
  *
- * @param githubToken
+ * @param githubToken tye user's github token
+ * @param isPrivate is the project private or not
+
  * @returns {Promise}
  */
-export function requestTravisToken(githubToken) {
+export function requestTravisToken(githubToken, isPrivate) {
   log.verbose('Travis Client - requestTravisToken()');
 
-  log.http(`POST ${travisApiUrl}/auth/github - getting travis token`);
+  log.http(`POST ${getTravisApiUrl(isPrivate)}/auth/github - getting travis token`);
   return new Promise((resolve, reject) => {
     superagent
-      .post(`${travisApiUrl}/auth/github`)
+      .post(`${getTravisApiUrl(isPrivate)}/auth/github`)
       .send({ github_token: githubToken })
       .set({
         'User-Agent': tyrAgent,
@@ -255,11 +276,11 @@ export function requestTravisToken(githubToken) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: POST ${travisApiUrl}/auth/github - getting travis token - 
+          log.debug(`ERROR: POST ${getTravisApiUrl(isPrivate)}/auth/github - getting travis token - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(err);
         } else {
-          log.debug(`RESPONSE: POST ${travisApiUrl}/auth/github - successfully got travis token`);
+          log.debug(`RESPONSE: POST ${getTravisApiUrl(isPrivate)}/auth/github - successfully got travis token`);
           resolve(res.body.access_token);
         }
       });
@@ -269,18 +290,19 @@ export function requestTravisToken(githubToken) {
 /**
  * Set environment variables on a Travis-CI project
  *
- * @param travisAccessToken
- * @param repoId
- * @param environmentVariable
+ * @param travisAccessToken the user's travis access token
+ * @param repoId the repository id
+ * @param environmentVariable the environment variable to set
+ * @param isPrivate is the project private or not
  * @returns {Promise}
  */
-export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable) {
+export function setEnvironmentVariable(travisAccessToken, repoId, environmentVariable, isPrivate) {
   log.verbose('Travis Client - setEnvironmentVariable()');
 
-  log.http(`POST ${travisApiUrl}/settings/env_vars - setting environment variables for repo with id ${repoId}`);
+  log.http(`POST ${getTravisApiUrl(isPrivate)}/settings/env_vars - setting environment variables for repo with id ${repoId}`);
   return new Promise((resolve, reject) => {
     superagent
-      .post(`${travisApiUrl}/settings/env_vars`)
+      .post(`${getTravisApiUrl(isPrivate)}/settings/env_vars`)
       .query({ repository_id: repoId })
       .send({ env_var: environmentVariable })
       .set({
@@ -290,11 +312,11 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: POST ${travisApiUrl}/settings/env_vars - setting environment variables for repo with id ${repoId} -
+          log.debug(`ERROR: POST ${getTravisApiUrl(isPrivate)}/settings/env_vars - setting environment variables for repo with id ${repoId} -
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: POST ${travisApiUrl}/settings/env_vars - successfully set environment variables for repo with id ${repoId}`);
+          log.debug(`RESPONSE: POST ${getTravisApiUrl(isPrivate)}/settings/env_vars - successfully set environment variables for repo with id ${repoId}`);
           resolve(res.body.env_var);
         }
       });
@@ -304,8 +326,10 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
 /**
  * Lists environment variables for a repository that's been enabled in TravisCI.
  *
- * @param travisAccessToken
- * @param repoId
+ * @param travisAccessToken the user's travis access token
+ * @param repoId the repository id
+ * @param isPrivate is the project private or not
+
  * @returns Promise (example shown below)
  * [
  *   {
@@ -323,13 +347,13 @@ export function setEnvironmentVariable(travisAccessToken, repoId, environmentVar
  *   }
  * ]
  */
-export function listEnvironmentVariables(travisAccessToken, repoId) {
+export function listEnvironmentVariables(travisAccessToken, repoId, isPrivate) {
   log.verbose('Travis Client - listEnvironmentVariables()');
 
-  log.http(`GET ${travisApiUrl}/settings/env_vars - getting environment variables for repo with id ${repoId}`);
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/settings/env_vars - getting environment variables for repo with id ${repoId}`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/settings/env_vars`)
+      .get(`${getTravisApiUrl(isPrivate)}/settings/env_vars`)
       .query({ repository_id: repoId })
       .set({
         'User-Agent': tyrAgent,
@@ -338,11 +362,11 @@ export function listEnvironmentVariables(travisAccessToken, repoId) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/settings/env_vars - error getting environment variables for repo with id ${repoId} - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/settings/env_vars - error getting environment variables for repo with id ${repoId} - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/settings/env_vars - error getting environment variables for repo with id ${repoId}`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/settings/env_vars - error getting environment variables for repo with id ${repoId}`);
           resolve(res.body.env_vars);
         }
       });
@@ -352,9 +376,11 @@ export function listEnvironmentVariables(travisAccessToken, repoId) {
 /**
  * Fetch information for a given repository
  *
- * @param travisAccessToken
- * @param username
- * @param repositoryName
+ * @param travisAccessToken the user's travis access token
+ * @param username the username
+ * @param repositoryName the name of the repository
+ * @param isPrivate is the project private or not
+
  * @returns Promise (example shown below)
  * {
  *   "id": 82,
@@ -369,14 +395,14 @@ export function listEnvironmentVariables(travisAccessToken, repoId) {
  *   "active": "true"
  * }
  */
-export function fetchRepository(travisAccessToken, username, repositoryName) {
+export function fetchRepository(travisAccessToken, username, repositoryName, isPrivate) {
   const repoSlug = `${username}/${repositoryName}`;
   log.debug('fetchRepository', repoSlug);
 
-  log.http(`GET ${travisApiUrl}/repos/${repoSlug} - getting repository information on TravisCI`);
+  log.http(`GET ${getTravisApiUrl(isPrivate)}/repos/${repoSlug} - getting repository information on TravisCI`);
   return new Promise((resolve, reject) => {
     superagent
-      .get(`${travisApiUrl}/repos/${repoSlug}`)
+      .get(`${getTravisApiUrl(isPrivate)}/repos/${repoSlug}`)
       .set({
         'User-Agent': tyrAgent,
         Accept: travisApiAccept,
@@ -384,13 +410,13 @@ export function fetchRepository(travisAccessToken, username, repositoryName) {
       })
       .end((err, res) => {
         if (err) {
-          log.debug(`ERROR: GET ${travisApiUrl}/repos/${repoSlug} - error getting repository information on TravisCI - 
+          log.debug(`ERROR: GET ${getTravisApiUrl(isPrivate)}/repos/${repoSlug} - error getting repository information on TravisCI - 
             ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(filterErrorResponse(err));
         } else if (!res.body.repo) {
           reject(new Error(`Unable to find the repository '${repoSlug}'!`));
         } else {
-          log.debug(`RESPONSE: GET ${travisApiUrl}/repos/${repoSlug} - success getting repository information on TravisCI`);
+          log.debug(`RESPONSE: GET ${getTravisApiUrl(isPrivate)}/repos/${repoSlug} - success getting repository information on TravisCI`);
           resolve(res.body.repo);
         }
       });
