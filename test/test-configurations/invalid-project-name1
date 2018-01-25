@@ -1,9 +1,9 @@
 {
     "projectConfigurations": {
         "projectName": "test-project-configurations",
-        "description": "jack",
+        "description": "test",
         "version": "0.0.0",
-        "author": "jack",
+        "author": "test",
         "license": "MIT"
     },
     "toolingConfigurations": {

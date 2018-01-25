@@ -65,6 +65,7 @@
     "shelljs": "0.7.8",
     "shortid": "^2.2.8",
     "simple-git": "1.79.0",
+    "spdx": "^0.5.1",
     "superagent": "3.6.2",
     "winston": "^3.0.0-rc1"
   },
