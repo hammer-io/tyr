@@ -32,7 +32,7 @@ export async function promptForProjectConfigurations() {
     type: 'input',
     default: '0.0.0',
     message: 'Version:',
-    validate: value => projectConfigurationValidator.validateVersionNumber(value)
+    validate: projectConfigurationValidator.validateVersionNumber
   }, {
     name: 'author',
     type: 'input',
@@ -40,7 +40,8 @@ export async function promptForProjectConfigurations() {
   }, {
     name: 'license',
     type: 'input',
-    message: 'License:'
+    message: 'License:',
+    validate: projectConfigurationValidator.validateLicense
   }];
 
   const projectConfigurations = await inquirer.prompt(projectConfigurationQuestions);

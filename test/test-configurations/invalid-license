@@ -1,16 +1,16 @@
 {
     "projectConfigurations": {
-        "projectName": "test-container",
-        "description": "test",
+        "projectName": "test-license",
+        "description": "test-license",
         "isPrivateProject": false,
         "version": "0.0.0",
-        "author": "test",
-        "license": "MIT"
+        "author": "test-license",
+        "license": "badlicense"
     },
     "toolingConfigurations": {
         "sourceControl": "GitHub",
         "ci": "TravisCI",
-        "containerization": "<None>",
+        "containerization": "Docker",
         "deployment": "Heroku",
         "web": "ExpressJS"
     }
