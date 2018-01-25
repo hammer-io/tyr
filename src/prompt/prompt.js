@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import * as projectConfigurationValidator from '../utils/project-configuration-validator';
 import choices from '../constants/choices';
 import * as githubService from '../services/github-service';
+import * as credentialValidator from '../utils/credential-validator';
 
 /**
  * Prompts the user for their project configurations
@@ -132,11 +133,13 @@ export async function promptForUsernamePassword() {
   const usernamePasswordQuestions = [{
     name: 'username',
     type: 'input',
-    message: 'Username:'
+    message: 'Username:',
+    validate: credentialValidator.validateUsername
   }, {
     name: 'password',
     type: 'password',
-    message: 'Password:'
+    message: 'Password:',
+    validate: credentialValidator.validatePassword
   }];
 
   const credentials = await inquirer.prompt(usernamePasswordQuestions);
@@ -151,15 +154,18 @@ export async function promptForEmailAndPasswordApiKey() {
   const usernamePasswordQuestions = [{
     name: 'email',
     type: 'input',
-    message: 'Email:'
+    message: 'Email:',
+    validate: credentialValidator.validateEmail
   }, {
     name: 'password',
     type: 'password',
-    message: 'Password:'
+    message: 'Password:',
+    validate: credentialValidator.validatePassword
   }, {
     name: 'apiKey',
     type: 'password',
-    message: 'API Key:'
+    message: 'API Key:',
+    validate: credentialValidator.validateApiKey
   }];
 
   const credentials = await inquirer.prompt(usernamePasswordQuestions);
