@@ -1,6 +1,6 @@
 import assert from 'assert';
 import fs from 'fs';
-import {validateProjectConfigurations, validateProjectName, validateVersionNumber} from '../dist/utils/project-configuration-validator';
+import {validateProjectConfigurations, validateProjectName, validateVersionNumber, validateLicense} from '../dist/utils/project-configuration-validator';
 import choices from '../dist/constants/choices';
 
 describe('Project Configuration Validator', () => {
@@ -37,6 +37,13 @@ describe('Project Configuration Validator', () => {
       const errors = validateProjectConfigurations(input);
       assert.equal(errors.length, 1);
       assert.equal(errors[0], 'Invalid version number!');
+    });
+
+    it('validate configuration file with errors because of invalid license', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/invalid-license', 'utf-8'));
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'License must be a valid SPDX License!');
     });
 
     it('should validate configuration file with errors because of bad tool names', () => {
@@ -125,5 +132,13 @@ describe('Project Configuration Validator', () => {
       assert.equal(validateVersionNumber('1.1.fdafda'), true);
       assert.equal(validateVersionNumber('fdafda.1'), 'Invalid version number!');
     });
+  });
+
+  describe('validateLicense()', () => {
+    it('should properly validate license names', () => {
+      assert.equal(validateLicense('MIT'), true);
+      assert.equal(validateLicense('badlicense'), 'License must be a valid SPDX License!');
+      assert.equal(validateLicense(''), true);
+    })
   });
 });

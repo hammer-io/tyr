@@ -1,5 +1,6 @@
 import isValidPath from 'is-valid-path';
 import fs from 'fs-extra';
+import spdx from 'spdx';
 
 import choices from '../constants/choices';
 
@@ -42,6 +43,23 @@ export function validateVersionNumber(value) {
 }
 
 /**
+ * Validates a license. A license is valid if it is blank or conforms to SPDX validations.
+ * @param value the license to validate
+ * @returns {*} true if valid, the error message otherwise
+ */
+export function validateLicense(value) {
+  // we'll allow for blank license
+  if ((typeof value === 'undefined') || value === '' || value.trim().length < 1) {
+    return true;
+  }
+
+  if (spdx.valid(value)) {
+    return true;
+  }
+
+  return 'License must be a valid SPDX License!';
+}
+/**
  * Validates the project configuration files
  * @param input the configuraiton file in as a json object
  * @returns {Array} the array of errors
@@ -81,6 +99,12 @@ export function validateProjectConfigurations(input) {
     if (validateResult !== true) {
       errors.push(validateResult);
     }
+  }
+
+  // validate license
+  const validateLicenseResult = validateLicense(input.projectConfigurations.license);
+  if (validateLicenseResult !== true) {
+    errors.push(validateLicenseResult);
   }
 
   // if there is an invalid source control choice
