@@ -49,7 +49,7 @@ export async function signInToHeroku() {
  * @returns {Object} the github credentials as a username and password key/value pair
  */
 export async function signInToGithub() {
-  const credentials = await prompt.promptForGithubCredentials();
+  let credentials = await prompt.promptForGithubCredentials();
   const isValid = await githubService.isValidCredentials(
     credentials.username,
     credentials.password
@@ -57,7 +57,7 @@ export async function signInToGithub() {
 
   if (!isValid) {
     log.error('Incorrect Username and/or Password!');
-    await signInToGithub();
+    credentials = await signInToGithub();
   }
 
   return credentials;
