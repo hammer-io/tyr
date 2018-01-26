@@ -146,6 +146,7 @@ export async function heroku(configs) {
   }
 
   updatedConfig.projectConfigurations.herokuAppName = appName;
+  log.info(`Successfully created Heroku App ${appName}`);
   return updatedConfig;
 }
 
