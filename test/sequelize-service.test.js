@@ -77,8 +77,8 @@ describe('Sequelize Service Test', () => {
         " \"license\": \"MIT\",\n" +
         " \"bin\": {},\n" +
         " \"dependencies\": {\n" +
-        "  \"sequelize\": \"4.32.1\",\n" +
-        "  \"mysql2\": \"1.5.1\"\n" +
+        "  \"sequelize\": \"^4.33.2\",\n" +
+        "  \"mysql2\": \"^1.5.2\"\n" +
         " },\n" +
         " \"devDependencies\": {}\n" +
         "}";

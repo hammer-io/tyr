@@ -38,8 +38,8 @@ async function createSequelizeFile(path) {
 async function updatePackageJsonWithSequelizeDependency(projectName) {
   let projectPackageJson = file.readFile(`${projectName}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.dependencies.sequelize = '4.32.1';
-  projectPackageJson.dependencies.mysql2 = '1.5.1';
+  projectPackageJson.dependencies.sequelize = '^4.33.2';
+  projectPackageJson.dependencies.mysql2 = '^1.5.2';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
   fs.unlinkSync(`${projectName}/package.json`);

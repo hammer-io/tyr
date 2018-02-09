@@ -59,7 +59,7 @@ describe('Mocha Service Test', () => {
         " \"bin\": {},\n" +
         " \"dependencies\": {},\n" +
         " \"devDependencies\": {\n" +
-        "  \"mocha\": \"3.5.3\"\n" +
+        "  \"mocha\": \"^5.0.0\"\n" +
         " }\n" +
         "}";
 

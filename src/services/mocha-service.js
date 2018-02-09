@@ -19,7 +19,7 @@ export async function generateMochaFiles(projectName) {
   // add mocha as a dev dependency to the package.json
   let projectPackageJson = file.readFile(`${projectName}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.devDependencies.mocha = '3.5.3';
+  projectPackageJson.devDependencies.mocha = '^5.0.0';
 
   // add mocha as the test script
   projectPackageJson.scripts.test = 'mocha';
