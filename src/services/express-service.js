@@ -32,7 +32,7 @@ export async function generateExpressFiles(projectName) {
   // add express.js as a dependency to the package.json
   let projectPackageJson = file.readFile(`${projectName}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.dependencies.express = '4.16.0';
+  projectPackageJson.dependencies.express = '^4.16.0';
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
 
   fs.unlinkSync(`${projectName}/package.json`);

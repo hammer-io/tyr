@@ -24,7 +24,7 @@ describe('Express Service Test', () => {
         "  \"bin\": {},\n" +
         "  \"dependencies\": {},\n" +
         "  \"devDependencies\": {\n" +
-        "    \"mocha\": \"3.5.3\"\n" +
+        "    \"mocha\": \"^5.0.0\"\n" +
         "  }\n" +
         "}");
     });
@@ -136,10 +136,10 @@ describe('Express Service Test', () => {
         " \"license\": \"\",\n" +
         " \"bin\": {},\n" +
         " \"dependencies\": {\n" +
-        "  \"express\": \"4.16.0\"\n" +
+        "  \"express\": \"^4.16.0\"\n" +
         " },\n" +
         " \"devDependencies\": {\n" +
-        "  \"mocha\": \"3.5.3\"\n" +
+        "  \"mocha\": \"^5.0.0\"\n" +
         " }\n" +
         "}";
 
