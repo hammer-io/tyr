@@ -110,10 +110,11 @@ export async function waitForProjectToExist(
 export async function enableTravis(configs) {
   log.verbose('Travis Service - enableTravis()');
 
-  let githubToken = {};
+  let githubToken = {
+    token: configs.credentials.github.token
+  };
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
-  githubToken.token = configs.credentials.github.token;
   const projectName = configs.projectConfigurations.projectName;
   const isPrivate = configs.projectConfigurations.isPrivateProject;
 
