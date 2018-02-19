@@ -72,7 +72,7 @@ export function isValidGithubRepositoryName(repositoryName, repositories) {
  */
 export async function createGitHubRepository(
   repositoryName, repositoryDescription, username,
-  password, isPrivate
+  password, token, isPrivate
 ) {
   log.verbose(`Creating GitHub repository ${username}/${repositoryName}.`);
 
@@ -82,6 +82,7 @@ export async function createGitHubRepository(
       repositoryDescription,
       username,
       password,
+      token,
       isPrivate
     );
 

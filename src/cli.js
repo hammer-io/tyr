@@ -6,6 +6,7 @@ import * as tyr from './tyr';
 import { parseConfigsFromFile } from './services/project-configuration-service';
 import * as githubService from './services/github-service';
 import * as herokuService from './services/heroku-service';
+import * as nodeService from './services/node-service';
 
 const log = getActiveLogger();
 
@@ -194,4 +195,9 @@ export async function run(configFile, logFile) {
   }
 
   await tyr.generateProject(configurations);
+
+  // npm install
+  await nodeService.npmInstall(configurations.projectConfigurations.projectName);
+
+  log.info('>>> Finished!');
 }

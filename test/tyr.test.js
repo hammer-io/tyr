@@ -34,9 +34,6 @@ describe('Tyr Test', () => {
 
           assert.equal(fs.existsSync(projectName + '/' + 'README.md'), true, 'should create a' +
               ' README.md file.');
-
-          assert.equal(fs.existsSync(projectName + '/node_modules'), true, 'should run NPM install,' +
-              ' thus creating a node_modules folder');
       }).timeout(10000);
 
       it('should generate a project with Mocha', async () => {
@@ -62,9 +59,6 @@ describe('Tyr Test', () => {
 
         assert.equal(fs.existsSync(projectName + '/' + 'README.md'), true, 'should create a' +
           ' README.md file.');
-
-        assert.equal(fs.existsSync(projectName + '/node_modules'), true, 'should run NPM install,' +
-          ' thus creating a node_modules folder');
       }).timeout(10000);
 
       it('should generate a project with no third party services', async () => {
@@ -86,12 +80,6 @@ describe('Tyr Test', () => {
 
           assert.equal(fs.existsSync(projectName + '/' + 'README.md'), true, 'should create a' +
               ' README.md file.');
-
-          if(process.version.startsWith("v8")) { // node 8 doesn't create node modules folder for no dependencies
-            assert.equal(fs.existsSync(projectName + '/node_modules'), false, 'should create node_modules folder because it\'s node 8');
-          } else  { // node 6 creates node modules for no dependencies
-            assert.equal(fs.existsSync(projectName + '/node_modules'), true, 'should create node_modules folder because it\'s node 6');
-          }
 
           assert.equal(fs.existsSync(projectName + '/.tyrfile'), true, 'should create a .tyrfile');
 

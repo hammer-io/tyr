@@ -164,6 +164,7 @@ export async function createRepository(
   repositoryDescription,
   username,
   password,
+  token,
   isPrivate
 ) {
   log.verbose('Github Client createRepository()');
@@ -173,12 +174,19 @@ export async function createRepository(
     private: isPrivate
   };
 
+  let authorization;
+  if (token) {
+    authorization = authorizationUtil.tokenAuthorization(token);
+  } else {
+    authorization = authorizationUtil.basicAuthorization(username, password);
+  }
+
   log.http(`POST ${githubApiUrl}/user/repos - creating github repository - ${JSON.stringify(payload)}`);
   return new Promise((resolve, reject) => {
     superagent
       .post(`${githubApiUrl}/user/repos`)
       .set({
-        Authorization: authorizationUtil.basicAuthorization(username, password)
+        Authorization: authorization
       })
       .send(payload)
       .end((err) => {

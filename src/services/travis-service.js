@@ -110,8 +110,10 @@ export async function waitForProjectToExist(
 export async function enableTravis(configs) {
   log.verbose('Travis Service - enableTravis()');
 
+  let githubToken = {};
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
+  githubToken.token = configs.credentials.github.token;
   const projectName = configs.projectConfigurations.projectName;
   const isPrivate = configs.projectConfigurations.isPrivateProject;
 
@@ -128,12 +130,13 @@ export async function enableTravis(configs) {
     });
   }
 
-  // get the github token
-  let githubToken = {};
-  try {
-    githubToken = await githubClient.requestGitHubToken(username, password);
-  } catch (error) {
-    throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to get a token from GitHub.`);
+  // get the github token if it does not exist
+  if (!githubToken.token) {
+    try {
+      githubToken = await githubClient.requestGitHubToken(username, password);
+    } catch (error) {
+      throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to get a token from GitHub.`);
+    }
   }
 
   // Use the GitHub token to get a Travis token
@@ -211,7 +214,10 @@ export async function enableTravis(configs) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to set environment variables.`);
   }
 
-  await githubClient.deleteGitHubToken(githubToken.url, username, password);
+  if (githubToken.url) {
+    // if the token was not passed in through the configs, delete it.
+    await githubClient.deleteGitHubToken(githubToken.url, username, password);
+  }
 
   log.info(`Successfully enabled TravisCI on ${username}/${projectName}`);
   return travisAccessToken;
