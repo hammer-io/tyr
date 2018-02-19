@@ -31,7 +31,7 @@ export function getCurrentUser(email, password) {
            - ${JSON.stringify({ status: err.status, message: err.message })}`);
           reject(err);
         } else {
-          log.debug(`RESPONSE: POST ${herokuApiUrl}/apps - error getting account information for email: ${email}`);
+          log.debug(`RESPONSE: POST ${herokuApiUrl}/apps - success getting account information for email: ${email}`);
           resolve(res.body);
         }
       });

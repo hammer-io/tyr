@@ -23,17 +23,13 @@ const log = getActiveLogger();
 async function github(configs) {
   const repositoryName = configs.projectConfigurations.projectName;
   const repositoryDescription = configs.projectConfigurations.description;
-  const username = configs.credentials.github.username;
-  const password = configs.credentials.github.password;
-  const token = configs.credentials.github.token;
+  const credentials = configs.credentials.github;
   const isPrivate = configs.projectConfigurations.isPrivateProject;
 
   await githubService.createGitHubRepository(
     repositoryName,
     repositoryDescription,
-    username,
-    password,
-    token,
+    credentials,
     isPrivate
   );
 

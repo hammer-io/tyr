@@ -154,17 +154,14 @@ export async function getRepositories(username, password, pageNumber) {
  * Make a request to https://api.github.com/user/repos, and authenticate with basic auth
  * @param repositoryName the repository name to create
  * @param repositoryDescription the description of the repository
- * @param username the username of the user
- * @param password the password of the user
+ * @param credentials the password, username, and/or token of the user
  * @param isPrivate flag to determine if a private project should be created or not
  * @returns {Promise<any>}
  */
 export async function createRepository(
   repositoryName,
   repositoryDescription,
-  username,
-  password,
-  token,
+  credentials,
   isPrivate
 ) {
   log.verbose('Github Client createRepository()');
@@ -175,10 +172,13 @@ export async function createRepository(
   };
 
   let authorization;
-  if (token) {
-    authorization = authorizationUtil.tokenAuthorization(token);
+  if (credentials.token) {
+    authorization = authorizationUtil.tokenAuthorization(credentials.token);
   } else {
-    authorization = authorizationUtil.basicAuthorization(username, password);
+    authorization = authorizationUtil.basicAuthorization(
+      credentials.username,
+      credentials.password
+    );
   }
 
   log.http(`POST ${githubApiUrl}/user/repos - creating github repository - ${JSON.stringify(payload)}`);
