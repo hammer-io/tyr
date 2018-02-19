@@ -8,7 +8,6 @@ import * as travisService from './services/travis-service';
 import * as dockerService from './services/docker-service';
 import * as expressService from './services/express-service';
 import * as mochaService from './services/mocha-service';
-import * as nodeService from './services/node-service';
 import * as sequelizeService from './services/sequelize-service';
 
 import { getActiveLogger } from './utils/winston';
@@ -26,6 +25,7 @@ async function github(configs) {
   const repositoryDescription = configs.projectConfigurations.description;
   const username = configs.credentials.github.username;
   const password = configs.credentials.github.password;
+  const token = configs.credentials.github.token;
   const isPrivate = configs.projectConfigurations.isPrivateProject;
 
   await githubService.createGitHubRepository(
@@ -33,6 +33,7 @@ async function github(configs) {
     repositoryDescription,
     username,
     password,
+    token,
     isPrivate
   );
 
@@ -214,9 +215,6 @@ export async function generateProject(configs) {
   // write configs to a file
   await projectService.generateTyrfile(configs);
 
-  // npm install
-  await nodeService.npmInstall(configs.projectConfigurations.projectName);
-
   // init, add, commit, push to github
   if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
     await githubService.initAddCommitAndPush(
@@ -225,6 +223,4 @@ export async function generateProject(configs) {
     );
     log.info('Successfully committed and pushed files to GitHub Repository');
   }
-
-  log.info('>>> Finished!');
 }
