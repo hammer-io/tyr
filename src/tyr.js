@@ -39,70 +39,77 @@ async function github(configs) {
 /**
  * Facilitates generating the necessary files for a basic nodejs project
  * @param configs the configurations object
+ * @param filePath the new project's file path
  * @returns {Promise<void>}
  */
-async function generateBasicNodeProject(configs) {
-  await projectService.generateBasicNodeFiles(configs);
+export async function generateBasicNodeProject(configs, filePath) {
+  await projectService.generateBasicNodeFiles(configs, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for GitHub/Git Support
  * @param configs the configurations object
+ * @param filePath the new project's file path
  * @returns {Promise<void>}
  */
-async function generateGithubFiles(configs) {
-  await githubService.generateGithubFiles(configs.projectConfigurations.projectName);
+async function generateGithubFiles(configs, filePath) {
+  await githubService.generateGithubFiles(configs.projectConfigurations.projectName, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for TravisCI support
  * @param configs the configurations object
+ * @param filePath the new project's file path
  * @returns {Promise<void>}
  */
-async function generateTravisFiles(configs) {
-  await travisService.generateTravisCIFile(configs);
+async function generateTravisFiles(configs, filePath) {
+  await travisService.generateTravisCIFile(configs, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for Docker support
  * @param configs the configurations object
+ * @param filePath the new project's file path
  * @returns {Promise<void>}
  */
-async function generateDockerFiles(configs) {
-  await dockerService.generateDockerFiles(configs.projectConfigurations.projectName);
+async function generateDockerFiles(configs, filePath) {
+  await dockerService.generateDockerFiles(configs.projectConfigurations.projectName, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for ExpressJS
- * @param configs
+ * @param configs the configuration object
+ * @param filePath the new project's file path
  * @returns {Promise<void>}
  */
-async function generateExpressFiles(configs) {
-  await expressService.generateExpressFiles(configs.projectConfigurations.projectName);
+async function generateExpressFiles(configs, filePath) {
+  await expressService.generateExpressFiles(configs.projectConfigurations.projectName, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for mocha
  * @param configs the configuration object
+ * @param filePath the new project's file path
  * @returns {Promise<*>}
  */
-export async function generateMochaFiles(configs) {
-  await mochaService.generateMochaFiles(configs.projectConfigurations.projectName);
+export async function generateMochaFiles(configs, filePath) {
+  await mochaService.generateMochaFiles(configs.projectConfigurations.projectName, filePath);
   return configs;
 }
 
 /**
  * Facilitates generating the necessary files for sequelize
  * @param configs the configuration object
+ * @param filePath the new project's file path
  * @returns {Promise<*>}
  */
-export async function generateSequelizeFiles(configs) {
-  await sequelizeService.generateSequelizeFiles(configs);
+export async function generateSequelizeFiles(configs, filePath) {
+  await sequelizeService.generateSequelizeFiles(configs, filePath);
   return configs;
 }
 
@@ -168,21 +175,24 @@ const staticFileGenerators = {
   sequelize: generateSequelizeFiles,
 };
 
-/**
- * Generates a project
- * @param configs the configurations object
- * @returns {Promise<void>}
- */
-export async function generateProject(configs) {
-  console.log();
-  log.info('>>> Generating Project!', configs);
+export async function generateStaticFiles(configs, filePath) {
+  // generating static files
   try {
-    await generateBasicNodeProject(configs);
+    for (const key of Object.keys(configs.toolingConfigurations)) {
+      const tool = configs.toolingConfigurations[key];
+      if (staticFileGenerators[tool.toLowerCase()]) {
+        await staticFileGenerators[tool.toLowerCase()](configs, filePath);
+      }
+    }
   } catch (error) {
-    log.error(error.message);
-    return;
+    return Promise.reject(error);
   }
 
+  // write configs to a file
+  await projectService.generateTyrfile(configs, filePath);
+}
+
+export async function setUpThirdPartyTools(configs) {
   // enabling third party tools
   try {
     for (const key of Object.keys(configs.toolingConfigurations)) {
@@ -193,30 +203,44 @@ export async function generateProject(configs) {
       }
     }
   } catch (error) {
-    log.error(error.message);
+    return Promise.reject(error);
   }
+}
 
-  // generating static files
-  try {
-    for (const key of Object.keys(configs.toolingConfigurations)) {
-      const tool = configs.toolingConfigurations[key];
-      if (staticFileGenerators[tool.toLowerCase()]) {
-        await staticFileGenerators[tool.toLowerCase()](configs);
-      }
-    }
-  } catch (error) {
-    log.error(error.message);
-  }
-
-  // write configs to a file
-  await projectService.generateTyrfile(configs);
-
+export async function commitToGithub(configs, filePath) {
   // init, add, commit, push to github
   if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
     await githubService.initAddCommitAndPush(
       configs.credentials.github.username,
-      configs.projectConfigurations.projectName
+      configs.projectConfigurations.projectName,
+      filePath
     );
     log.info('Successfully committed and pushed files to GitHub Repository');
+  }
+}
+
+/**
+ * Generates a project
+ * @param configs the configurations object
+ * @returns {Promise<void>}
+ */
+export async function generateProject(configs) {
+  console.log();
+  log.info('>>> Generating Project!', configs);
+
+  const filePath = process.cwd();
+
+  try {
+    await generateBasicNodeProject(configs, filePath);
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  try {
+    await setUpThirdPartyTools(configs);
+    await generateStaticFiles(configs, filePath);
+    await commitToGithub(configs, filePath);
+  } catch (error) {
+    log.error(error.message);
   }
 }

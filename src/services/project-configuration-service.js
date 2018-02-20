@@ -36,13 +36,13 @@ export function parseConfigsFromFile(path) {
  *
  * @param configs the config object
  */
-export function writeToConfigFile(configs) {
+export function writeToConfigFile(configs, filePath) {
   const outputConfig = {};
   outputConfig.projectConfigurations = configs.projectConfigurations;
   outputConfig.toolingConfigurations = configs.toolingConfigurations;
 
   try {
-    file.writeFile(`${configs.projectConfigurations.projectName}/.tyrfile`, JSON.stringify(outputConfig, null, ' '));
+    file.writeFile(`${filePath}/${configs.projectConfigurations.projectName}/.tyrfile`, JSON.stringify(outputConfig, null, ' '));
   } catch (err) {
     throw new Error('Failed to generate .tyrfile!');
   }

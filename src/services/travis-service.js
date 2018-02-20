@@ -10,11 +10,12 @@ const log = getActiveLogger();
 /**
  * Generates the TravisCI file.
  * @param configs the configurations object
+ * @param filePath the path to the newly created project
  * @returns {Promise<void>}
  */
-export async function generateTravisCIFile(configs) {
+export async function generateTravisCIFile(configs, filePath) {
   log.verbose('Travis Service - generateTravisCIFile()');
-  const path = `${configs.projectConfigurations.projectName}/.travis.yml`;
+  const path = `${filePath}/${configs.projectConfigurations.projectName}/.travis.yml`;
 
   // load in the base travis CI file.
   const travisCIFile = yaml.safeLoad(file.loadTemplate('./../../templates/travis/travis.yml'));

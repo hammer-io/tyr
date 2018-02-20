@@ -2,8 +2,9 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import sinon from 'sinon';
 
-import {generateProject, heroku} from '../dist/tyr';
+import {generateProject, generateStaticFiles, heroku} from '../dist/tyr';
 import * as herokuClient from "../dist/clients/heroku-client";
+import {generateBasicNodeFiles} from '../src/services/project-service';
 
 describe('Tyr Test', () => {
 
@@ -90,6 +91,48 @@ describe('Tyr Test', () => {
 
       afterEach(() => {
         fs.removeSync('test-project');
+      })
+    });
+
+    describe('generateStaticFiles()', () => {
+      it('should generate static tooling files', async function() {
+        const validConfig = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration'));
+        const projectName = validConfig.projectConfigurations.projectName;
+        await generateBasicNodeFiles(validConfig, process.cwd());
+        await generateStaticFiles(validConfig, process.cwd());
+
+        assert.equal(fs.existsSync(projectName), true, 'should create a top level folder with' +
+          ' project name');
+
+        assert.equal(fs.existsSync(projectName + '/src'), true, 'should create a src folder' +
+          ' within the project folder');
+
+        assert.equal(fs.existsSync(projectName + '/src/' + 'index.js'), true, 'should create an' +
+          ' index.js file.');
+
+        assert.equal(fs.existsSync(projectName + '/src/' + 'index.html'), true, 'should create a index.html file');
+
+        assert.equal(fs.existsSync(projectName + '/' + 'package.json'), true, 'should create a' +
+          ' package.json file.');
+
+        assert.equal(fs.existsSync(projectName + '/' + 'README.md'), true, 'should create a' +
+          ' README.md file.');
+
+        assert.equal(fs.existsSync(projectName + '/' + '.gitignore'), true, 'should create a' +
+          ' .gitignore file.');
+
+        assert.equal(fs.existsSync(projectName + '/' + '.dockerignore'), true, 'should create a' +
+          ' .dockerignore file.');
+
+        assert.equal(fs.existsSync(projectName + '/' + '.travis.yml'), true, 'should create a' +
+          ' .travis.yml file.');
+
+        assert.equal(fs.existsSync(projectName + '/' + 'Dockerfile'), true, 'should create a' +
+          ' Dockerfile.');
+      }).timeout(10000);
+
+      afterEach(() => {
+        fs.removeSync('test-config');
       })
     });
 

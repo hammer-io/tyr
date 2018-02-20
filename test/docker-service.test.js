@@ -15,7 +15,7 @@ describe('Docker Service Test', () => {
         "node_modules\n" +
         "npm-debug.log";
 
-      await generateDockerFiles('test-docker');
+      await generateDockerFiles('test-docker', process.cwd());
 
       assert.equal(eol.auto(fs.readFileSync('test-docker/.dockerignore', 'utf-8')), eol.auto(dockerignoreExpectedContents));
       assert.equal(fs.existsSync('test-docker/.dockerignore'), true);
@@ -44,7 +44,7 @@ describe('Docker Service Test', () => {
         "CMD [\"npm\", \"start\"]";
 
 
-      await generateDockerFiles('test-docker');
+      await generateDockerFiles('test-docker', process.cwd());
 
       assert.equal(fs.existsSync('test-docker/Dockerfile'), true);
       assert.equal(eol.auto(fs.readFileSync('test-docker/Dockerfile', 'utf-8')), eol.auto(dockerfileExpectedContents));

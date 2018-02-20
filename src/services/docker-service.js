@@ -6,12 +6,13 @@ const log = getActiveLogger();
 /**
  * Generates the files needed for docker support, including dockerignore and Dockerfile
  * @param projectName the project name for the project directory
+ * @param filePath the newly created project's file path
  * @returns {Promise<void>}
  */
-export async function generateDockerFiles(projectName) {
+export async function generateDockerFiles(projectName, filePath) {
   log.verbose('Docker Service - generateDockerFiles()');
-  const dockerFilePath = `${projectName}/Dockerfile`;
-  const dockerIgnorePath = `${projectName}/.dockerignore`;
+  const dockerFilePath = `${filePath}/${projectName}/Dockerfile`;
+  const dockerIgnorePath = `${filePath}/${projectName}/.dockerignore`;
 
   const dockerFileContents = file.loadTemplate('./../../templates/docker/Dockerfile');
   const dockerIgnoreContents = file.loadTemplate('./../../templates/docker/dockerignore');

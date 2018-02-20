@@ -33,7 +33,7 @@ describe('Project Service Test', () => {
         " }\n" +
         "}";
 
-      await projectService.generateTyrfile(configs);
+      await projectService.generateTyrfile(configs, process.cwd());
 
       assert.equal(fs.existsSync(projectName + "/.tyrfile"), true);
       assert.equal(eol.auto(fs.readFileSync(projectName + "/.tyrfile", 'utf-8')), eol.auto(expectedTyrFileConfigs));
@@ -42,7 +42,7 @@ describe('Project Service Test', () => {
 
   describe('generateBasicNodeFiles()', () => {
     beforeEach(async () => {
-      await projectService.generateBasicNodeFiles(configs);
+      await projectService.generateBasicNodeFiles(configs, process.cwd());
     });
 
     it('should generate a top level folder with the project name', async () => {

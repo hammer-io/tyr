@@ -30,7 +30,7 @@ describe('Express Service Test', () => {
     });
 
     it('should generate an index.html file', async () => {
-      await generateExpressFiles('test-express');
+      await generateExpressFiles('test-express', process.cwd());
 
       const expectedIndexContents = "<head>\n" +
         "    <meta charset=\"utf-8\">\n" +
@@ -77,7 +77,7 @@ describe('Express Service Test', () => {
     });
 
     it('should generate an index.js file', async () => {
-      await generateExpressFiles('test-express');
+      await generateExpressFiles('test-express', process.cwd());
 
       const expectedIndexContents = "const express = require('express');\n" +
         "const routes = require('./routes');\n" +
@@ -101,7 +101,7 @@ describe('Express Service Test', () => {
     });
 
     it('should generate a routes.js file', async () => {
-      await generateExpressFiles('test-express');
+      await generateExpressFiles('test-express', process.cwd());
 
       const expectedRoutesContent = "const express = require('express');\n" +
         "const router = express.Router();\n" +
@@ -144,7 +144,7 @@ describe('Express Service Test', () => {
         "}";
 
 
-      await generateExpressFiles('test-express');
+      await generateExpressFiles('test-express', process.cwd());
 
       assert.equal(fs.existsSync('test-express/package.json'), true);
       assert.equal(eol.auto(fs.readFileSync('test-express/package.json', 'utf-8')), eol.auto(expectedPackageJsonContents));

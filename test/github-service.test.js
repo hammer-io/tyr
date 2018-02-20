@@ -77,7 +77,7 @@ describe('GitHub Service', () => {
         "# dotenv environment variables file\n" +
         ".env";
 
-      await githubService.generateGithubFiles('test-github');
+      await githubService.generateGithubFiles('test-github', process.cwd());
 
       assert.equal(fs.existsSync('test-github/.gitignore'), true);
       assert.equal(eol.auto(fs.readFileSync('test-github/.gitignore', 'utf-8')), eol.auto(expectedGitignoreContents));

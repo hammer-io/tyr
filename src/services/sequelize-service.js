@@ -32,41 +32,45 @@ async function createSequelizeFile(path) {
 
 /**
  * Updates the package.json file for the project with the sequelize dependency
- * @param projectName the name of the project
+ * @param path the path to the new project directory
  * @returns {Promise<void>}
  */
-async function updatePackageJsonWithSequelizeDependency(projectName) {
-  let projectPackageJson = file.readFile(`${projectName}/package.json`);
+async function updatePackageJsonWithSequelizeDependency(path) {
+  const packageJsonFileName = `${path}/package.json`;
+  let projectPackageJson = file.readFile(packageJsonFileName);
   projectPackageJson = JSON.parse(projectPackageJson);
   projectPackageJson.dependencies.sequelize = '^4.33.2';
   projectPackageJson.dependencies.mysql2 = '^1.5.2';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  fs.unlinkSync(`${projectName}/package.json`);
-  file.writeFile(`${projectName}/package.json`, projectPackageJson);
+  fs.unlinkSync(packageJsonFileName);
+  file.writeFile(packageJsonFileName, projectPackageJson);
 }
 
 /**
  * Updates the index.js file to add the sequelize require statement
- * @param projectName the project name
+ * @param path the path to the new project src folder
  */
-async function updateIndexJs(projectName) {
-  let contents = file.readFile(`${projectName}/src/index.js`);
+async function updateIndexJs(path) {
+  const indexJSFileName = `${path}/index.js`;
+  let contents = file.readFile(indexJSFileName);
   const firstLine = 'const sequelize = require(\'./db/sequelize\');\n';
   contents = firstLine + contents;
-  fs.unlinkSync(`${projectName}/src/index.js`);
-  file.writeFile(`${projectName}/src/index.js`, contents);
+  fs.unlinkSync(indexJSFileName);
+  file.writeFile(indexJSFileName, contents);
 }
 /**
  * Generates the files necessary for sequelize and updates the package.json with the proper
  * dependencies
  * @param configs
+ * @param filePath
  * @returns {Promise<void>}
  */
-export async function generateSequelizeFiles(configs) {
+export async function generateSequelizeFiles(configs, filePath) {
   const projectName = configs.projectConfigurations.projectName;
-  const path = `${projectName}/src/db`;
-  fs.mkdirSync(path);
+  const path = `${filePath}/${projectName}/`;
+  const dbFolderPath = `${path}/src/db`;
+  fs.mkdirSync(dbFolderPath);
 
   // create db config
   await createDbConfig(
@@ -74,17 +78,17 @@ export async function generateSequelizeFiles(configs) {
     configs.credentials.sequelize.password,
     'localhost',
     projectName,
-    path
+    dbFolderPath
   );
 
   // create sequelize file
-  await createSequelizeFile(path);
+  await createSequelizeFile(dbFolderPath);
 
   // update package.json
-  await updatePackageJsonWithSequelizeDependency(projectName);
+  await updatePackageJsonWithSequelizeDependency(`${path}/`);
 
   // update the index.js file
-  await updateIndexJs(projectName);
+  await updateIndexJs(`${path}/src/`);
 
   return configs;
 }
