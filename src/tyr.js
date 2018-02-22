@@ -209,13 +209,17 @@ export async function setUpThirdPartyTools(configs) {
 
 export async function commitToGithub(configs, filePath) {
   // init, add, commit, push to github
-  if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
-    await githubService.initAddCommitAndPush(
-      configs.credentials.github.username,
-      configs.projectConfigurations.projectName,
-      filePath
-    );
-    log.info('Successfully committed and pushed files to GitHub Repository');
+  try {
+    if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
+      await githubService.initAddCommitAndPush(
+        configs.credentials.github.username,
+        configs.projectConfigurations.projectName,
+        filePath
+      );
+      log.info('Successfully committed and pushed files to GitHub Repository');
+    }
+  } catch (error) {
+    return Promise.reject(error);
   }
 }
 
@@ -232,11 +236,6 @@ export async function generateProject(configs) {
 
   try {
     await generateBasicNodeProject(configs, filePath);
-  } catch (error) {
-    console.log(error.message);
-  }
-
-  try {
     await setUpThirdPartyTools(configs);
     await generateStaticFiles(configs, filePath);
     await commitToGithub(configs, filePath);

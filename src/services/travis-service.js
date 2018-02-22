@@ -196,7 +196,6 @@ export async function enableTravis(configs) {
 
     await travisClient.activateTravisHook(repoId, travisAccessToken, isPrivate);
   } catch (error) {
-    console.log(JSON.stringify(error));
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to activate TravisCI.`);
   }
 
