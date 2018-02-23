@@ -10,9 +10,9 @@ const log = getActiveLogger();
  * adding express as a dependency.
  * @returns {Promise<void>}
  */
-export async function generateExpressFiles(projectName, filePath) {
+export async function generateExpressFiles(projectPath) {
   log.verbose('Express Service - generateExpressFiles()');
-  const path = `${filePath}/${projectName}/src`;
+  const path = `${projectPath}/src`;
 
   // generate the index.html file
   const indexHTMLContents = file.loadTemplate('./../../templates/express/index.html');
@@ -30,11 +30,11 @@ export async function generateExpressFiles(projectName, filePath) {
   log.info(`Successfully generated file: ${path}/routes.js`);
 
   // add express.js as a dependency to the package.json
-  let projectPackageJson = file.readFile(`${filePath}/${projectName}/package.json`);
+  let projectPackageJson = file.readFile(`${projectPath}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
   projectPackageJson.dependencies.express = '^4.16.0';
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
 
-  fs.unlinkSync(`${filePath}/${projectName}/package.json`);
-  file.writeFile(`${filePath}/${projectName}/package.json`, projectPackageJson);
+  fs.unlinkSync(`${projectPath}/package.json`);
+  file.writeFile(`${projectPath}/package.json`, projectPackageJson);
 }

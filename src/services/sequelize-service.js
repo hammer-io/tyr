@@ -8,6 +8,7 @@ import * as file from '../utils/file';
  * @param password the password of the mysql database user
  * @param url the url
  * @param projectName the project name, which will be used as a the schema name
+ * @param path to the newly created project
  */
 async function createDbConfig(username, password, url, projectName, path) {
   // create the configuration
@@ -63,12 +64,12 @@ async function updateIndexJs(path) {
  * Generates the files necessary for sequelize and updates the package.json with the proper
  * dependencies
  * @param configs
- * @param filePath
+ * @param projectPath
  * @returns {Promise<void>}
  */
-export async function generateSequelizeFiles(configs, filePath) {
+export async function generateSequelizeFiles(configs, projectPath) {
   const projectName = configs.projectConfigurations.projectName;
-  const path = `${filePath}/${projectName}/`;
+  const path = `${projectPath}/`;
   const dbFolderPath = `${path}/src/db`;
   fs.mkdirSync(dbFolderPath);
 

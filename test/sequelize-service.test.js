@@ -8,11 +8,12 @@ describe('Sequelize Service Test', () => {
   describe('generateSequelizeFiles()', async () => {
     beforeEach(async () => {
       const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration-sequalize'));
+      const projectName = configs.projectConfigurations.projectName;
       // generate the basic node files
-      projectService.generateBasicNodeFiles(configs, process.cwd());
+      projectService.generateBasicNodeFiles(configs, `${process.cwd()}/${projectName}`);
 
       // then create the sequelize files
-      await generateSequelizeFiles(configs, process.cwd());
+      await generateSequelizeFiles(configs, `${process.cwd()}/${projectName}`);
     });
 
     it('should create the dbConfig.json file', () => {

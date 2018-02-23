@@ -5,14 +5,13 @@ import { getActiveLogger } from '../utils/winston';
 const log = getActiveLogger();
 /**
  * Generates the files needed for docker support, including dockerignore and Dockerfile
- * @param projectName the project name for the project directory
- * @param filePath the newly created project's file path
+ * @param projectPath the newly created project's file path
  * @returns {Promise<void>}
  */
-export async function generateDockerFiles(projectName, filePath) {
+export async function generateDockerFiles(projectPath) {
   log.verbose('Docker Service - generateDockerFiles()');
-  const dockerFilePath = `${filePath}/${projectName}/Dockerfile`;
-  const dockerIgnorePath = `${filePath}/${projectName}/.dockerignore`;
+  const dockerFilePath = `${projectPath}/Dockerfile`;
+  const dockerIgnorePath = `${projectPath}/.dockerignore`;
 
   const dockerFileContents = file.loadTemplate('./../../templates/docker/Dockerfile');
   const dockerIgnoreContents = file.loadTemplate('./../../templates/docker/dockerignore');

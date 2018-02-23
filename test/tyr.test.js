@@ -97,8 +97,9 @@ describe('Tyr Test', () => {
       it('should generate static tooling files', async function() {
         const validConfig = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration'));
         const projectName = validConfig.projectConfigurations.projectName;
-        await generateBasicNodeProject(validConfig, process.cwd());
-        await generateStaticFiles(validConfig, process.cwd());
+        const projectPath = `${process.cwd()}`;
+        await generateBasicNodeProject(validConfig, projectPath);
+        await generateStaticFiles(validConfig, projectPath);
 
         assert.equal(fs.existsSync(projectName), true, 'should create a top level folder with' +
           ' project name');
@@ -136,9 +137,10 @@ describe('Tyr Test', () => {
         // will be test-config/test-config to make project removal easier
         const filePath = `${process.cwd()}/test-config`;
         fs.mkdirSync(filePath);
+        const projectPath = `${filePath}/${projectName}`;
         await generateBasicNodeProject(validConfig, filePath);
         await generateStaticFiles(validConfig, filePath);
-        const projectPath = `${filePath}/${projectName}`;
+
 
         assert.equal(fs.existsSync(projectPath), true, 'should create a top level folder with' +
           ' project name');
