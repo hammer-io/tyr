@@ -37,7 +37,7 @@ describe('Mocha Service Test', () => {
         "  })\n" +
         "});";
 
-      await generateMochaFiles('test-mocha');
+      await generateMochaFiles(`${process.cwd()}/test-mocha`);
 
       assert.equal(fs.existsSync('test-mocha/test/test.js'), true);
       assert.equal(eol.auto(fs.readFileSync('test-mocha/test/test.js', 'utf-8')), eol.auto(expectedMochaContents));
@@ -64,7 +64,7 @@ describe('Mocha Service Test', () => {
         "}";
 
 
-      await generateMochaFiles('test-mocha');
+      await generateMochaFiles(`${process.cwd()}/test-mocha`);
 
       assert.equal(fs.existsSync('test-mocha/package.json'), true);
       assert.equal(eol.auto(fs.readFileSync('test-mocha/package.json', 'utf-8')), eol.auto(expectedPackageJsonContents));

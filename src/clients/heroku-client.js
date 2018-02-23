@@ -39,10 +39,9 @@ export function getCurrentUser(email, password) {
 }
 
 /**
- * Makes a request at https://api.heroku.com/apps, and authenticates with basic auth
+ * Makes a request at https://api.heroku.com/apps, and authenticates with token auth
  * @param name the name of the application to create
- * @param email the email of the user
- * @param password the password of the user
+ * @param token the token of the user
  * @returns {Promise<any>}
  */
 export function createApp(name, token) {

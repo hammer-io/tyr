@@ -209,7 +209,7 @@ describe('Test Travis Service', () => {
         "  email:\n" +
         "    on_success: never";
 
-      await generateTravisCIFile(configs);
+      await generateTravisCIFile(configs, `${process.cwd()}/test-project`);
 
       const actualContents = fs.readFileSync('test-project/.travis.yml', 'utf-8');
 
@@ -260,7 +260,7 @@ describe('Test Travis Service', () => {
         "\n" +
         "    fi\n";
 
-      await generateTravisCIFile(configs);
+      await generateTravisCIFile(configs, `${process.cwd()}/test-project`);
 
       const actualContents = fs.readFileSync('test-project/.travis.yml', 'utf-8');
 

@@ -38,7 +38,7 @@ export async function createApp(appName, token) {
     await herokuClient.createApp(appName, token);
     return true;
   } catch (error) {
-    if (error.status === 422) {
+    if (error.status === 422 && error.response.body.message === 'Name is already taken') {
       log.debug('ERROR: Application Name is already in use on Heroku');
       return false;
     }

@@ -95,13 +95,13 @@ export async function createGitHubRepository(
 
 /**
  * Generates the necessary git files, including .gitignore
- * @param projectName the project name
+ * @param projectPath the newly created project's file path
  * @returns {Promise<void>}
  */
-export async function generateGithubFiles(projectName) {
+export async function generateGithubFiles(projectPath) {
   log.verbose('Generating files for GitHub.');
 
-  const path = `${projectName}/.gitignore`;
+  const path = `${projectPath}/.gitignore`;
   const contents = file.loadTemplate('./../../templates/git/gitignore');
   file.writeFile(path, contents);
 
@@ -115,12 +115,11 @@ export async function generateGithubFiles(projectName) {
  *
  * @param username
  * @param projectName
- * @param isTwoFactorAuth
  */
-export function initAddCommitAndPush(username, projectName) {
+export function initAddCommitAndPush(username, projectName, filePath) {
   log.verbose('Github Service - initAddCommitAndPush()');
   return new Promise((resolve) => {
-    git(`${process.cwd()}/${projectName}`)
+    git(`${filePath}/${projectName}`)
       .init()
       .add('.gitignore')
       .add('./*')

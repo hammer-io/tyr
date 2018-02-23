@@ -7,17 +7,17 @@ import { getActiveLogger } from '../utils/winston';
 const log = getActiveLogger();
 /**
  * Generates the files needed for mocha test
- * @param projectName the project name
+ * @param projectPath the newly created project's filePath
  * @returns {Promise<void>}
  */
-export async function generateMochaFiles(projectName) {
+export async function generateMochaFiles(projectPath) {
   log.verbose('Mocha Service - generateMochaFiles()');
-  fs.mkdirSync(`${projectName}/test`);
-  const path = `${projectName}/test/test.js`;
+  fs.mkdirSync(`${projectPath}/test`);
+  const path = `${projectPath}/test/test.js`;
   const content = file.loadTemplate('./../../templates/mocha/test.js');
 
   // add mocha as a dev dependency to the package.json
-  let projectPackageJson = file.readFile(`${projectName}/package.json`);
+  let projectPackageJson = file.readFile(`${projectPath}/package.json`);
   projectPackageJson = JSON.parse(projectPackageJson);
   projectPackageJson.devDependencies.mocha = '^5.0.0';
 
@@ -25,8 +25,8 @@ export async function generateMochaFiles(projectName) {
   projectPackageJson.scripts.test = 'mocha';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  fs.unlinkSync(`${projectName}/package.json`);
-  file.writeFile(`${projectName}/package.json`, projectPackageJson);
+  fs.unlinkSync(`${projectPath}/package.json`);
+  file.writeFile(`${projectPath}/package.json`, projectPackageJson);
   file.writeFile(path, content);
   log.info(`Successfully generated file: ${path}`);
 }
