@@ -2,9 +2,8 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import sinon from 'sinon';
 
-import {generateProject, generateStaticFiles, heroku} from '../dist/tyr';
+import {generateProject, generateStaticFiles, generateBasicNodeProject, heroku} from '../dist/tyr';
 import * as herokuClient from "../dist/clients/heroku-client";
-import {generateBasicNodeFiles} from '../src/services/project-service';
 
 describe('Tyr Test', () => {
 
@@ -98,7 +97,7 @@ describe('Tyr Test', () => {
       it('should generate static tooling files', async function() {
         const validConfig = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration'));
         const projectName = validConfig.projectConfigurations.projectName;
-        await generateBasicNodeFiles(validConfig, process.cwd());
+        await generateBasicNodeProject(validConfig, process.cwd());
         await generateStaticFiles(validConfig, process.cwd());
 
         assert.equal(fs.existsSync(projectName), true, 'should create a top level folder with' +
@@ -130,6 +129,47 @@ describe('Tyr Test', () => {
         assert.equal(fs.existsSync(projectName + '/' + 'Dockerfile'), true, 'should create a' +
           ' Dockerfile.');
       }).timeout(10000);
+
+      it('should generate static tooling files into the specified directory', async function() {
+        const validConfig = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration'));
+        const projectName = validConfig.projectConfigurations.projectName;
+        // will be test-config/test-config to make project removal easier
+        const filePath = `${process.cwd()}/test-config`;
+        fs.mkdirSync(filePath);
+        await generateBasicNodeProject(validConfig, filePath);
+        await generateStaticFiles(validConfig, filePath);
+        const projectPath = `${filePath}/${projectName}`;
+
+        assert.equal(fs.existsSync(projectPath), true, 'should create a top level folder with' +
+          ' project name');
+
+        assert.equal(fs.existsSync(projectPath + '/src'), true, 'should create a src folder' +
+          ' within the project folder');
+
+        assert.equal(fs.existsSync(projectPath + '/src/' + 'index.js'), true, 'should create an' +
+          ' index.js file.');
+
+        assert.equal(fs.existsSync(projectPath + '/src/' + 'index.html'), true, 'should create a index.html file');
+
+        assert.equal(fs.existsSync(projectPath + '/' + 'package.json'), true, 'should create a' +
+          ' package.json file.');
+
+        assert.equal(fs.existsSync(projectPath + '/' + 'README.md'), true, 'should create a' +
+          ' README.md file.');
+
+        assert.equal(fs.existsSync(projectPath + '/' + '.gitignore'), true, 'should create a' +
+          ' .gitignore file.');
+
+        assert.equal(fs.existsSync(projectPath + '/' + '.dockerignore'), true, 'should create a' +
+          ' .dockerignore file.');
+
+        assert.equal(fs.existsSync(projectPath + '/' + '.travis.yml'), true, 'should create a' +
+          ' .travis.yml file.');
+
+        assert.equal(fs.existsSync(projectPath + '/' + 'Dockerfile'), true, 'should create a' +
+          ' Dockerfile.');
+      }).timeout(10000);
+
 
       afterEach(() => {
         fs.removeSync('test-config');
@@ -164,7 +204,7 @@ describe('Tyr Test', () => {
 
         it('should append a random UUID to the end of the name if the project name already exists', async function() {
             const herokuCreateRepoStub = sinon.stub(herokuClient, 'createApp');
-            herokuCreateRepoStub.onFirstCall().rejects({status: 422});
+            herokuCreateRepoStub.onFirstCall().rejects({status: 422, response : { body: { message: 'Name is already taken'}}});
             herokuCreateRepoStub.onSecondCall().resolves();
 
             const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configurations-credentials'));

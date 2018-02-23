@@ -21,6 +21,20 @@ describe('Docker Service Test', () => {
       assert.equal(fs.existsSync('test-docker/.dockerignore'), true);
     });
 
+    it('should generate a .dockerignore file in the correct directory', async () => {
+      const dockerignoreExpectedContents = "" +
+        "node_modules\n" +
+        "npm-debug.log";
+
+      // test-docker/test-docker is where the file will be to make removal easy for each test
+      const filePath = `${process.cwd()}/test-docker`;
+      fs.mkdirSync(`${filePath}/projectName`);
+      await generateDockerFiles('projectName', filePath);
+
+      assert.equal(eol.auto(fs.readFileSync(`${filePath}/projectName/.dockerignore`, 'utf-8')), eol.auto(dockerignoreExpectedContents));
+      assert.equal(fs.existsSync(`${filePath}/projectName/.dockerignore`), true);
+    });
+
     it('should generate a Dockerfile file', async () => {
       const dockerfileExpectedContents = "" +
         "# Use the official Node runtime as a parent image\n" +
@@ -48,6 +62,38 @@ describe('Docker Service Test', () => {
 
       assert.equal(fs.existsSync('test-docker/Dockerfile'), true);
       assert.equal(eol.auto(fs.readFileSync('test-docker/Dockerfile', 'utf-8')), eol.auto(dockerfileExpectedContents));
+
+    });
+
+    it('should generate a Dockerfile file', async () => {
+      const dockerfileExpectedContents = "" +
+        "# Use the official Node runtime as a parent image\n" +
+        "# More info at https://hub.docker.com/_/node/\n" +
+        "FROM node:alpine\n" +
+        "\n" +
+        "# Set the working directory\n" +
+        "WORKDIR /app\n" +
+        "COPY package.json /app\n" +
+        "\n" +
+        "# Install app dependencies\n" +
+        "RUN npm install\n" +
+        "\n" +
+        "# Bundle app source\n" +
+        "COPY . /app\n" +
+        "\n" +
+        "# Make port 8080 available to the world outside this container\n" +
+        "EXPOSE 8080\n" +
+        "\n" +
+        "# Run \"npm start\" when the container launches\n" +
+        "CMD [\"npm\", \"start\"]";
+
+      // test-docker/test-docker is where the file will be to make removal easy for each test
+      const filePath = `${process.cwd()}/test-docker`;
+      fs.mkdirSync(`${filePath}/projectName`);
+      await generateDockerFiles('projectName', filePath);
+
+      assert.equal(fs.existsSync(`${filePath}/projectName/Dockerfile`), true);
+      assert.equal(eol.auto(fs.readFileSync(`${filePath}/projectName/Dockerfile`, 'utf-8')), eol.auto(dockerfileExpectedContents));
 
     });
   });

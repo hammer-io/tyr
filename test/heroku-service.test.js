@@ -64,7 +64,7 @@ describe('Heroku Service', () => {
     });
 
     it('should not create an app and return false if the name is already taken on heroku', async () => {
-      createAppRequest.rejects({status: 422});
+      createAppRequest.rejects({status: 422, response : { body: { message: 'Name is already taken'}}});
       const isCreated = await herokuService.createApp('blah', '1234');
       assert.equal(isCreated, false);
     });
