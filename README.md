@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/hammer-io/tyr.svg?branch=master)](https://travis-ci.org/hammer-io/tyr)
 [![codecov](https://codecov.io/gh/hammer-io/tyr/branch/master/graph/badge.svg)](https://codecov.io/gh/hammer-io/tyr)
 [![npm version](https://badge.fury.io/js/tyr-cli.svg)](https://badge.fury.io/js/tyr-cli)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr?ref=badge_shield)
 
 # tyr
 
@@ -104,6 +105,9 @@ Choice must also be `<None>`.
 }
 ```
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr?ref=badge_large)
 
 ## Contributing
 
