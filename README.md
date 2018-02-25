@@ -106,6 +106,9 @@ Choice must also be `<None>`.
 ```
 
 
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhammer-io%2Ftyr?ref=badge_large)
+
 ## Contributing
 
 Please see our [Contributing Guide](https://github.com/hammer-io/tyr/blob/master/CONTRIBUTING.md)
