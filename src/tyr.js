@@ -214,7 +214,7 @@ export async function commitToGithub(configs, filePath) {
   try {
     if (configs.toolingConfigurations.sourceControl && configs.toolingConfigurations.sourceControl.toLowerCase() === 'github') {
       await githubService.initAddCommitAndPush(
-        configs.credentials.github.username,
+        configs.credentials.github,
         configs.projectConfigurations.projectName,
         filePath
       );

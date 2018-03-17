@@ -156,15 +156,19 @@ export async function enableTravis(configs) {
     response = await travisClient.getUserAccount(travisAccessToken, isPrivate);
     // a user may have many accounts, we should find the account associated with the github username
     for (let i = 0; i < response.accounts.length; i += 1) {
-      if (response.accounts[i].login === username) {
+      if (response.accounts[i].login.toLowerCase() === username.toLowerCase()) {
         account = response.accounts[i];
         break;
       }
     }
+
+    if (account === {}) {
+      // Should be located above, but in the case that it doesn't throw a new error
+      throw new Error();
+    }
   } catch (error) {
     throw new Error(`Failed to enable travis on ${username}/${projectName} because we were unable to get account information from TravisCI.`);
   }
-
 
   // Wait for the user's account to be done syncing....
   await waitForSync(travisAccessToken, account, isPrivate);

@@ -1,6 +1,13 @@
-src
-node_modules
+src/
+node_modules/
+test/
+.idea/
 package-lock.json
 PULL_REQUEST_TEMPLATE.MD
 CONTRIBUTING.md
 .travis.yml
+tools/
+.nyc_output/
+.babelrc
+.eslintignore
+.eslintrc.js

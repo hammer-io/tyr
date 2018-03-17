@@ -1,4 +1,4 @@
-/* eslint-disable import/prefer-default-export,no-await-in-loop */
+/* eslint-disable import/prefer-default-export,no-await-in-loop,prefer-destructuring */
 import git from 'simple-git';
 
 import * as githubClient from '../clients/github-client';
@@ -113,18 +113,25 @@ export async function generateGithubFiles(projectPath) {
  * Init the git repository, add all the files, make the first commit,
  * add the remote origin, and push origin to master.
  *
- * @param username
- * @param projectName
+ * @param credentials the github credentials object
+ * @param projectName the project's name
+ * @param filePath the filePath where the project files are
  */
-export function initAddCommitAndPush(username, projectName, filePath) {
+export function initAddCommitAndPush(credentials, projectName, filePath) {
   log.verbose('Github Service - initAddCommitAndPush()');
+  const username = credentials.username;
+  let secret = credentials.token;
+  if (!secret) {
+    secret = credentials.password;
+  }
+  const uri = `https://${username}:${secret}@github.com/${username}/${projectName}.git`;
   return new Promise((resolve) => {
     git(`${filePath}/${projectName}`)
       .init()
       .add('.gitignore')
       .add('./*')
       .commit('Initial Commit w/ :heart: by @hammer-io.')
-      .addRemote('origin', `https://github.com/${username}/${projectName}.git`)
+      .addRemote('origin', uri)
       .push('origin', 'master')
       .exec(() => {
         log.warn('Please wait while files are pushed to GitHub...');

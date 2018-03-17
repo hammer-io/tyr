@@ -2,7 +2,7 @@
   "name": "tyr-cli",
   "version": "0.4.0",
   "description": "A command line interface for hammer-io.",
-  "main": "src/index.js",
+  "main": "dist/tyr.js",
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "test": "npm run build && nyc mocha --compilers js:babel-register --require babel-polyfill",
