@@ -199,4 +199,16 @@ describe('GitHub Service', () => {
       getRepositoryStub.restore();
     });
   });
+
+  describe('initAddCommitAndPush', () => {
+    it('should throw an error if the password contains a forward slash', () => {
+      const credentials = { username: 'username', password: 'bad/password' };
+      try {
+        githubService.initAddCommitAndPush(credentials, 'projectName', process.cwd());
+        assert.equal('should not reach here', 'undefined');
+      } catch (error) {
+        assert.equal(error.message, 'Github password cannot contain backward slashes');
+      }
+    });
+  });
 });

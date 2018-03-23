@@ -122,6 +122,9 @@ export function initAddCommitAndPush(credentials, projectName, filePath) {
   const username = credentials.username;
   let secret = credentials.token;
   if (!secret) {
+    if (!credentials.password || credentials.password.includes('/')) {
+      throw new Error('Github password cannot contain backward slashes');
+    }
     secret = credentials.password;
   }
   const uri = `https://${username}:${secret}@github.com/${username}/${projectName}.git`;
