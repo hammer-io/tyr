@@ -1,0 +1,13 @@
+{
+    "projectConfigurations": {
+        "projectName": "test-bad-test-choice",
+        "description": "test",
+        "version": "0.0.0",
+        "author": "test",
+        "license": "MIT",
+        "isPrivateProject": false
+    },
+    "toolingConfigurations": {
+        "test": "not-a-real-choice"
+    }
+}

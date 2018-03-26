@@ -116,10 +116,10 @@ export async function promptForToolingConfigurations() {
     choices: choices.testChoices,
     message: 'Testing Framework:'
   }, {
-    name: 'database',
+    name: 'orm',
     type: 'list',
-    choices: choices.databaseChoices,
-    message: 'Database Framework:'
+    choices: choices.ormChoices,
+    message: 'Object-relational Mapping Tool:'
   }];
 
   const tooling = await inquirer.prompt(toolingQuestions);

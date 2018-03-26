@@ -9,5 +9,5 @@ export default {
   sourceControlChoices: ['<None>', 'GitHub'],
   webChoices: ['<None>', 'ExpressJS'],
   testChoices: ['<None>', 'Mocha'],
-  databaseChoices: ['<None>', 'Sequelize']
+  ormChoices: ['<None>', 'Sequelize']
 };

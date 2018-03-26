@@ -72,7 +72,7 @@ tyr [OPTIONS]
 | `sourceControl`    | Yes      | The source control tool you want to use        | `<None>`, `GitHub`    |
 | `web`              | Yes      | The web framework you want to use              | `<None>`, `ExpressJS` |
 | `test`             | Yes      | The test framework you want to use             | `<None>`, `Mocha`      |
-| `database`         | Yes      | The database framework you want to use         | `<None>`, `Sequelize` |
+| `orm`              | Yes      | The Object-relational Mapping framework you want to use | `<None>`, `Sequelize` |
 
 
 * If Source Control Choice is `<None>`, then CI Choice, Containerization Choice, and Deployment 
@@ -101,7 +101,7 @@ Choice must also be `<None>`.
       deployment: '{deployment choice}',
       web: '{web framework choice}',
       test: '{test framework choice}',
-      database: '{database framework choice}'
+      orm: '{orm framework choice}'
     }
 }
 ```
