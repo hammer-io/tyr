@@ -1,0 +1,13 @@
+{
+    "projectConfigurations": {
+        "projectName": "test-bad-orm-choice",
+        "description": "test",
+        "version": "0.0.0",
+        "author": "test",
+        "license": "MIT",
+        "isPrivateProject": false
+    },
+    "toolingConfigurations": {
+        "orm": "not-a-real-choice"
+    }
+}

@@ -7,7 +7,7 @@
         "license": "MIT"
     },
     "toolingConfigurations": {
-        "database": "Sequelize"
+        "orm": "Sequelize"
     },
     "credentials": {
         "sequelize": {

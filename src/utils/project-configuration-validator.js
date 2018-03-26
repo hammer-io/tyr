@@ -181,5 +181,17 @@ export function validateProjectConfigurations(input) {
     errors.push(`Invalid web framework choice. Valid choices are ${choices.webChoices}`);
   }
 
+  // check to make sure there are valid test choices
+  if (input.toolingConfigurations.test &&
+    (!choices.testChoices.includes(input.toolingConfigurations.test))) {
+    errors.push(`Invalid test framework choice. Valid choices are ${choices.testChoices}`);
+  }
+
+  // check to make sure there are valid orm framework choices
+  if (input.toolingConfigurations.orm &&
+    (!choices.ormChoices.includes(input.toolingConfigurations.orm))) {
+    errors.push(`Invalid orm choice. Valid choices are ${choices.ormChoices}`);
+  }
+
   return errors;
 }
