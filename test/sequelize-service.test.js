@@ -18,10 +18,12 @@ describe('Sequelize Service Test', () => {
 
     it('should create the config/default.json file', () => {
       const expected = "{\n" +
-        " \"username\": \"username\",\n" +
-        " \"password\": \"password\",\n" +
-        " \"url\": \"localhost\",\n" +
-        " \"schema\": \"test-sequelize\"\n" +
+        " \"dbConfig\": {\n" +
+        "  \"username\": \"username\",\n" +
+        "  \"password\": \"password\",\n" +
+        "  \"url\": \"localhost\",\n" +
+        "  \"schema\": \"test-sequelize\"\n" +
+        " }\n" +
         "}";
 
       assert.equal(fs.readFileSync('test-sequelize/config/default.json', 'utf-8'), expected);
@@ -29,23 +31,31 @@ describe('Sequelize Service Test', () => {
 
     it('should create the config/default-example.json file', () => {
       const expected = "{\n" +
-        " \"username\": \"\",\n" +
-        " \"password\": \"\",\n" +
-        " \"url\": \"\",\n" +
-        " \"schema\": \"\"\n" +
+        " \"dbConfig\": {\n" +
+        "  \"username\": \"\",\n" +
+        "  \"password\": \"\",\n" +
+        "  \"url\": \"\",\n" +
+        "  \"schema\": \"\"\n" +
+        " }\n" +
         "}";
+
+
+
+      console.log(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'));
 
       assert.equal(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'), expected);
     });
 
     it('should create the sequelize.js file', () => {
-      const expected = "const config = require('../../config/default.json');\n" +
+      const expected = "const config = require('config');\n" +
         "const Sequelize = require('sequelize');\n" +
         "\n" +
+        "const dbConfig = config.get('dbConfig');\n" +
+        "\n" +
         "const sequelize = new Sequelize(\n" +
-        "  config.schema,\n" +
-        "  config.username,\n" +
-        "  config.password, {\n" +
+        "  dbConfig.schema,\n" +
+        "  dbConfig.username,\n" +
+        "  dbConfig.password, {\n" +
         "    host: config.url,\n" +
         "    dialect: 'mysql',\n" +
         "\n" +
@@ -89,9 +99,9 @@ describe('Sequelize Service Test', () => {
         " \"license\": \"MIT\",\n" +
         " \"bin\": {},\n" +
         " \"dependencies\": {\n" +
+        "  \"config\": \"^1.3.0\",\n" +
         "  \"sequelize\": \"^4.33.2\",\n" +
-        "  \"mysql2\": \"^1.5.2\",\n" +
-        "  \"config\": \"^1.3.0\"\n" +
+        "  \"mysql2\": \"^1.5.2\"\n" +
         " },\n" +
         " \"devDependencies\": {}\n" +
         "}";

@@ -11,26 +11,18 @@ import * as file from '../utils/file';
  * @param path to the newly created project
  */
 async function createDbConfig(username, password, url, projectName, path) {
-  // create the configuration
-  const dbConfig = {
-    username,
-    password,
-    url: 'localhost',
-    schema: projectName
-  };
+  const dbConfigTemplate = file.loadTemplate('../../templates/node-config/default.json');
+  const dbConfig = JSON.parse(dbConfigTemplate);
+  const dbConfigExample = JSON.parse(dbConfigTemplate);
 
-  const dbConfigExample = {
-    username: '',
-    password: '',
-    url: '',
-    schema: ''
-  };
+  dbConfig.dbConfig.username = username;
+  dbConfig.dbConfig.password = password;
+  dbConfig.dbConfig.url = 'localhost';
+  dbConfig.dbConfig.schema = projectName;
 
   await fs.mkdir(`${path}/config`);
   await file.writeFile(`${path}/config/default.json`, JSON.stringify(dbConfig, null, ' '));
   await file.writeFile(`${path}/config/default-example.json`, JSON.stringify(dbConfigExample, null, ' '));
-  // TODO add '/config/default.json' to .gitignore
-  // TODO add node-config to the project's dependencies
 }
 
 /**
@@ -53,7 +45,6 @@ async function updatePackageJsonWithSequelizeDependencies(path) {
   projectPackageJson = JSON.parse(projectPackageJson);
   projectPackageJson.dependencies.sequelize = '^4.33.2';
   projectPackageJson.dependencies.mysql2 = '^1.5.2';
-  projectPackageJson.dependencies.config = '^1.3.0';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
   fs.unlinkSync(packageJsonFileName);

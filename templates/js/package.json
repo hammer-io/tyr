@@ -11,6 +11,8 @@
   "authors": [],
   "license": "",
   "bin": {},
-  "dependencies": {},
+  "dependencies": {
+    "config": "^1.3.0"
+  },
   "devDependencies": {}
 }
