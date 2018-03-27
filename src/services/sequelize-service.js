@@ -11,18 +11,28 @@ import * as file from '../utils/file';
  * @param path to the newly created project
  */
 async function createDbConfig(username, password, url, projectName, path) {
-  const dbConfigTemplate = file.loadTemplate('../../templates/node-config/default.json');
+  const configPath = `${path}/config/`;
+  const dbConfigTemplate = file.loadTemplate('../../templates/node-config/dbConfig.json');
   const dbConfig = JSON.parse(dbConfigTemplate);
   const dbConfigExample = JSON.parse(dbConfigTemplate);
 
-  dbConfig.dbConfig.username = username;
-  dbConfig.dbConfig.password = password;
-  dbConfig.dbConfig.url = 'localhost';
-  dbConfig.dbConfig.schema = projectName;
+  dbConfig.username = username;
+  dbConfig.password = password;
+  dbConfig.url = 'localhost';
+  dbConfig.schema = projectName;
 
-  await fs.mkdir(`${path}/config`);
-  await file.writeFile(`${path}/config/default.json`, JSON.stringify(dbConfig, null, ' '));
-  await file.writeFile(`${path}/config/default-example.json`, JSON.stringify(dbConfigExample, null, ' '));
+  const defaultJsonPath = `${configPath}/default.json`;
+  const defaultExampleJsonPath = `${configPath}/default-example.json`;
+  const defaultJson = JSON.parse(await file.readFile(defaultJsonPath));
+  const defaultExampleJson = JSON.parse(await file.readFile(defaultExampleJsonPath));
+
+  defaultJson.dbConfig = dbConfig;
+  defaultExampleJson.dbConfig = dbConfigExample;
+
+  await fs.unlinkSync(`${configPath}/default.json`);
+  await fs.unlinkSync(`${configPath}/default-example.json`);
+  await file.writeFile(defaultJsonPath, JSON.stringify(defaultJson, null, ' '));
+  await file.writeFile(defaultExampleJsonPath, JSON.stringify(defaultExampleJson, null, ' '));
 }
 
 /**

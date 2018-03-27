@@ -109,6 +109,17 @@ export async function generateTyrfile(configs, projectPath) {
   log.info(`Successfully generated file: ${configs.projectConfigurations.projectName}/.tyrfile`);
 }
 
+export async function generateNodeConfig(configs, projectPath) {
+  log.verbose('Project Service - generateNodeConfig');
+
+  const configPath = `${projectPath}/config`;
+  const emptyJsonObject = {};
+
+  fs.mkdirSync(`${configPath}`);
+  await file.writeFile(`${configPath}/default.json`, JSON.stringify(emptyJsonObject, null, ' '));
+  await file.writeFile(`${configPath}/default-example.json`, JSON.stringify(emptyJsonObject, null, ' '));
+}
+
 /**
  * Genereates the basic file structure and files needed for a node project
  * @param configs the configurations object
@@ -122,5 +133,6 @@ export async function generateBasicNodeFiles(configs, projectPath) {
   await generateIndexFile(projectPath);
   await generatePackageJson(configs, projectPath);
   await generateReadMe(configs, projectPath);
+  await generateNodeConfig(configs, projectPath);
 }
 

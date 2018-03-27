@@ -10,7 +10,7 @@ describe('Sequelize Service Test', () => {
       const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration-sequalize'));
       const projectName = configs.projectConfigurations.projectName;
       // generate the basic node files
-      projectService.generateBasicNodeFiles(configs, `${process.cwd()}/${projectName}`);
+      await projectService.generateBasicNodeFiles(configs, `${process.cwd()}/${projectName}`);
 
       // then create the sequelize files
       await generateSequelizeFiles(configs, `${process.cwd()}/${projectName}`);
@@ -38,10 +38,6 @@ describe('Sequelize Service Test', () => {
         "  \"schema\": \"\"\n" +
         " }\n" +
         "}";
-
-
-
-      console.log(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'));
 
       assert.equal(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'), expected);
     });
