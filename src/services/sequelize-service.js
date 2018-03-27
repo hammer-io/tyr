@@ -19,7 +19,18 @@ async function createDbConfig(username, password, url, projectName, path) {
     schema: projectName
   };
 
-  await file.writeFile(`${path}/dbConfig.json`, JSON.stringify(dbConfig, null, ' '));
+  const dbConfigExample = {
+    username: '',
+    password: '',
+    url: '',
+    schema: ''
+  };
+
+  await fs.mkdir(`${path}/config`);
+  await file.writeFile(`${path}/config/default.json`, JSON.stringify(dbConfig, null, ' '));
+  await file.writeFile(`${path}/config/default-example.json`, JSON.stringify(dbConfigExample, null, ' '));
+  // TODO add '/config/default.json' to .gitignore
+  // TODO add node-config to the project's dependencies
 }
 
 /**
@@ -36,12 +47,13 @@ async function createSequelizeFile(path) {
  * @param path the path to the new project directory
  * @returns {Promise<void>}
  */
-async function updatePackageJsonWithSequelizeDependency(path) {
+async function updatePackageJsonWithSequelizeDependencies(path) {
   const packageJsonFileName = `${path}/package.json`;
   let projectPackageJson = file.readFile(packageJsonFileName);
   projectPackageJson = JSON.parse(projectPackageJson);
   projectPackageJson.dependencies.sequelize = '^4.33.2';
   projectPackageJson.dependencies.mysql2 = '^1.5.2';
+  projectPackageJson.dependencies.config = '^1.3.0';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
   fs.unlinkSync(packageJsonFileName);
@@ -79,14 +91,14 @@ export async function generateSequelizeFiles(configs, projectPath) {
     configs.credentials.sequelize.password,
     'localhost',
     projectName,
-    dbFolderPath
+    path
   );
 
   // create sequelize file
   await createSequelizeFile(dbFolderPath);
 
   // update package.json
-  await updatePackageJsonWithSequelizeDependency(`${path}/`);
+  await updatePackageJsonWithSequelizeDependencies(path);
 
   // update the index.js file
   await updateIndexJs(`${path}/src/`);

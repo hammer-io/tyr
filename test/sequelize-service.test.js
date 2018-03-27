@@ -16,7 +16,7 @@ describe('Sequelize Service Test', () => {
       await generateSequelizeFiles(configs, `${process.cwd()}/${projectName}`);
     });
 
-    it('should create the dbConfig.json file', () => {
+    it('should create the config/default.json file', () => {
       const expected = "{\n" +
         " \"username\": \"username\",\n" +
         " \"password\": \"password\",\n" +
@@ -24,11 +24,22 @@ describe('Sequelize Service Test', () => {
         " \"schema\": \"test-sequelize\"\n" +
         "}";
 
-      assert.equal(fs.readFileSync('test-sequelize/src/db/dbConfig.json', 'utf-8'), expected);
+      assert.equal(fs.readFileSync('test-sequelize/config/default.json', 'utf-8'), expected);
+    });
+
+    it('should create the config/default-example.json file', () => {
+      const expected = "{\n" +
+        " \"username\": \"\",\n" +
+        " \"password\": \"\",\n" +
+        " \"url\": \"\",\n" +
+        " \"schema\": \"\"\n" +
+        "}";
+
+      assert.equal(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'), expected);
     });
 
     it('should create the sequelize.js file', () => {
-      const expected = "const config = require('./dbConfig');\n" +
+      const expected = "const config = require('../../config/default.json');\n" +
         "const Sequelize = require('sequelize');\n" +
         "\n" +
         "const sequelize = new Sequelize(\n" +
@@ -79,7 +90,8 @@ describe('Sequelize Service Test', () => {
         " \"bin\": {},\n" +
         " \"dependencies\": {\n" +
         "  \"sequelize\": \"^4.33.2\",\n" +
-        "  \"mysql2\": \"^1.5.2\"\n" +
+        "  \"mysql2\": \"^1.5.2\",\n" +
+        "  \"config\": \"^1.3.0\"\n" +
         " },\n" +
         " \"devDependencies\": {}\n" +
         "}";

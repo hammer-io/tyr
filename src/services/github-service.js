@@ -131,6 +131,7 @@ export function initAddCommitAndPush(credentials, projectName, filePath) {
   return new Promise((resolve) => {
     git(`${filePath}/${projectName}`)
       .init()
+      .silent()
       .add('.gitignore')
       .add('./*')
       .commit('Initial Commit w/ :heart: by @hammer-io.')

@@ -1,4 +1,4 @@
-const config = require('./dbConfig');
+const config = require('../../config/default.json');
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(
