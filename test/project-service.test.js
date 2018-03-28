@@ -81,7 +81,9 @@ describe('Project Service Test', () => {
         " ],\n" +
         " \"license\": \"MIT\",\n" +
         " \"bin\": {},\n" +
-        " \"dependencies\": {},\n" +
+        " \"dependencies\": {\n" +
+        "  \"config\": \"^1.3.0\"\n" +
+        " },\n" +
         " \"devDependencies\": {}\n" +
         "}";
 

@@ -11,15 +11,28 @@ import * as file from '../utils/file';
  * @param path to the newly created project
  */
 async function createDbConfig(username, password, url, projectName, path) {
-  // create the configuration
-  const dbConfig = {
-    username,
-    password,
-    url: 'localhost',
-    schema: projectName
-  };
+  const configPath = `${path}/config/`;
+  const dbConfigTemplate = file.loadTemplate('../../templates/node-config/dbConfig.json');
+  const dbConfig = JSON.parse(dbConfigTemplate);
+  const dbConfigExample = JSON.parse(dbConfigTemplate);
 
-  await file.writeFile(`${path}/dbConfig.json`, JSON.stringify(dbConfig, null, ' '));
+  dbConfig.username = username;
+  dbConfig.password = password;
+  dbConfig.url = 'localhost';
+  dbConfig.schema = projectName;
+
+  const defaultJsonPath = `${configPath}/default.json`;
+  const defaultExampleJsonPath = `${configPath}/default-example.json`;
+  const defaultJson = JSON.parse(await file.readFile(defaultJsonPath));
+  const defaultExampleJson = JSON.parse(await file.readFile(defaultExampleJsonPath));
+
+  defaultJson.dbConfig = dbConfig;
+  defaultExampleJson.dbConfig = dbConfigExample;
+
+  await fs.unlinkSync(`${configPath}/default.json`);
+  await fs.unlinkSync(`${configPath}/default-example.json`);
+  await file.writeFile(defaultJsonPath, JSON.stringify(defaultJson, null, ' '));
+  await file.writeFile(defaultExampleJsonPath, JSON.stringify(defaultExampleJson, null, ' '));
 }
 
 /**
@@ -36,7 +49,7 @@ async function createSequelizeFile(path) {
  * @param path the path to the new project directory
  * @returns {Promise<void>}
  */
-async function updatePackageJsonWithSequelizeDependency(path) {
+async function updatePackageJsonWithSequelizeDependencies(path) {
   const packageJsonFileName = `${path}/package.json`;
   let projectPackageJson = file.readFile(packageJsonFileName);
   projectPackageJson = JSON.parse(projectPackageJson);
@@ -79,14 +92,14 @@ export async function generateSequelizeFiles(configs, projectPath) {
     configs.credentials.sequelize.password,
     'localhost',
     projectName,
-    dbFolderPath
+    path
   );
 
   // create sequelize file
   await createSequelizeFile(dbFolderPath);
 
   // update package.json
-  await updatePackageJsonWithSequelizeDependency(`${path}/`);
+  await updatePackageJsonWithSequelizeDependencies(path);
 
   // update the index.js file
   await updateIndexJs(`${path}/src/`);

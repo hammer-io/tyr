@@ -60,3 +60,6 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Config file for node-config
+config/default.json

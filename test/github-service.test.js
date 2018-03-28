@@ -75,7 +75,10 @@ describe('GitHub Service', () => {
         ".yarn-integrity\n" +
         "\n" +
         "# dotenv environment variables file\n" +
-        ".env";
+        ".env\n" +
+        "\n" +
+        "# Config file for node-config\n" +
+        "config/default.json";
 
       await githubService.generateGithubFiles(`${process.cwd()}/test-github`);
 
@@ -197,18 +200,6 @@ describe('GitHub Service', () => {
       assert.equal('project4', repos[3].name);
 
       getRepositoryStub.restore();
-    });
-  });
-
-  describe('initAddCommitAndPush', () => {
-    it('should throw an error if the password contains a forward slash', () => {
-      const credentials = { username: 'username', password: 'bad/password' };
-      try {
-        githubService.initAddCommitAndPush(credentials, 'projectName', process.cwd());
-        assert.equal('should not reach here', 'undefined');
-      } catch (error) {
-        assert.equal(error.message, 'Github password cannot contain backward slashes');
-      }
     });
   });
 });

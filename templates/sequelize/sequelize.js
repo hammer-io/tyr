@@ -1,10 +1,12 @@
-const config = require('./dbConfig');
+const config = require('config');
 const Sequelize = require('sequelize');
 
+const dbConfig = config.get('dbConfig');
+
 const sequelize = new Sequelize(
-  config.schema,
-  config.username,
-  config.password, {
+  dbConfig.schema,
+  dbConfig.username,
+  dbConfig.password, {
     host: config.url,
     dialect: 'mysql',
 

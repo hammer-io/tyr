@@ -10,31 +10,48 @@ describe('Sequelize Service Test', () => {
       const configs = JSON.parse(fs.readFileSync('test/test-configurations/valid-project-configuration-sequalize'));
       const projectName = configs.projectConfigurations.projectName;
       // generate the basic node files
-      projectService.generateBasicNodeFiles(configs, `${process.cwd()}/${projectName}`);
+      await projectService.generateBasicNodeFiles(configs, `${process.cwd()}/${projectName}`);
 
       // then create the sequelize files
       await generateSequelizeFiles(configs, `${process.cwd()}/${projectName}`);
     });
 
-    it('should create the dbConfig.json file', () => {
+    it('should create the config/default.json file', () => {
       const expected = "{\n" +
-        " \"username\": \"username\",\n" +
-        " \"password\": \"password\",\n" +
-        " \"url\": \"localhost\",\n" +
-        " \"schema\": \"test-sequelize\"\n" +
+        " \"dbConfig\": {\n" +
+        "  \"username\": \"username\",\n" +
+        "  \"password\": \"password\",\n" +
+        "  \"url\": \"localhost\",\n" +
+        "  \"schema\": \"test-sequelize\"\n" +
+        " }\n" +
         "}";
 
-      assert.equal(fs.readFileSync('test-sequelize/src/db/dbConfig.json', 'utf-8'), expected);
+      assert.equal(fs.readFileSync('test-sequelize/config/default.json', 'utf-8'), expected);
+    });
+
+    it('should create the config/default-example.json file', () => {
+      const expected = "{\n" +
+        " \"dbConfig\": {\n" +
+        "  \"username\": \"\",\n" +
+        "  \"password\": \"\",\n" +
+        "  \"url\": \"\",\n" +
+        "  \"schema\": \"\"\n" +
+        " }\n" +
+        "}";
+
+      assert.equal(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'), expected);
     });
 
     it('should create the sequelize.js file', () => {
-      const expected = "const config = require('./dbConfig');\n" +
+      const expected = "const config = require('config');\n" +
         "const Sequelize = require('sequelize');\n" +
         "\n" +
+        "const dbConfig = config.get('dbConfig');\n" +
+        "\n" +
         "const sequelize = new Sequelize(\n" +
-        "  config.schema,\n" +
-        "  config.username,\n" +
-        "  config.password, {\n" +
+        "  dbConfig.schema,\n" +
+        "  dbConfig.username,\n" +
+        "  dbConfig.password, {\n" +
         "    host: config.url,\n" +
         "    dialect: 'mysql',\n" +
         "\n" +
@@ -78,6 +95,7 @@ describe('Sequelize Service Test', () => {
         " \"license\": \"MIT\",\n" +
         " \"bin\": {},\n" +
         " \"dependencies\": {\n" +
+        "  \"config\": \"^1.3.0\",\n" +
         "  \"sequelize\": \"^4.33.2\",\n" +
         "  \"mysql2\": \"^1.5.2\"\n" +
         " },\n" +
