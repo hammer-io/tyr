@@ -2,6 +2,7 @@
 import * as file from '../utils/file';
 import { getActiveLogger } from '../utils/winston';
 import * as projectConfigurationService from './project-configuration-service';
+import * as jsonUtil from '../utils/json-util';
 
 const log = getActiveLogger();
 
@@ -61,7 +62,7 @@ async function generatePackageJson(configs, projectPath) {
   contents.authors = projectConfigs.author.split(',');
 
   // turn the contents back to JSON
-  contents = JSON.stringify(contents, null, ' ');
+  contents = jsonUtil.stringify(contents);
   file.writeFile(path, contents);
   log.info(`Successfully generated file: ${path}`);
 }
@@ -114,8 +115,8 @@ export async function generateNodeConfig(configs, projectPath) {
   const emptyJsonObject = {};
 
   file.createDirectory(`${configPath}`);
-  await file.writeFile(`${configPath}/default.json`, JSON.stringify(emptyJsonObject, null, ' '));
-  await file.writeFile(`${configPath}/default-example.json`, JSON.stringify(emptyJsonObject, null, ' '));
+  await file.writeFile(`${configPath}/default.json`, jsonUtil.stringify(emptyJsonObject));
+  await file.writeFile(`${configPath}/default-example.json`, jsonUtil.stringify(emptyJsonObject));
 }
 
 /**

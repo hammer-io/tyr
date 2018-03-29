@@ -1,5 +1,7 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
 import * as file from '../utils/file';
+import * as jsonUtil from '../utils/json-util';
+import * as packageJsonUtil from '../utils/package-json-util';
 
 /**
  * Creates the db configuration object and writes it to a file
@@ -22,20 +24,20 @@ async function createDbConfig(username, password, url, projectName, path) {
 
   const defaultJsonPath = `${configPath}/default.json`;
   const defaultExampleJsonPath = `${configPath}/default-example.json`;
-  const defaultJson = JSON.parse(await file.readFile(defaultJsonPath));
-  const defaultExampleJson = JSON.parse(await file.readFile(defaultExampleJsonPath));
+  const defaultJson = JSON.parse(file.readFile(defaultJsonPath));
+  const defaultExampleJson = JSON.parse(file.readFile(defaultExampleJsonPath));
 
   defaultJson.dbConfig = dbConfig;
   defaultExampleJson.dbConfig = dbConfigExample;
 
-  await file.deleteFile(`${configPath}/default.json`);
-  await file.deleteFile(`${configPath}/default-example.json`);
-  await file.writeFile(defaultJsonPath, JSON.stringify(defaultJson, null, ' '));
-  await file.writeFile(defaultExampleJsonPath, JSON.stringify(defaultExampleJson, null, ' '));
+  file.deleteFile(`${configPath}/default.json`);
+  file.deleteFile(`${configPath}/default-example.json`);
+  file.writeFile(defaultJsonPath, jsonUtil.stringify(defaultJson));
+  file.writeFile(defaultExampleJsonPath, jsonUtil.stringify(defaultExampleJson));
 }
 
 /**
- * Creats the sequelize file from the template and writes it to the user's project
+ * Creates the sequelize file from the template and writes it to the user's project
  * @param path the path to the db directory in the project
  */
 async function createSequelizeFile(path) {
@@ -49,15 +51,8 @@ async function createSequelizeFile(path) {
  * @returns {Promise<void>}
  */
 async function updatePackageJsonWithSequelizeDependencies(path) {
-  const packageJsonFileName = `${path}/package.json`;
-  let projectPackageJson = file.readFile(packageJsonFileName);
-  projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.dependencies.sequelize = '^4.33.2';
-  projectPackageJson.dependencies.mysql2 = '^1.5.2';
-
-  projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  file.deleteFile(packageJsonFileName);
-  file.writeFile(packageJsonFileName, projectPackageJson);
+  packageJsonUtil.addDependencyToPackageJsonFile(path, 'sequelize', '^4.33.2');
+  packageJsonUtil.addDependencyToPackageJsonFile(path, 'mysql2', '^1.5.2');
 }
 
 /**
