@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import * as file from '../utils/file';
+import * as packageJsonUtil from '../utils/package-json-util';
 import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
@@ -12,19 +13,14 @@ export async function generateMochaFiles(projectPath) {
   log.verbose('Mocha Service - generateMochaFiles()');
   file.createDirectory(`${projectPath}/test`);
   const path = `${projectPath}/test/test.js`;
+
+  // create test.js file
   const content = file.loadTemplate('./../../templates/mocha/test.js');
+  file.writeFile(path, content);
 
   // add mocha as a dev dependency to the package.json
-  let projectPackageJson = file.readFile(`${projectPath}/package.json`);
-  projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.devDependencies.mocha = '^5.0.0';
+  packageJsonUtil.addDevDependencyToPackageJsonFile(projectPath, 'mocha', '^5.0.0');
+  packageJsonUtil.addScriptToPackageJsonFile(projectPath, 'test', 'mocha');
 
-  // add mocha as the test script
-  projectPackageJson.scripts.test = 'mocha';
-
-  projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  file.deleteFile(`${projectPath}/package.json`);
-  file.writeFile(`${projectPath}/package.json`, projectPackageJson);
-  file.writeFile(path, content);
   log.info(`Successfully generated file: ${path}`);
 }
