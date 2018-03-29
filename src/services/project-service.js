@@ -1,6 +1,4 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
-import fs from 'fs';
-
 import * as file from '../utils/file';
 import { getActiveLogger } from '../utils/winston';
 import * as projectConfigurationService from './project-configuration-service';
@@ -15,9 +13,9 @@ const log = getActiveLogger();
 async function generateProjectFolders(projectPath) {
   log.verbose('Project File Service - generateProjectFolders()');
 
-  if (!fs.existsSync(`${projectPath}`)) {
-    fs.mkdirSync(`${projectPath}`);
-    fs.mkdirSync(`${projectPath}/src`);
+  if (!file.exists(`${projectPath}`)) {
+    file.createDirectory(`${projectPath}`);
+    file.createDirectory(`${projectPath}/src`);
     log.info('Successfully created project folder structure');
   } else {
     throw new Error('Project already exists!');
@@ -62,7 +60,7 @@ async function generatePackageJson(configs, projectPath) {
   contents.version = projectConfigs.version;
   contents.authors = projectConfigs.author.split(',');
 
-  // turn the contents back to JSOn
+  // turn the contents back to JSON
   contents = JSON.stringify(contents, null, ' ');
   file.writeFile(path, contents);
   log.info(`Successfully generated file: ${path}`);
@@ -115,7 +113,7 @@ export async function generateNodeConfig(configs, projectPath) {
   const configPath = `${projectPath}/config`;
   const emptyJsonObject = {};
 
-  fs.mkdirSync(`${configPath}`);
+  file.createDirectory(`${configPath}`);
   await file.writeFile(`${configPath}/default.json`, JSON.stringify(emptyJsonObject, null, ' '));
   await file.writeFile(`${configPath}/default-example.json`, JSON.stringify(emptyJsonObject, null, ' '));
 }

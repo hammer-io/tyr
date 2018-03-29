@@ -1,5 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import fs from 'fs';
 import * as file from '../utils/file';
 import { getActiveLogger } from '../utils/winston';
 
@@ -35,6 +34,6 @@ export async function generateExpressFiles(projectPath) {
   projectPackageJson.dependencies.express = '^4.16.0';
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
 
-  fs.unlinkSync(`${projectPath}/package.json`);
+  file.deleteFile(`${projectPath}/package.json`);
   file.writeFile(`${projectPath}/package.json`, projectPackageJson);
 }

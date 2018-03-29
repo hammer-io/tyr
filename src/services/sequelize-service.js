@@ -1,5 +1,4 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
-import fs from 'fs-extra';
 import * as file from '../utils/file';
 
 /**
@@ -29,8 +28,8 @@ async function createDbConfig(username, password, url, projectName, path) {
   defaultJson.dbConfig = dbConfig;
   defaultExampleJson.dbConfig = dbConfigExample;
 
-  await fs.unlinkSync(`${configPath}/default.json`);
-  await fs.unlinkSync(`${configPath}/default-example.json`);
+  await file.deleteFile(`${configPath}/default.json`);
+  await file.deleteFile(`${configPath}/default-example.json`);
   await file.writeFile(defaultJsonPath, JSON.stringify(defaultJson, null, ' '));
   await file.writeFile(defaultExampleJsonPath, JSON.stringify(defaultExampleJson, null, ' '));
 }
@@ -57,7 +56,7 @@ async function updatePackageJsonWithSequelizeDependencies(path) {
   projectPackageJson.dependencies.mysql2 = '^1.5.2';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  fs.unlinkSync(packageJsonFileName);
+  file.deleteFile(packageJsonFileName);
   file.writeFile(packageJsonFileName, projectPackageJson);
 }
 
@@ -70,7 +69,7 @@ async function updateIndexJs(path) {
   let contents = file.readFile(indexJSFileName);
   const firstLine = 'const sequelize = require(\'./db/sequelize\');\n';
   contents = firstLine + contents;
-  fs.unlinkSync(indexJSFileName);
+  file.deleteFile(indexJSFileName);
   file.writeFile(indexJSFileName, contents);
 }
 /**
@@ -84,7 +83,7 @@ export async function generateSequelizeFiles(configs, projectPath) {
   const projectName = configs.projectConfigurations.projectName;
   const path = `${projectPath}/`;
   const dbFolderPath = `${path}/src/db`;
-  fs.mkdirSync(dbFolderPath);
+  file.createDirectory(dbFolderPath);
 
   // create db config
   await createDbConfig(
