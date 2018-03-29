@@ -82,10 +82,10 @@ describe('Express Service Test', () => {
       const expectedIndexContents = "const express = require('express');\n" +
         "const routes = require('./routes');\n" +
         "\n" +
-        "const app = express();\n" +
-        "\n" +
         "// set our port\n" +
         "const port = process.env.PORT || 8080;\n" +
+        "\n" +
+        "const app = express();\n" +
         "\n" +
         "// routes\n" +
         "app.use('/', routes);\n" +
