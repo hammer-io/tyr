@@ -1,6 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import fs from 'fs';
-
 import * as file from '../utils/file';
 import { getActiveLogger } from '../utils/winston';
 
@@ -12,7 +10,7 @@ const log = getActiveLogger();
  */
 export async function generateMochaFiles(projectPath) {
   log.verbose('Mocha Service - generateMochaFiles()');
-  fs.mkdirSync(`${projectPath}/test`);
+  file.createDirectory(`${projectPath}/test`);
   const path = `${projectPath}/test/test.js`;
   const content = file.loadTemplate('./../../templates/mocha/test.js');
 
@@ -25,7 +23,7 @@ export async function generateMochaFiles(projectPath) {
   projectPackageJson.scripts.test = 'mocha';
 
   projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-  fs.unlinkSync(`${projectPath}/package.json`);
+  file.deleteFile(`${projectPath}/package.json`);
   file.writeFile(`${projectPath}/package.json`, projectPackageJson);
   file.writeFile(path, content);
   log.info(`Successfully generated file: ${path}`);

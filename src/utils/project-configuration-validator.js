@@ -1,8 +1,8 @@
 import isValidPath from 'is-valid-path';
-import fs from 'fs-extra';
 import spdx from 'spdx';
 
 import choices from '../constants/choices';
+import * as file from '../utils/file';
 
 /**
  * Validates the format of the configurations
@@ -35,7 +35,7 @@ export function validateProjectName(value) {
     return 'Project Names must be less than 20 characters or less!';
   }
 
-  if (fs.existsSync(value)) {
+  if (file.exists(value)) {
     return 'Project with this name already exists in this directory!';
   }
 

@@ -1,5 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import fs from 'fs';
 import * as file from '../utils/file';
 
 import * as validator from '../utils/project-configuration-validator';
@@ -13,7 +12,7 @@ const log = getActiveLogger();
  */
 export function parseConfigsFromFile(path) {
   log.verbose('Project Configuration Service - parseConfigsFromFile()');
-  const contents = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  const contents = JSON.parse(file.readFile(path));
   const errors = validator.validateProjectConfigurations(contents);
 
   if (errors.length > 0) {
