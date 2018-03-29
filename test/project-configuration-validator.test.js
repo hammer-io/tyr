@@ -132,6 +132,52 @@ describe('Project Configuration Validator', () => {
       assert.equal(errors.length, 1);
       assert.equal(errors[0], `Invalid orm choice. Valid choices are <None>,Sequelize`)
     });
+
+    it('should validate without errors with skadi', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 0);
+    });
+
+    it('should validate configuration file because skadi did not have the right value', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      input.toolingConfigurations.skadi = 'blah'
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'Invalid skadi choice. Valid value is skadi.');
+    });
+
+    it('should validate configuration file with errors because skadi was chosen but there was not skadi config block', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      delete input.skadi;
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'There must be a key skadi with a value of the skadi configs.');
+    });
+
+    it('should validate configuration file with errors because skadi is used without ExpressJS', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      delete input.toolingConfigurations.web;
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'Skadi can only be used with ExpressJS.');
+    });
+
+    it('should validate configuration file with errors because skadi config block did not have required fields ', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      delete input.skadi.apiKey;
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'API Key must exist in Skadi config.');
+    });
+
+    it('should validate configuration file with errors because skadi api key is not a string', () => {
+      const input = JSON.parse(fs.readFileSync('test/test-configurations/valid-configuration-with-skadi', 'utf-8'));
+      input.skadi.apiKey = 1;
+      const errors = validateProjectConfigurations(input);
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'API Key must be a string.');
+    });
   });
 
   describe('validateProjectName()', () => {

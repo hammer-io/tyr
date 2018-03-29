@@ -74,12 +74,12 @@ export function writeFile(filePath, fileContents) {
  * @param filePath the path to the file to be deleted
  */
 export function deleteFile(filePath) {
-  log.verbose(`writing file: ${filePath}`);
+  log.verbose(`deleting file: ${filePath}`);
   try {
     fs.unlinkSync(filePath);
   } catch (error) {
     log.debug(error.message);
-    throw new Error(`Failed to write ${filePath}!`);
+    throw new Error(`Failed to delete ${filePath}!`);
   }
 }
 
@@ -93,6 +93,6 @@ export function exists(filePath) {
     return fs.existsSync(filePath);
   } catch (error) {
     log.debug(error.message);
-    throw new Error(`Failed to write ${filePath}!`);
+    throw new Error(`Failed to check if ${filePath} exists!`);
   }
 }

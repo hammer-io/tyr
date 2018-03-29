@@ -284,8 +284,46 @@ function validateORMFrameworks(input, errors) {
 }
 
 /**
+ * Validates the skadi config object. The only required field is an api key.
+ * @param skadiConfig
+ * @param errors
+ */
+function validateSkadiConfig(skadiConfig, errors) {
+  if (!skadiConfig.apiKey) {
+    errors.push('API Key must exist in Skadi config.');
+  } else if (typeof skadiConfig.apiKey !== 'string') {
+    errors.push('API Key must be a string.');
+  }
+}
+
+
+/**
+ * Validate skadi. The value must be skadi. If skadi exists, then there must be a skadi block with
+ * the skadi configs. Skadi can only be used if express was chosen.
+ * @param input
+ * @param errors
+ */
+function validateSkadi(input, errors) {
+  if (input.toolingConfigurations.skadi) {
+    if (input.toolingConfigurations.skadi !== 'skadi') {
+      errors.push('Invalid skadi choice. Valid value is skadi.');
+    }
+
+    if (input.toolingConfigurations.web !== 'ExpressJS') {
+      errors.push('Skadi can only be used with ExpressJS.');
+    }
+
+    if (!input.skadi) {
+      errors.push('There must be a key skadi with a value of the skadi configs.');
+    } else {
+      validateSkadiConfig(input.skadi, errors);
+    }
+  }
+}
+
+/**
  * Validates the project configuration files
- * @param input the configuraiton file in as a json object
+ * @param input the configuration file in as a json object
  * @returns {Array} the array of errors
  */
 export function validateProjectConfigurations(input) {
@@ -307,6 +345,7 @@ export function validateProjectConfigurations(input) {
   validateWebFrameworks(input, errors);
   validateTestFrameworks(input, errors);
   validateORMFrameworks(input, errors);
+  validateSkadi(input, errors);
 
   return errors;
 }

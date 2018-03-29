@@ -1,0 +1,22 @@
+{
+    "projectConfigurations": {
+        "projectName": "test-skadi",
+        "description": "test-project",
+        "isPrivateProject": false,
+        "version": "0.0.0",
+        "author": "",
+        "license": "MIT"
+    },
+    "toolingConfigurations": {
+        "web": "ExpressJS",
+        "skadi": "skadi",
+        "orm": "Sequelize"
+    },
+    "skadi":  {
+        "interval": "1000",
+        "apiKey": "bff198fa-3afd-42d4-a884-9954a4384870",
+        "heartbeatUrl": "http://localhost:3001/api/v1/heartbeats",
+        "osDataUrl": "http://localhost:3001/api/v1/osdata",
+        "httpDataUrl": "http://localhost:3001/api/v1/httpdata"
+    }
+}
