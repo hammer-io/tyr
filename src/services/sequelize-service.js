@@ -1,40 +1,6 @@
 /* eslint-disable import/prefer-default-export,prefer-destructuring */
 import * as file from '../utils/file';
-import * as jsonUtil from '../utils/json-util';
 import * as packageJsonUtil from '../utils/package-json-util';
-
-/**
- * Creates the db configuration object and writes it to a file
- * @param username the username of the mysql database user
- * @param password the password of the mysql database user
- * @param url the url
- * @param projectName the project name, which will be used as a the schema name
- * @param path to the newly created project
- */
-async function createDbConfig(username, password, url, projectName, path) {
-  const configPath = `${path}/config/`;
-  const dbConfigTemplate = file.loadTemplate('../../templates/node-config/dbConfig.json');
-  const dbConfig = JSON.parse(dbConfigTemplate);
-  const dbConfigExample = JSON.parse(dbConfigTemplate);
-
-  dbConfig.username = username;
-  dbConfig.password = password;
-  dbConfig.url = 'localhost';
-  dbConfig.schema = projectName;
-
-  const defaultJsonPath = `${configPath}/default.json`;
-  const defaultExampleJsonPath = `${configPath}/default-example.json`;
-  const defaultJson = JSON.parse(file.readFile(defaultJsonPath));
-  const defaultExampleJson = JSON.parse(file.readFile(defaultExampleJsonPath));
-
-  defaultJson.dbConfig = dbConfig;
-  defaultExampleJson.dbConfig = dbConfigExample;
-
-  file.deleteFile(`${configPath}/default.json`);
-  file.deleteFile(`${configPath}/default-example.json`);
-  file.writeFile(defaultJsonPath, jsonUtil.stringify(defaultJson));
-  file.writeFile(defaultExampleJsonPath, jsonUtil.stringify(defaultExampleJson));
-}
 
 /**
  * Creates the sequelize file from the template and writes it to the user's project
@@ -75,19 +41,9 @@ async function updateIndexJs(path) {
  * @returns {Promise<void>}
  */
 export async function generateSequelizeFiles(configs, projectPath) {
-  const projectName = configs.projectConfigurations.projectName;
   const path = `${projectPath}/`;
   const dbFolderPath = `${path}/src/db`;
   file.createDirectory(dbFolderPath);
-
-  // create db config
-  await createDbConfig(
-    configs.credentials.sequelize.username,
-    configs.credentials.sequelize.password,
-    'localhost',
-    projectName,
-    path
-  );
 
   // create sequelize file
   await createSequelizeFile(dbFolderPath);

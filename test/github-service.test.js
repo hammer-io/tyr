@@ -77,8 +77,9 @@ describe('GitHub Service', () => {
         "# dotenv environment variables file\n" +
         ".env\n" +
         "\n" +
-        "# Config file for node-config\n" +
-        "config/default.json";
+        "# Node-Config files. Only commit the default-example\n" +
+        "**/config/*\n" +
+        "!config/default-example.json\n";
 
       await githubService.generateGithubFiles(`${process.cwd()}/test-github`);
 

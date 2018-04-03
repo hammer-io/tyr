@@ -1,20 +1,11 @@
-const config = require('config');
 const Sequelize = require('sequelize');
 
-const dbConfig = config.get('dbConfig');
-
+// Add MySQL schema name, username, password and url here!
 const sequelize = new Sequelize(
-  dbConfig.schema,
-  dbConfig.username,
-  dbConfig.password, {
-    host: config.url,
+  '',
+  '',
+  '', {
+    host: '',
     dialect: 'mysql',
-
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    },
   }
 );
