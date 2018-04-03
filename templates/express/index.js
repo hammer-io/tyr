@@ -1,10 +1,10 @@
 const express = require('express');
 const routes = require('./routes');
 
-const app = express();
-
 // set our port
 const port = process.env.PORT || 8080;
+
+const app = express();
 
 // routes
 app.use('/', routes);

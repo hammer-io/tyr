@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import fs from 'fs';
 import * as file from '../utils/file';
+import * as packageJsonUtil from '../utils/package-json-util';
 import { getActiveLogger } from '../utils/winston';
 
 const log = getActiveLogger();
@@ -30,11 +30,5 @@ export async function generateExpressFiles(projectPath) {
   log.info(`Successfully generated file: ${path}/routes.js`);
 
   // add express.js as a dependency to the package.json
-  let projectPackageJson = file.readFile(`${projectPath}/package.json`);
-  projectPackageJson = JSON.parse(projectPackageJson);
-  projectPackageJson.dependencies.express = '^4.16.0';
-  projectPackageJson = JSON.stringify(projectPackageJson, null, ' ');
-
-  fs.unlinkSync(`${projectPath}/package.json`);
-  file.writeFile(`${projectPath}/package.json`, projectPackageJson);
+  packageJsonUtil.addDependencyToPackageJsonFile(projectPath, 'express', '^4.16.0');
 }

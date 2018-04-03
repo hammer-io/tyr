@@ -9,6 +9,7 @@ import * as dockerService from './services/docker-service';
 import * as expressService from './services/express-service';
 import * as mochaService from './services/mocha-service';
 import * as sequelizeService from './services/sequelize-service';
+import * as skadiService from './services/skadi-service';
 
 import { getActiveLogger } from './utils/winston';
 import { makeHerokuAppNameCompliant } from './utils/heroku-util';
@@ -115,6 +116,17 @@ export async function generateSequelizeFiles(configs, projectPath) {
 }
 
 /**
+ * Facilitates generating the necessary files for skadi
+ * @param configs the configuration object
+ * @param projectPath the new proejct's file path
+ * @returns {Promise<void>}
+ */
+export async function generateSkadiFiles(configs, projectPath) {
+  await skadiService.generateSkadiFiles(configs, projectPath);
+  return configs;
+}
+
+/**
  * Facilitates enabling travis ci for the user.
  * @configs the configuration object
  * @returns {Promise<void>}
@@ -174,6 +186,7 @@ const staticFileGenerators = {
   expressjs: generateExpressFiles,
   mocha: generateMochaFiles,
   sequelize: generateSequelizeFiles,
+  skadi: generateSkadiFiles
 };
 
 export async function generateStaticFiles(configs, filePath) {

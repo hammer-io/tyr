@@ -1,8 +1,21 @@
 import isValidPath from 'is-valid-path';
-import fs from 'fs-extra';
 import spdx from 'spdx';
 
 import choices from '../constants/choices';
+import * as file from '../utils/file';
+
+/**
+ * Validates the format of the configurations
+ * @param input the input configuration
+ * @param errors the errors
+ * @returns {*}
+ */
+function validateFormat(input, errors) {
+  if ((typeof input.projectConfigurations === 'undefined') ||
+    (typeof input.toolingConfigurations === 'undefined')) {
+    errors.push('Invalid configuration file format!');
+  }
+}
 
 /**
  * Validate project name
@@ -22,11 +35,53 @@ export function validateProjectName(value) {
     return 'Project Names must be less than 20 characters or less!';
   }
 
-  if (fs.existsSync(value)) {
+  if (file.exists(value)) {
     return 'Project with this name already exists in this directory!';
   }
 
   return true;
+}
+
+/**
+ * Validates the project name and adds it to the errors.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateName(input, errors) {
+  // validate project name
+  if (typeof input.projectConfigurations.projectName === 'undefined') {
+    errors.push('Project Name does not exist!');
+  } else {
+    const validateResult = validateProjectName(input.projectConfigurations.projectName);
+    if (validateResult !== true) {
+      errors.push(validateResult);
+    }
+  }
+}
+
+/**
+ * Validate description. Must exist
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateDescription(input, errors) {
+  if (typeof input.projectConfigurations.description === 'undefined') {
+    errors.push('Project Description does not exist!');
+  }
+}
+
+/**
+ * Validate is project project. Must be a boolean. Must exist.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateIsPrivateProject(input, errors) {
+  // validate isPrivateProject
+  if (typeof input.projectConfigurations.isPrivateProject === 'undefined') {
+    errors.push('Private Project Flag does not exist!');
+  } else if (typeof input.projectConfigurations.isPrivateProject !== 'boolean') {
+    errors.push('Private Project Flag must be a boolean value!');
+  }
 }
 
 /**
@@ -40,6 +95,20 @@ export function validateVersionNumber(value) {
   }
 
   return 'Invalid version number!';
+}
+
+/**
+ * Validate verison number
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateVersion(input, errors) {
+  if (typeof input.projectConfigurations.version !== 'undefined') {
+    const validateResult = validateVersionNumber(input.projectConfigurations.version);
+    if (validateResult !== true) {
+      errors.push(validateResult);
+    }
+  }
 }
 
 /**
@@ -59,54 +128,27 @@ export function validateLicense(value) {
 
   return 'License must be a valid SPDX License!';
 }
+
 /**
- * Validates the project configuration files
- * @param input the configuraiton file in as a json object
- * @returns {Array} the array of errors
+ * Valiates the project license
+ * @param input the input configuration
+ * @param errors the errors
  */
-export function validateProjectConfigurations(input) {
-  const errors = [];
-  if ((typeof input.projectConfigurations === 'undefined') || (typeof input.toolingConfigurations === 'undefined')) {
-    errors.push('Invalid configuration file format!');
-    return errors; // can't go any farther with a bad format like this
-  }
-
-  // validate project name
-  if (typeof input.projectConfigurations.projectName === 'undefined') {
-    errors.push('Project Name does not exist!');
-  } else {
-    const validateResult = validateProjectName(input.projectConfigurations.projectName);
-    if (validateResult !== true) {
-      errors.push(validateResult);
-    }
-  }
-
-  // validate description
-  if (typeof input.projectConfigurations.description === 'undefined') {
-    errors.push('Project Description does not exist!');
-  }
-
-  // validate isPrivateProject
-  if (typeof input.projectConfigurations.isPrivateProject === 'undefined') {
-    errors.push('Private Project Flag does not exist!');
-  } else if (typeof input.projectConfigurations.isPrivateProject !== 'boolean') {
-    errors.push('Private Project Flag must be a boolean value!');
-  }
-
-  // validate version
-  if (typeof input.projectConfigurations.version !== 'undefined') {
-    const validateResult = validateVersionNumber(input.projectConfigurations.version);
-    if (validateResult !== true) {
-      errors.push(validateResult);
-    }
-  }
-
+function validateProjectLicense(input, errors) {
   // validate license
   const validateLicenseResult = validateLicense(input.projectConfigurations.license);
   if (validateLicenseResult !== true) {
     errors.push(validateLicenseResult);
   }
+}
 
+/**
+ * Validate source control tool. Must be valid choice. Make sure no CI Tool, Containerization Tool,
+ * or deployment tool was selected.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateSourceControlTool(input, errors) {
   // if there is an invalid source control choice
   if (input.toolingConfigurations.sourceControl &&
     (!choices.sourceControlChoices.includes(input.toolingConfigurations.sourceControl))) {
@@ -134,27 +176,45 @@ export function validateProjectConfigurations(input) {
         ' selected');
     }
   }
+}
 
+/**
+ * Validate CI tool. Must be a valid choice. Make sure no deployment tool was selected. Make sure
+ * no containerization tool was selected.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateCITool(input, errors) {
   // if there is invalid CI choice
   if (input.toolingConfigurations.ci &&
     !choices.ciChoices.includes(input.toolingConfigurations.ci)) {
     errors.push(`Invalid CI choice. Valid choices are ${choices.ciChoices}.`);
     // otherwise, if no CI choice was selected, make sure a containerization choice or
     // deployment choice is not selected.
-  } else if ((typeof input.toolingConfigurations.ci === 'undefined') || (input.toolingConfigurations.ci === choices.none)) {
+  } else if ((typeof input.toolingConfigurations.ci === 'undefined') ||
+      (input.toolingConfigurations.ci === choices.none)) {
     // check to make sure containerization is not used without a CI tool
-    if ((typeof input.toolingConfigurations.containerization !== 'undefined') && (input.toolingConfigurations.containerization !== choices.none)) {
+    if ((typeof input.toolingConfigurations.containerization !== 'undefined') &&
+        (input.toolingConfigurations.containerization !== choices.none)) {
       errors.push('If no continuous integration tool was selected, there cannot be a' +
         ' containerization tool selected');
     }
 
     // check to make sure deployment choice is not used without a CI tool
-    if ((typeof input.toolingConfigurations.deployment !== 'undefined') && (input.toolingConfigurations.deployment !== choices.none)) {
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') &&
+        (input.toolingConfigurations.deployment !== choices.none)) {
       errors.push('If no continuous integration tool was selected, there cannot be a deployment' +
         ' tool selected');
     }
   }
+}
 
+/**
+ * Validate containerization tool. Must be a valid choice. Make sure no deployment tool was selected
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateContainerizationTool(input, errors) {
   // if there is an invalid containerization choice
   if (input.toolingConfigurations.containerization &&
     !choices.containerizationChoices.includes(input.toolingConfigurations.containerization)) {
@@ -163,35 +223,129 @@ export function validateProjectConfigurations(input) {
   } else if ((typeof input.toolingConfigurations.containerization === 'undefined')
     || (input.toolingConfigurations.containerization === choices.none)) {
     // check to make sure no deployment choice was chosen
-    if ((typeof input.toolingConfigurations.deployment !== 'undefined') && (input.toolingConfigurations.deployment !== choices.none)) {
+    if ((typeof input.toolingConfigurations.deployment !== 'undefined') &&
+        (input.toolingConfigurations.deployment !== choices.none)) {
       errors.push('If no containerization tool was selected, there cannot be a deployment tool' +
         ' selected');
     }
   }
+}
 
+/**
+ * Validate deployment tool. Must be a valid choice.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateDeploymentTool(input, errors) {
   // check to make sure of valid deployment choices
   if (input.toolingConfigurations.deployment &&
     (!choices.deploymentChoices.includes(input.toolingConfigurations.deployment))) {
     errors.push(`Invalid deployment choice. Valid choices are ${choices.deploymentChoices}`);
   }
+}
 
+/**
+ * Validate web frameworks. Must be a valid choice.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateWebFrameworks(input, errors) {
   // check to make sure there are valid web choices
   if (input.toolingConfigurations.web &&
     !choices.webChoices.includes(input.toolingConfigurations.web)) {
     errors.push(`Invalid web framework choice. Valid choices are ${choices.webChoices}`);
   }
+}
 
+/**
+ * Validates test frameworks. Must be a valid choice.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateTestFrameworks(input, errors) {
   // check to make sure there are valid test choices
   if (input.toolingConfigurations.test &&
     (!choices.testChoices.includes(input.toolingConfigurations.test))) {
     errors.push(`Invalid test framework choice. Valid choices are ${choices.testChoices}`);
   }
+}
 
+/**
+ * Validates orm frameworks. Must be a valid choice.
+ * @param input the input configuration
+ * @param errors the errors
+ */
+function validateORMFrameworks(input, errors) {
   // check to make sure there are valid orm framework choices
   if (input.toolingConfigurations.orm &&
     (!choices.ormChoices.includes(input.toolingConfigurations.orm))) {
     errors.push(`Invalid orm choice. Valid choices are ${choices.ormChoices}`);
   }
+}
+
+/**
+ * Validates the skadi config object. The only required field is an api key.
+ * @param skadiConfig
+ * @param errors
+ */
+function validateSkadiConfig(skadiConfig, errors) {
+  if (!skadiConfig.apiKey) {
+    errors.push('API Key must exist in Skadi config.');
+  } else if (typeof skadiConfig.apiKey !== 'string') {
+    errors.push('API Key must be a string.');
+  }
+}
+
+
+/**
+ * Validate skadi. The value must be skadi. If skadi exists, then there must be a skadi block with
+ * the skadi configs. Skadi can only be used if express was chosen.
+ * @param input
+ * @param errors
+ */
+function validateSkadi(input, errors) {
+  if (input.toolingConfigurations.skadi) {
+    if (input.toolingConfigurations.skadi !== 'skadi') {
+      errors.push('Invalid skadi choice. Valid value is skadi.');
+    }
+
+    if (input.toolingConfigurations.web !== 'ExpressJS') {
+      errors.push('Skadi can only be used with ExpressJS.');
+    }
+
+    if (!input.skadi) {
+      errors.push('There must be a key skadi with a value of the skadi configs.');
+    } else {
+      validateSkadiConfig(input.skadi, errors);
+    }
+  }
+}
+
+/**
+ * Validates the project configuration files
+ * @param input the configuration file in as a json object
+ * @returns {Array} the array of errors
+ */
+export function validateProjectConfigurations(input) {
+  const errors = [];
+  validateFormat(input, errors);
+  if (errors.length > 0) {
+    return errors; // stop right here. Can't go further with bad format.
+  }
+
+  validateName(input, errors);
+  validateDescription(input, errors);
+  validateIsPrivateProject(input, errors);
+  validateVersion(input, errors);
+  validateProjectLicense(input, errors);
+  validateSourceControlTool(input, errors);
+  validateCITool(input, errors);
+  validateContainerizationTool(input, errors);
+  validateDeploymentTool(input, errors);
+  validateWebFrameworks(input, errors);
+  validateTestFrameworks(input, errors);
+  validateORMFrameworks(input, errors);
+  validateSkadi(input, errors);
 
   return errors;
 }

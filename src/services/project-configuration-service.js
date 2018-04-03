@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import fs from 'fs';
 import * as file from '../utils/file';
+import * as jsonUtil from '../utils/json-util';
 
 import * as validator from '../utils/project-configuration-validator';
 import { getActiveLogger } from '../utils/winston';
@@ -13,7 +13,7 @@ const log = getActiveLogger();
  */
 export function parseConfigsFromFile(path) {
   log.verbose('Project Configuration Service - parseConfigsFromFile()');
-  const contents = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  const contents = JSON.parse(file.readFile(path));
   const errors = validator.validateProjectConfigurations(contents);
 
   if (errors.length > 0) {
@@ -43,7 +43,7 @@ export function writeToConfigFile(configs, projectPath) {
   outputConfig.toolingConfigurations = configs.toolingConfigurations;
 
   try {
-    file.writeFile(`${projectPath}/.tyrfile`, JSON.stringify(outputConfig, null, ' '));
+    file.writeFile(`${projectPath}/.tyrfile`, jsonUtil.stringify(outputConfig));
   } catch (err) {
     throw new Error('Failed to generate .tyrfile!');
   }
