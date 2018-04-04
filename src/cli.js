@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop,no-restricted-syntax */
-import chalk from 'chalk';
 import * as prompt from './prompt/prompt';
 import { getActiveLogger, enableLogFile } from './utils/winston';
 import * as tyr from './tyr';
@@ -64,23 +63,13 @@ export async function signInToGithub() {
   return credentials;
 }
 
-/**
- * Facilitates prompting the user for their username and password
- * @returns credentials the username and password of the user
- */
-export async function signInToSequelize() {
-  console.log(chalk.blue('Enter your MySQL Credentials'));
-  const credentials = await prompt.promptForUsernamePassword();
-  return credentials;
-}
 
 // If the user needs to sign in to third party tools, then a key/value pair should go in this
 // constant. The key should be the tool's name (all lowercase) and the value should be a function
 // which should handle the sign in process.
 const thirdPartyTools = {
   heroku: signInToHeroku,
-  github: signInToGithub,
-  sequelize: signInToSequelize,
+  github: signInToGithub
 };
 
 /**

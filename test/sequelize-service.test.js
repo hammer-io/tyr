@@ -17,50 +17,27 @@ describe('Sequelize Service Test', () => {
     });
 
     it('should create the config/default.json file', () => {
-      const expected = "{\n" +
-        " \"dbConfig\": {\n" +
-        "  \"username\": \"username\",\n" +
-        "  \"password\": \"password\",\n" +
-        "  \"url\": \"localhost\",\n" +
-        "  \"schema\": \"test-sequelize\"\n" +
-        " }\n" +
-        "}";
+      const expected = "{}";
 
       assert.equal(fs.readFileSync('test-sequelize/config/default.json', 'utf-8'), expected);
     });
 
     it('should create the config/default-example.json file', () => {
-      const expected = "{\n" +
-        " \"dbConfig\": {\n" +
-        "  \"username\": \"\",\n" +
-        "  \"password\": \"\",\n" +
-        "  \"url\": \"\",\n" +
-        "  \"schema\": \"\"\n" +
-        " }\n" +
-        "}";
+      const expected = "{}";
 
       assert.equal(fs.readFileSync('test-sequelize/config/default-example.json', 'utf-8'), expected);
     });
 
     it('should create the sequelize.js file', () => {
-      const expected = "const config = require('config');\n" +
-        "const Sequelize = require('sequelize');\n" +
+      const expected = "const Sequelize = require('sequelize');\n" +
         "\n" +
-        "const dbConfig = config.get('dbConfig');\n" +
-        "\n" +
+        "// Add MySQL schema name, username, password and url here!\n" +
         "const sequelize = new Sequelize(\n" +
-        "  dbConfig.schema,\n" +
-        "  dbConfig.username,\n" +
-        "  dbConfig.password, {\n" +
-        "    host: config.url,\n" +
+        "  '',\n" +
+        "  '',\n" +
+        "  '', {\n" +
+        "    host: '',\n" +
         "    dialect: 'mysql',\n" +
-        "\n" +
-        "    pool: {\n" +
-        "      max: 5,\n" +
-        "      min: 0,\n" +
-        "      acquire: 30000,\n" +
-        "      idle: 10000\n" +
-        "    },\n" +
         "  }\n" +
         ");";
 

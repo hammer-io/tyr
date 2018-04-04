@@ -78,6 +78,7 @@ export function requestGitHubToken(username, password, note = 'hammer-io token')
       if (err) {
         log.debug(`ERROR: ${githubApiUrl}/authorizations - error getting token for ${username} - 
         ${JSON.stringify({ status: err.status, message: err.message })}`);
+        log.debug(JSON.stringify(err));
         reject(err);
       } else {
         log.debug(`RESPONSE: ${githubApiUrl}/authorizations - successfully retrieved token for ${username}`);
