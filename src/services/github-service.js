@@ -132,6 +132,8 @@ export function initAddCommitAndPush(credentials, projectName, filePath) {
     git(`${filePath}/${projectName}`)
       .init()
       .silent()
+      .addConfig('user.name', 'hammer-io')
+      .addConfig('user.email', 'hammer.io.team@gmail.com')
       .add('.gitignore')
       .add('./*')
       .commit('Initial Commit w/ :heart: by @hammer-io.')
