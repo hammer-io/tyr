@@ -68,7 +68,7 @@ describe('Express Service Test', () => {
         "\n" +
         "</style></head>\n" +
         "<body>\n" +
-        "<div id=\"root\"><div class=\"App\"><header class=\"App-header\"><img src=\"https://hammer-io.github.io/i/Viking_Hammer_Logo_1.png\" class=\"App-logo\" alt=\"logo\"><h1 class=\"App-title\">Hello World!</h1></header><p class=\"App-intro\">Welcome to your new app created through <a href=\"https://github.com/hammer-io\">hammer-io<a>.</p></div></div>\n" +
+        "<div id=\"root\"><div class=\"App\"><header class=\"App-header\"><img src=\"https://hammer-io.github.io/i/Viking_Hammer_Logo_1.png\" class=\"App-logo\" alt=\"logo\"><h1 class=\"App-title\">Hello World!</h1></header><p class=\"App-intro\">Welcome to your new app created through <a href=\"https://github.com/hammer-io\">hammer-io</a>.</p></div></div>\n" +
         "\n" +
         "</body>"
 
