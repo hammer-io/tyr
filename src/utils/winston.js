@@ -13,7 +13,7 @@ function isLoggerType(str) {
  * The initial active logger attempts to read from environment variables.
  * Otherwise, it defaults to 'info'.
  */
-let activeLogger = process.env.TYR_LOG_LEVEL || 'debug';
+let activeLogger = process.env.TYR_LOG_LEVEL || 'info';
 if (!isLoggerType(activeLogger)) {
   activeLogger = 'info';
 }
