@@ -189,6 +189,15 @@ const staticFileGenerators = {
   skadi: generateSkadiFiles
 };
 
+/**
+ * Generate the static files needed to create a Node.js project with the third-party services
+ * and packages requested by the user. If something goes wrong and an error occurs, it will be
+ * thrown again here.
+ *
+ * @param configs - the project configs
+ * @param filePath - the filePath where the project should be located
+ * @returns {Promise<never>}
+ */
 export async function generateStaticFiles(configs, filePath) {
   // generating static files
   const projectPath = `${filePath}/${configs.projectConfigurations.projectName}`;
@@ -207,6 +216,14 @@ export async function generateStaticFiles(configs, filePath) {
   await projectService.generateTyrfile(configs, projectPath);
 }
 
+/**
+ * Sets up all the third party tools requested by the user. This function makes calls to each
+ * of the third party APIs and can take a couple minutes to complete. If something goes wrong and
+ * an error occurs, it will be thrown again here.
+ *
+ * @param configs - the project configs
+ * @returns {Promise<never>}
+ */
 export async function setUpThirdPartyTools(configs) {
   // enabling third party tools
   try {
@@ -222,6 +239,14 @@ export async function setUpThirdPartyTools(configs) {
   }
 }
 
+/**
+ * Initializes a git repo in the folder, then commits the files, and pushes them to github. If
+ * something goes wrong and an error occurs, it will be thrown again here.
+ *
+ * @param configs - the project configs
+ * @param filePath - the filePath where the new file will be created
+ * @returns {Promise<never>}
+ */
 export async function commitToGithub(configs, filePath) {
   // init, add, commit, push to github
   try {
