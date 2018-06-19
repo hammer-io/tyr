@@ -13,7 +13,8 @@ running the CLI, it will ask you a series of questions and use the answers to do
 following:
 
 - generate a new Node.js project,
-- add testing, web, and database frameworks,
+- add testing, web, and orm frameworks,
+- setup Skadi, our data monitoring library,
 - initialize and push the code to a new GitHub repository,
 - establish a continuous integration environment,
 - build a container for the code, and
